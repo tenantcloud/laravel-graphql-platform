@@ -20,20 +20,19 @@
 
 Laravel GraphQL platform makes it simple to use utilities to develop a GraphQL API based
 on `thecodingmachine/graphqlite` and `webonyx/graphql-php`. Out of the box, it provides
-the following extensions for `graphqlite`:
+the following extensions for `graphqlite` (with tests 🎉):
 
 - ✅ Complies with official [GraphQL-over-HTTP spec](https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#sec-Response)
 - ✅ Laravel integration (debug mode, error handling etc)
 - ✅ Testing tools & assertions
+- ✅ Optional input fields
+- ✅ Automatic persisted queries ([Apollo spec](https://www.apollographql.com/docs/apollo-server/performance/apq))
+- ✅ Automatic query complexity ([Hot chocolate](https://chillicream.com/docs/hotchocolate/v13/security/operation-complexity))
+- ✅ Input validation using [Symfony validator](https://symfony.com/doc/current/validation.html)
+- ✅ Apollo [embeddable sandbox](https://www.apollographql.com/docs/graphos/explorer) page
+- ✅ File uploads compliant with [spec](https://github.com/jaydenseric/graphql-multipart-request-spec)
 - ✅ Multiple schemas support
 - ✅ `DateTime` and `Duration` scalar types as per [ISO8601](https://en.wikipedia.org/wiki/ISO_8601)
-- ✅ Optional input fields
-- ✅ Apollo [embeddable sandbox](https://www.apollographql.com/docs/graphos/explorer) page
-- ✅ Input validation using [Symfony validator](https://symfony.com/doc/current/validation.html)
-- ✅ Automatic persisted queries ([Apollo spec](https://www.apollographql.com/docs/apollo-server/performance/apq))
-- ✅ Query complexity with custom cost per field ([Hot chocolate](https://chillicream.com/docs/hotchocolate/v13/security/operation-complexity))
-- ✅ File uploads compliant with [spec](https://github.com/jaydenseric/graphql-multipart-request-spec)
 - 🚧 Offset pagination (Relay spec-like)
 - 🚧 Cursor pagination ([Relay spec](https://github.com/facebook/relay/blob/main/website/spec/Connections.md))
 - 🚧 Subscriptions
-- 🚧 Apollo tracing
