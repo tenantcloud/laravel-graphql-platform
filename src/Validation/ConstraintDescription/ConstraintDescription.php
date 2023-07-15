@@ -7,12 +7,15 @@ use UnitEnum;
 
 class ConstraintDescription implements Stringable
 {
+	/**
+	 * @param array<string, mixed> $parameters
+	 */
 	public function __construct(
 		public readonly string $name,
 		public readonly array $parameters,
 	) {}
 
-	private function mapValue($value): string
+	private function mapValue(mixed $value): string
 	{
 		return match (true) {
 			$value instanceof self                            => (string) $value,

@@ -12,6 +12,8 @@ use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
+use ReflectionMethod;
+use ReflectionProperty;
 use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TenantCloud\GraphQLPlatform\MissingValue;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
@@ -25,12 +27,12 @@ class MissingValueTypeMapper implements RootTypeMapperInterface
 		private readonly RootTypeMapperInterface $next,
 	) {}
 
-	public function toGraphQLOutputType(Type $type, ?OutputType $subType, $reflector, DocBlock $docBlockObj): OutputType&GraphQLType
+	public function toGraphQLOutputType(Type $type, ?OutputType $subType, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): OutputType&GraphQLType
 	{
 		return $this->next->toGraphQLOutputType($type, $subType, $reflector, $docBlockObj);
 	}
 
-	public function toGraphQLInputType(Type $type, ?InputType $subType, string $argumentName, $reflector, DocBlock $docBlockObj): InputType&GraphQLType
+	public function toGraphQLInputType(Type $type, ?InputType $subType, string $argumentName, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): InputType&GraphQLType
 	{
 		$type = $this->replaceMissingValueWithNull($type);
 

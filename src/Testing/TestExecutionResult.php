@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Testing;
 
+use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\Assert;
@@ -65,6 +66,9 @@ class TestExecutionResult extends ExecutionResult
 		return $this;
 	}
 
+	/**
+	 * @param callable|array<mixed, mixed> $expected
+	 */
 	public function assertErrors(callable|array $expected): self
 	{
 		$data = $this->toArray()['errors'] ?? [];
@@ -84,13 +88,16 @@ class TestExecutionResult extends ExecutionResult
 		return $this;
 	}
 
+	/**
+	 * @return array<mixed, mixed>|int|float|string|bool|null
+	 */
 	public function data(string $field = null): array|int|float|string|bool|null
 	{
 		if ($field === null) {
 			$fieldNames = [
 				...array_keys($this->data ?? []),
 				...array_filter(
-					array_map(fn (array $error) => $error['path'][0] ?? null, $this->errors),
+					array_map(fn (Error $error) => $error->path[0] ?? null, $this->errors),
 				),
 			];
 

@@ -4,10 +4,19 @@ namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use TenantCloud\GraphQLPlatform\Pagination\OffsetConnection;
+use TenantCloud\GraphQLPlatform\Pagination\OffsetConnectionEdge;
 use TenantCloud\GraphQLPlatform\Pagination\ProvidesTotalCount;
 
+/**
+ * @template NodeType
+ *
+ * @template-implements OffsetConnection<NodeType, OffsetConnectionEdge<NodeType>>
+ */
 class LengthAwarePaginatorOffsetConnectionAdapter implements OffsetConnection, ProvidesTotalCount
 {
+	/**
+	 * @param LengthAwarePaginator<NodeType> $paginator
+	 */
 	public function __construct(
 		public readonly LengthAwarePaginator $paginator,
 	) {}

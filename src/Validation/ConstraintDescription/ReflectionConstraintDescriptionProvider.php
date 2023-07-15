@@ -35,7 +35,7 @@ class ReflectionConstraintDescriptionProvider implements ConstraintDescriptionPr
 				continue;
 			}
 
-			/** @var ReflectionParameter $constructorParameter */
+			/** @var ReflectionParameter|null $constructorParameter */
 			$constructorParameter = Arr::first(
 				$reflection->getConstructor()?->getParameters() ?? [],
 				fn (ReflectionParameter $parameter) => $parameter->name === $property->getName(),

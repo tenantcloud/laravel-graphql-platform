@@ -3,7 +3,6 @@
 namespace TenantCloud\GraphQLPlatform\Http;
 
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\Executor\Promise\Promise;
 use GraphQL\Server\Helper as ServerHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
@@ -35,6 +34,9 @@ class GraphQLController
 		private readonly HttpCodeDeciderInterface $httpCodeDecider,
 	) {}
 
+	/**
+	 * @param OperationParams|OperationParams[] $parsedBody
+	 */
 	private function handlePsr7Request(Schema $schema, array|OperationParams $parsedBody): JsonResponse
 	{
 		$this->config->setSchema($schema);
@@ -66,10 +68,6 @@ class GraphQLController
 					'Content-Type' => self::GRAPHQL_RESPONSE_CONTENT_TYPE . '; charset=utf-8',
 				]
 			);
-		}
-
-		if ($result instanceof Promise) {
-			throw new RuntimeException('Only SyncPromiseAdapter is supported');
 		}
 
 		throw new RuntimeException('Unexpected response from StandardServer::executePsrRequest');

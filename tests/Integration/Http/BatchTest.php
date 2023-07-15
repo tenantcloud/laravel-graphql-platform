@@ -78,6 +78,7 @@ class BatchTest extends HttpIntegrationTestCase
 		$this->afterApplicationCreated(function () {
 			$this->app->extend(
 				SchemaConfigurator::class,
+				/** @phpstan-ignore-next-line */
 				fn (SchemaConfigurator $configurator) => $configurator->batchingEnabled(false)
 			);
 		});

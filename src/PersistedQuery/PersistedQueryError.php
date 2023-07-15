@@ -7,6 +7,9 @@ use Throwable;
 
 class PersistedQueryError extends RequestError
 {
+	/**
+	 * @param string $code
+	 */
 	public function __construct(
 		string $message,
 		protected $code,

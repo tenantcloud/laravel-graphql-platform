@@ -4,6 +4,7 @@ namespace TenantCloud\GraphQLPlatform\Internal;
 
 use InvalidArgumentException;
 use phpDocumentor\Reflection\Fqsen;
+use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\AbstractList;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Object_;
@@ -16,6 +17,9 @@ class PhpDocTypes
 		return ltrim((string) $type->getFqsen(), '\\');
 	}
 
+	/**
+	 * @param Type[] $types
+	 */
 	public static function generic(string $className, array $types): Object_|Collection
 	{
 		$fqsen = new Fqsen("\\{$className}");
@@ -28,6 +32,9 @@ class PhpDocTypes
 		};
 	}
 
+	/**
+	 * @return Type[]
+	 */
 	public static function genericToTypes(Object_|Collection $type): array
 	{
 		$keyType = $type instanceof Collection ?

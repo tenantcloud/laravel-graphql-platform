@@ -4,10 +4,19 @@ namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use TenantCloud\GraphQLPlatform\Pagination\Connection;
+use TenantCloud\GraphQLPlatform\Pagination\ConnectionEdge;
 use TenantCloud\GraphQLPlatform\Pagination\ConnectionPageInfo;
 
+/**
+ * @template NodeType
+ *
+ * @template-implements Connection<NodeType, ConnectionEdge<NodeType>>
+ */
 class CursorPaginatorConnectionAdapter implements Connection
 {
+	/**
+	 * @param CursorPaginator<NodeType> $paginator
+	 */
 	public function __construct(
 		public readonly CursorPaginator $paginator,
 	) {}

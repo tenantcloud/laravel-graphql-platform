@@ -5,8 +5,17 @@ namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use TenantCloud\GraphQLPlatform\Pagination\OffsetConnectionEdge;
 
+/**
+ * @template NodeType
+ *
+ * @template-implements OffsetConnectionEdge<NodeType>
+ */
 class LengthAwarePaginatorOffsetConnectionEdgeAdapter implements OffsetConnectionEdge
 {
+	/**
+	 * @param LengthAwarePaginator<NodeType> $paginator
+	 * @param NodeType                       $item
+	 */
 	public function __construct(
 		public readonly LengthAwarePaginator $paginator,
 		public readonly mixed $item,

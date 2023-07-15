@@ -21,13 +21,14 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TheCodingMachine\GraphQLite\Utils\Cloneable;
 
+/**
+ * @phpstan-import-type PersistedQueryLoader from ServerConfig
+ */
 final class GraphQLConfigurator
 {
 	use Cloneable;
 
 	/**
-	 * @phpstan-import-type PersistedQueryLoader from ServerConfig
-	 *
 	 * @param PersistedQueryLoader|null                                                          $persistedQueryLoader
 	 * @param array<callable(Router, UrlGenerator): Route>                                       $routes
 	 * @param array<string, SchemaConfigurator|callable(SchemaConfigurator): SchemaConfigurator> $schemas

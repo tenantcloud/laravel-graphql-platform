@@ -25,7 +25,6 @@ class LaravelPaginationTypeMapper implements RootTypeMapperInterface
 {
 	public function __construct(
 		private readonly RootTypeMapperInterface $next,
-		private readonly RootTypeMapperInterface $topRootTypeMapper,
 	) {}
 
 	public function toGraphQLOutputType(\phpDocumentor\Reflection\Type $type, ?OutputType $subType, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): OutputType&Type
@@ -37,7 +36,7 @@ class LaravelPaginationTypeMapper implements RootTypeMapperInterface
 		$className = PhpDocTypes::className($type);
 
 		if (is_a($className, CursorPaginator::class, true)) {
-			[$firstType] = PhpDocTypes::genericToTypes($type);
+			[$firstType] = PhpDocTypes::genericToTypes($type) + [0 => null];
 
 			if (!$firstType) {
 				throw PaginatorMissingParameterException::noSubType(CursorPaginator::class);
@@ -52,7 +51,7 @@ class LaravelPaginationTypeMapper implements RootTypeMapperInterface
 		}
 
 		if (is_a($className, LengthAwarePaginator::class, true)) {
-			[$firstType] = PhpDocTypes::genericToTypes($type);
+			[$firstType] = PhpDocTypes::genericToTypes($type) + [0 => null];
 
 			if (!$firstType) {
 				throw PaginatorMissingParameterException::noSubType(LengthAwarePaginator::class);

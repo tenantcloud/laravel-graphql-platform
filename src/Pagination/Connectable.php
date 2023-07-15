@@ -4,8 +4,8 @@ namespace TenantCloud\GraphQLPlatform\Pagination;
 
 /**
  * @template-covariant NodeType
- * @template-covariant ConnectionEdgeType of ConnectionEdge
- * @template-covariant OffsetConnectionEdgeType of OffsetConnectionEdge
+ * @template-covariant ConnectionEdgeType of ConnectionEdge<NodeType>
+ * @template-covariant OffsetConnectionEdgeType of OffsetConnectionEdge<NodeType>
  */
 interface Connectable
 {

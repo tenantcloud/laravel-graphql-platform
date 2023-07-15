@@ -56,11 +56,7 @@ class UserController
 			$user = $user->with(somethingAfter: $data->somethingAfter);
 		}
 
-		if ($data->fileIds !== MissingValue::INSTANCE) {
-			$user = $user->with(fileIds: $data->fileIds);
-		}
-
-		return $user;
+		return $user->with(fileIds: $data->fileIds);
 	}
 
 	private function dummyUser(): User

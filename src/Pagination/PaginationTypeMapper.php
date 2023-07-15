@@ -221,22 +221,22 @@ class PaginationTypeMapper implements RootTypeMapperInterface
 				'hasNextPage' => [
 					'type'        => Type::nonNull(Type::boolean()),
 					'description' => 'Determine if there are more items in the data source after these.',
-					'resolve'     => static fn (ConnectionPageInfo $root): bool => $root->hasNextPage,
+					'resolve'     => static fn (ConnectionPageInfo $root) => $root->hasNextPage,
 				],
 				'hasPreviousPage' => [
 					'type'        => Type::nonNull(Type::boolean()),
 					'description' => 'Determine if there are more items in the data source before these.',
-					'resolve'     => static fn (ConnectionPageInfo $root): bool => $root->hasPreviousPage,
+					'resolve'     => static fn (ConnectionPageInfo $root) => $root->hasPreviousPage,
 				],
 				'startCursor' => [
 					'type'        => Type::string(),
 					'description' => 'A cursor for the first item.',
-					'resolve'     => static fn (ConnectionPageInfo $root): bool => $root->startCursor,
+					'resolve'     => static fn (ConnectionPageInfo $root) => $root->startCursor,
 				],
 				'endCursor' => [
 					'type'        => Type::string(),
 					'description' => 'A cursor for the last item.',
-					'resolve'     => static fn (ConnectionPageInfo $root): bool => $root->endCursor,
+					'resolve'     => static fn (ConnectionPageInfo $root) => $root->endCursor,
 				],
 			],
 		]);

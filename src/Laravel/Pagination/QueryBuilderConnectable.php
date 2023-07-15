@@ -5,8 +5,15 @@ namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 use Illuminate\Contracts\Database\Query\Builder;
 use TenantCloud\GraphQLPlatform\Pagination\Connectable;
 use TenantCloud\GraphQLPlatform\Pagination\Connection;
+use TenantCloud\GraphQLPlatform\Pagination\ConnectionEdge;
 use TenantCloud\GraphQLPlatform\Pagination\OffsetConnection;
+use TenantCloud\GraphQLPlatform\Pagination\OffsetConnectionEdge;
 
+/**
+ * @template-covariant NodeType
+ *
+ * @template-implements Connectable<NodeType, ConnectionEdge<NodeType>, OffsetConnectionEdge<NodeType>>
+ */
 class QueryBuilderConnectable implements Connectable
 {
 	public function __construct(

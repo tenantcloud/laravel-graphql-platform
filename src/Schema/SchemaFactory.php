@@ -115,7 +115,7 @@ class SchemaFactory
 			$topRootTypeMapper,
 			$this->container->get(AnnotationReader::class),
 		);
-		$rootTypeMapper = new LaravelPaginationTypeMapper($rootTypeMapper, $topRootTypeMapper);
+		$rootTypeMapper = new LaravelPaginationTypeMapper($rootTypeMapper);
 
 		$lastTopRootTypeMapper->setNext($rootTypeMapper);
 

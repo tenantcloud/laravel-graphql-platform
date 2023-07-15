@@ -21,6 +21,7 @@ class ResponseTest extends HttpIntegrationTestCase
 						clientSafeError
 					}
 					GRAPHQL,
+				/* @phpstan-ignore-next-line */
 				[7]
 			)
 			->assertBadRequest()

@@ -5,7 +5,7 @@ namespace TenantCloud\GraphQLPlatform\Validation;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use TenantCloud\GraphQLPlatform\MissingValue\MissingValue;
+use TenantCloud\GraphQLPlatform\MissingValue;
 
 class SkipMissingValueConstraintValidator implements ConstraintValidatorInterface
 {

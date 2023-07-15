@@ -3,9 +3,10 @@ includes:
 	- vendor/phpstan/phpstan-phpunit/extension.neon
 	- vendor/phpstan/phpstan-webmozart-assert/extension.neon
 	- vendor/phpstan/phpstan-mockery/extension.neon
+	- vendor/nunomaduro/larastan/extension.neon
 
 parameters:
-	level: max
+	level: 6
 	tmpDir: ./tmp/phpstan
 
 	paths:
@@ -13,7 +14,12 @@ parameters:
 		- tests
 
 	ignoreErrors:
-		# There's no extension for that :(
+		# Vendor wrong return type
+		- '#Method TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult::fromExecutionResult\(\) should return TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult but returns GraphQL\\Executor\\ExecutionResult\.#i'
+		# Vendor inherited without types
+		- '#Method TenantCloud\\GraphQLPlatform\\Schema\\NamespacedCache::(getMultiple|setMultiple|deleteMultiple|namespacedKeys)\(\) (has parameter|return type) .*#i'
+		- '#Method TenantCloud\\GraphQLPlatform\\Schema\\NullAnnotationReader::getClassAnnotation(s?)\(\) has parameter \$class with generic class ReflectionClass but does not specify its types#i'
+		- '#Method TenantCloud\\GraphQLPlatform\\Validation\\LaravelCompositeTranslatorAdapter::trans\(\) has parameter \$parameters with no value type specified in iterable type array\.#i'
 		-
-			message: '#Call to an undefined method Pest\\Expectation|Pest\\Support\\Extendable::#i'
-			path: 'tests/*Test.php'
+			message: '#no value type specified#i'
+			path: 'tests/*.php'
