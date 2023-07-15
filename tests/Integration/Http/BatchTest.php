@@ -4,7 +4,6 @@ namespace Tests\Integration\Http;
 
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
-use Tests\Integration\IntegrationTestCase;
 
 class BatchTest extends HttpIntegrationTestCase
 {
@@ -21,21 +20,19 @@ class BatchTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				[
-					'query' =>
-						<<<GRAPHQL
+					'query' => <<<'GRAPHQL'
 						query {
 							firstUser { name }
 						}
 						GRAPHQL,
 				],
 				[
-					'query' =>
-						<<<GRAPHQL
+					'query' => <<<'GRAPHQL'
 						query {
 							firstUser { somethingAfter }
 						}
 						GRAPHQL,
-				]
+				],
 			])
 			->dump();
 	}
@@ -46,33 +43,31 @@ class BatchTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				[
-					'query' =>
-						<<<GRAPHQL
+					'query' => <<<'GRAPHQL'
 						query {
 							firstUser { name }
 						}
 						GRAPHQL,
 				],
 				[
-					'query' =>
-						<<<GRAPHQL
+					'query' => <<<'GRAPHQL'
 						query {
 							firstUser { somethingAfter }
 						}
 						GRAPHQL,
-				]
+				],
 			])
 			->assertBadRequest()
 			->assertJson([
 				[
 					'errors' => [
 						['message' => 'Batched queries are not supported by this server'],
-					]
+					],
 				],
 				[
 					'errors' => [
 						['message' => 'Batched queries are not supported by this server'],
-					]
+					],
 				],
 			]);
 	}
@@ -92,21 +87,19 @@ class BatchTest extends HttpIntegrationTestCase
 				uri: $this->endpoint,
 				data: [
 					[
-						'query' =>
-							<<<GRAPHQL
+						'query' => <<<'GRAPHQL'
 							query {
 								firstUser { name }
 							}
 							GRAPHQL,
 					],
 					[
-						'query' =>
-							<<<GRAPHQL
+						'query' => <<<'GRAPHQL'
 							query {
 								firstUser { somethingAfter }
 							}
 							GRAPHQL,
-					]
+					],
 				],
 				options: JSON_THROW_ON_ERROR,
 			)
@@ -115,12 +108,12 @@ class BatchTest extends HttpIntegrationTestCase
 				[
 					'errors' => [
 						['message' => 'Batched queries are not supported by this server'],
-					]
+					],
 				],
 				[
 					'errors' => [
 						['message' => 'Batched queries are not supported by this server'],
-					]
+					],
 				],
 			]);
 	}

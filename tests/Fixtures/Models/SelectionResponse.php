@@ -14,7 +14,5 @@ class SelectionResponse
 		#[Field] public readonly LengthAwarePaginator $users,
 		/** @var mixed */
 		#[Field] public readonly mixed $selection,
-	)
-	{
-	}
+	) {}
 }

@@ -9,12 +9,10 @@ use GraphQL\Type\Definition\Type as GraphQLType;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Mixed_;
-use phpDocumentor\Reflection\Types\Void_;
 use ReflectionMethod;
 use ReflectionProperty;
 use TheCodingMachine\GraphQLite\Mappers\CannotMapTypeException;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
-use TheCodingMachine\GraphQLite\Types\VoidType;
 
 class AnyRootTypeMapper implements RootTypeMapperInterface
 {
@@ -22,13 +20,11 @@ class AnyRootTypeMapper implements RootTypeMapperInterface
 
 	public function __construct(
 		private readonly RootTypeMapperInterface $next,
-	)
-	{
-	}
+	) {}
 
 	public function toGraphQLOutputType(Type $type, OutputType|null $subType, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): OutputType&GraphQLType
 	{
-		if (! $type instanceof Mixed_) {
+		if (!$type instanceof Mixed_) {
 			return $this->next->toGraphQLOutputType($type, $subType, $reflector, $docBlockObj);
 		}
 
@@ -37,7 +33,7 @@ class AnyRootTypeMapper implements RootTypeMapperInterface
 
 	public function toGraphQLInputType(Type $type, InputType|null $subType, string $argumentName, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): InputType&GraphQLType
 	{
-		if (! $type instanceof Mixed_) {
+		if (!$type instanceof Mixed_) {
 			return $this->next->toGraphQLInputType($type, $subType, $argumentName, $reflector, $docBlockObj);
 		}
 
@@ -48,7 +44,7 @@ class AnyRootTypeMapper implements RootTypeMapperInterface
 	{
 		return match ($typeName) {
 			self::getAnyType()->name => self::getAnyType(),
-			default => $this->next->mapNameToType($typeName),
+			default                  => $this->next->mapNameToType($typeName),
 		};
 	}
 

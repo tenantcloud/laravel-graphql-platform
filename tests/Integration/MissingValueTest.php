@@ -18,22 +18,22 @@ class MissingValueTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				mutation {
-					updateUser(
-						data: {
-							id: 123,
+				<<<'GRAPHQL'
+					mutation {
+						updateUser(
+							data: {
+								id: 123,
+							}
+						) {
+							name
+							somethingAfter
 						}
-					) {
-						name
-						somethingAfter
 					}
-				}
-				GRAPHQL,
+					GRAPHQL,
 			)
 			->assertSuccessful()
 			->assertData([
-				'name' => 'Alex',
+				'name'           => 'Alex',
 				'somethingAfter' => 'PT1H',
 			]);
 	}
@@ -43,24 +43,24 @@ class MissingValueTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				mutation {
-					updateUser(
-						data: {
-							id: 123,
-							name: "Bruce",
-							somethingAfter: "P3D",
+				<<<'GRAPHQL'
+					mutation {
+						updateUser(
+							data: {
+								id: 123,
+								name: "Bruce",
+								somethingAfter: "P3D",
+							}
+						) {
+							name
+							somethingAfter
 						}
-					) {
-						name
-						somethingAfter
 					}
-				}
-				GRAPHQL,
+					GRAPHQL,
 			)
 			->assertSuccessful()
 			->assertData([
-				'name' => 'Bruce',
+				'name'           => 'Bruce',
 				'somethingAfter' => 'P3D',
 			]);
 	}

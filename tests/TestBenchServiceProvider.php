@@ -3,8 +3,6 @@
 namespace Tests;
 
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Psr16Cache;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use Tests\Fixtures\TypeMappers\AnyRootTypeMapper;
@@ -18,10 +16,10 @@ class TestBenchServiceProvider extends ServiceProvider
 	{
 		$this->app->extend(
 			SchemaConfigurator::class,
-			fn(SchemaConfigurator $configurator) => $configurator
+			fn (SchemaConfigurator $configurator) => $configurator
 				->addTypeNamespace('Tests\\Fixtures')
 				->addControllerNamespace('Tests\\Fixtures')
-				->addRootTypeMapperFactory(new class implements RootTypeMapperFactoryInterface {
+				->addRootTypeMapperFactory(new class () implements RootTypeMapperFactoryInterface {
 					public function create(RootTypeMapperInterface $next, RootTypeMapperFactoryContext $context): RootTypeMapperInterface
 					{
 						return new AnyRootTypeMapper($next);
@@ -31,7 +29,7 @@ class TestBenchServiceProvider extends ServiceProvider
 
 		$this->app->extend(
 			GraphQLConfigurator::class,
-			fn(GraphQLConfigurator $configurator) => $configurator
+			fn (GraphQLConfigurator $configurator) => $configurator
 				->addDefaultSchema(fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
 		);
 	}

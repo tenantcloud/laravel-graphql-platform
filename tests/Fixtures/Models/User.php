@@ -15,12 +15,10 @@ class User
 	use Cloneable;
 
 	public function __construct(
-		#[Field] public readonly string           $name,
-		#[Field] public readonly CarbonImmutable  $createdAt,
-		#[Field] #[Cost(3)] public readonly ?CarbonInterval  $somethingAfter = null,
+		#[Field] public readonly string $name,
+		#[Field] public readonly CarbonImmutable $createdAt,
+		#[Field] #[Cost(3)] public readonly ?CarbonInterval $somethingAfter = null,
 		/** @var array<int> $fileIds */
 		#[Field] public readonly array $fileIds = [],
-	)
-	{
-	}
+	) {}
 }

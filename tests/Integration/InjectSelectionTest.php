@@ -2,19 +2,11 @@
 
 namespace Tests\Integration;
 
-use GraphQL\Error\DebugFlag;
-use GraphQL\GraphQL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use TenantCloud\GraphQLPlatform\Carbon\CarbonRootTypeMapper;
-use TenantCloud\GraphQLPlatform\Carbon\DateTimeType;
-use TenantCloud\GraphQLPlatform\Carbon\DurationType;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelection;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameter;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
-use Tests\TestCase;
-use TheCodingMachine\GraphQLite\FieldsBuilder;
-use TheCodingMachine\GraphQLite\Schema;
 
 #[CoversClass(InjectSelection::class)]
 #[CoversClass(InjectSelectionParameter::class)]
@@ -26,18 +18,18 @@ class InjectSelectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					fullSelection {
-						users {
-							nodes {
-								name
+				<<<'GRAPHQL'
+					query {
+						fullSelection {
+							users {
+								nodes {
+									name
+								}
 							}
+							selection
 						}
-						selection
 					}
-				}
-				GRAPHQL,
+					GRAPHQL,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -57,18 +49,18 @@ class InjectSelectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					nestedSelection {
-						users {
-							nodes {
-								name
+				<<<'GRAPHQL'
+					query {
+						nestedSelection {
+							users {
+								nodes {
+									name
+								}
 							}
+							selection
 						}
-						selection
 					}
-				}
-				GRAPHQL,
+					GRAPHQL,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -83,13 +75,13 @@ class InjectSelectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					nestedSelection {
-						selection
+				<<<'GRAPHQL'
+					query {
+						nestedSelection {
+							selection
+						}
 					}
-				}
-				GRAPHQL,
+					GRAPHQL,
 			)
 			->assertSuccessful()
 			->assertData([

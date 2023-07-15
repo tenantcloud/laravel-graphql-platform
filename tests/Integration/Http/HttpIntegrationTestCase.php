@@ -4,8 +4,8 @@ namespace Tests\Integration\Http;
 
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
-use TenantCloud\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
+use TenantCloud\GraphQLPlatform\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use Tests\TestCase;
 
@@ -28,7 +28,7 @@ abstract class HttpIntegrationTestCase extends TestCase
 
 		$app->extend(
 			GraphQLConfigurator::class,
-			fn(GraphQLConfigurator $configurator) => $configurator
+			fn (GraphQLConfigurator $configurator) => $configurator
 				->useAutomaticPersistedQueries(new Psr16Cache(new ArrayAdapter()))
 				->addGraphQLRoute()
 				->addExploreRoute()

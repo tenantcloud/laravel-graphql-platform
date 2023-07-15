@@ -16,11 +16,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query Test (\$q: Int!) {
-					clientSafeError
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query Test ($q: Int!) {
+						clientSafeError
+					}
+					GRAPHQL,
 				[7]
 			)
 			->assertBadRequest()
@@ -30,7 +30,7 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					['message' => 'GraphQL Request parameter "variables" must be object or JSON string parsed to object, but got [7]'],
-				]
+				],
 			]);
 	}
 
@@ -43,11 +43,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				queryasd {
-					clientSafeError
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					queryasd {
+						clientSafeError
+					}
+					GRAPHQL,
 			)
 			->assertBadRequest()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -56,7 +56,7 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					['message' => 'Syntax Error: Unexpected Name "queryasd"'],
-				]
+				],
 			]);
 	}
 
@@ -69,11 +69,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					unknownField
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query {
+						unknownField
+					}
+					GRAPHQL,
 			)
 			->assertBadRequest()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -82,7 +82,7 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					['message' => 'Cannot query field "unknownField" on type "Query".'],
-				]
+				],
 			]);
 	}
 
@@ -97,11 +97,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					clientSafeError
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query {
+						clientSafeError
+					}
+					GRAPHQL,
 			)
 			->assertStatus(Response::HTTP_MULTI_STATUS)
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -110,12 +110,12 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					[
-						'message' => 'You did something wrong :(',
+						'message'    => 'You did something wrong :(',
 						'extensions' => [
 							'line' => 14,
-						]
+						],
 					],
-				]
+				],
 			]);
 	}
 
@@ -130,11 +130,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					clientSafeError
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query {
+						clientSafeError
+					}
+					GRAPHQL,
 			)
 			->assertStatus(Response::HTTP_MULTI_STATUS)
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -143,13 +143,13 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertExactJson([
 				'errors' => [
 					[
-						'message' => 'You did something wrong :(',
+						'message'   => 'You did something wrong :(',
 						'locations' => [
-							['line' => 2, 'column' => 2]
+							['line' => 2, 'column' => 2],
 						],
-						'path' => ['clientSafeError']
+						'path' => ['clientSafeError'],
 					],
-				]
+				],
 			]);
 	}
 
@@ -158,11 +158,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					firstUser { name }
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query {
+						firstUser { name }
+					}
+					GRAPHQL,
 			)
 			->assertOk()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -170,7 +170,7 @@ class ResponseTest extends HttpIntegrationTestCase
 				'data' => [
 					'firstUser' => [
 						'name' => 'Alex',
-					]
+					],
 				],
 			]);
 	}
@@ -186,18 +186,18 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					clientUnsafeError
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query {
+						clientUnsafeError
+					}
+					GRAPHQL,
 			)
 			->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
 			->assertHeader('Content-Type', 'application/json')
 			->assertJsonMissingPath('data')
 			->assertJsonMissingPath('errors')
 			->assertJson([
-				'message' => 'We did something wrong.',
+				'message'   => 'We did something wrong.',
 				'exception' => 'RuntimeException',
 			]);
 	}
@@ -213,11 +213,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->graphQL(
-				<<<GRAPHQL
-				query {
-					clientUnsafeError
-				}
-				GRAPHQL,
+				<<<'GRAPHQL'
+					query {
+						clientUnsafeError
+					}
+					GRAPHQL,
 			)
 			->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
 			->assertHeader('Content-Type', 'application/json')

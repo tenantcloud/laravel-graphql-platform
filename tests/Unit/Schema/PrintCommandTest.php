@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Schema;
 
-use GraphQL\Type\Schema;
-use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Schema\PrintCommand;

@@ -11,10 +11,8 @@ use TheCodingMachine\GraphQLite\Annotations\Input;
 class CreateUserData
 {
 	public function __construct(
-		#[Field] public readonly string           $name,
-		#[Field] public readonly CarbonImmutable  $createdAt,
-		#[Field] public readonly CarbonInterval  $somethingAfter,
-	)
-	{
-	}
+		#[Field] public readonly string $name,
+		#[Field] public readonly CarbonImmutable $createdAt,
+		#[Field] public readonly CarbonInterval $somethingAfter,
+	) {}
 }

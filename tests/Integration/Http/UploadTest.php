@@ -33,7 +33,7 @@ class UploadTest extends HttpIntegrationTestCase
 			->assertJson([
 				'data' => [
 					'uploadFile' => 'test.pdf',
-				]
+				],
 			]);
 	}
 }

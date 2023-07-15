@@ -41,7 +41,6 @@ class UserController
 	#[Mutation]
 	public function createUser(CreateUserData $data): void
 	{
-
 	}
 
 	#[Mutation]

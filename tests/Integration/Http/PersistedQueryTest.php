@@ -17,8 +17,7 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80',
-				'query' =>
-					<<<GRAPHQL
+				'query'   => <<<'GRAPHQL'
 					query {
 						firstUser { name }
 					}
@@ -29,8 +28,8 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 				'data' => [
 					'firstUser' => [
 						'name' => 'Alex',
-					]
-				]
+					],
+				],
 			]);
 
 		$this
@@ -42,8 +41,8 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 				'data' => [
 					'firstUser' => [
 						'name' => 'Alex',
-					]
-				]
+					],
+				],
 			]);
 	}
 
@@ -53,8 +52,7 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80123123',
-				'query' =>
-					<<<GRAPHQL
+				'query'   => <<<'GRAPHQL'
 					query {
 						firstUser { name }
 					}
@@ -64,7 +62,7 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					['message' => 'Query ID doesnt match the provided query.'],
-				]
+				],
 			]);
 	}
 
@@ -79,7 +77,7 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					['message' => 'Persisted query by that ID was not found and "query" was omitted.'],
-				]
+				],
 			]);
 	}
 }
