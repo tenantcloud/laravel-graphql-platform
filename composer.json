@@ -1,19 +1,46 @@
 {
-	"name": "tenantcloud/composer-package",
-	"description": "A template for composer packages",
+	"name": "tenantcloud/laravel-graphql-platform",
+	"description": "Platform for writing GraphQL APIs with Laravel",
 	"license": "MIT",
 	"require": {
-		"php": ">=8.1"
+		"php": ">=8.1",
+		"webonyx/graphql-php": "^15.3.1",
+		"thecodingmachine/graphqlite": "dev-prefetch-refactor as 6.1.0",
+		"illuminate/support": "^9.0 || ^10.0",
+		"illuminate/database": "^9.0 || ^10.0",
+		"illuminate/console": "^9.0 || ^10.0",
+		"illuminate/container": "^9.0 || ^10.0",
+		"illuminate/cache": "^9.0 || ^10.0",
+		"symfony/validator": "^6.0",
+		"symfony/cache": "^5.0 || ^6.0",
+		"symfony/psr-http-message-bridge": "^1.3.0 || ^2",
+		"laminas/laminas-diactoros": "^2.2.2",
+		"tenantcloud/php-standard": "^1.0"
 	},
 	"require-dev": {
-		"pestphp/pest": "^1.0",
+		"pestphp/pest": "^2.0",
 		"php-cs-fixer/shim": "~3.8.0",
 		"tenantcloud/php-cs-fixer-rule-sets": "~2.0.0",
 		"phpstan/phpstan": "^1.0",
 		"phpstan/phpstan-phpunit": "^1.0",
 		"phpstan/phpstan-webmozart-assert": "^1.0",
-		"phpstan/phpstan-mockery": "^1.0"
+		"phpstan/phpstan-mockery": "^1.0",
+		"orchestra/testbench": "^7.0 || ^8.0",
+		"ecodev/graphql-upload": "^7.0"
 	},
+	"suggest": {
+		"ecodev/graphql-upload": "^7.0"
+	},
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/oprypkhantc/graphqlite"
+		},
+		{
+			"type": "git",
+			"url": "https://github.com/tenantcloud/laravel-api-versioning"
+		}
+	],
 	"autoload": {
 		"psr-0": {
 			"": "src/"
@@ -24,12 +51,20 @@
 			"Tests\\": "tests/"
 		}
 	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"TenantCloud\\GraphQLPlatform\\GraphQLPlatformServiceProvider"
+			]
+		}
+	},
 	"scripts": {
+		"test-print-schema": "./vendor/bin/testbench graphql:print ../../../../tests/Fixtures/schema.gql",
 		"test": "./vendor/bin/pest",
 		"cs-fix": "./vendor/bin/php-cs-fixer fix -v --show-progress=dots",
 		"phpstan":  "./vendor/bin/phpstan analyse"
 	},
-	"minimum-stability": "stable",
+	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"config": {
 		"allow-plugins": {

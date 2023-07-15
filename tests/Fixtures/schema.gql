@@ -1,0 +1,105 @@
+type SelectionResponse {
+  users: UserConnection!
+  selection: Any!
+}
+
+type UserConnection {
+  nodes: [User!]!
+  edges: [UserEdge]!
+  pageInfo: PageInfo!
+}
+
+"The `DateTime` scalar type represents time data, represented as an ISO-8601 encoded UTC date string."
+scalar DateTime
+
+"The `Duration` scalar type represents a time duration conforming to the `ISO8601` standard, such as `P1W1DT13H23M34S`."
+scalar Duration
+
+type UserEdge {
+  node: User!
+  cursor: String
+}
+
+type PageInfo {
+  "Determine if there are more items in the data source after these."
+  hasNextPage: Boolean!
+
+  "Determine if there are more items in the data source before these."
+  hasPreviousPage: Boolean!
+
+  "A cursor for the first item."
+  startCursor: String
+
+  "A cursor for the last item."
+  endCursor: String
+}
+
+scalar Any
+
+type User {
+  name: String!
+  createdAt: DateTime!
+  somethingAfter: Duration
+  fileIds: [Int!]!
+}
+
+type Query {
+  listUsers(perPage: Int = 15): UserConnection!
+  firstUser: User!
+  clientSafeError: Int!
+  clientUnsafeError: Int!
+
+  """
+  Available in versions: >=2
+  
+  """
+  versionedField: String!
+
+  fullSelection: SelectionResponse!
+  nestedSelection: SelectionResponse!
+}
+
+type Mutation {
+  createUser(data: CreateUserDataInput!): Void
+  updateUser(data: UpdateUserDataInput!): User!
+  uploadFile(file: Upload!): String!
+}
+
+input CreateUserDataInput {
+  ""
+  name: String!
+
+  ""
+  createdAt: DateTime!
+
+  ""
+  somethingAfter: Duration!
+}
+
+"The `Void` scalar type represents no value being returned."
+scalar Void
+
+input UpdateUserDataInput {
+  ""
+  id: Int!
+
+  ""
+  name: String
+
+  ""
+  somethingAfter: Duration
+
+  ""
+  fileIds: [Int!]! = []
+}
+
+"""
+The `Upload` special type represents a file to be uploaded in the same HTTP request as specified by
+ [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
+"""
+scalar Upload
+
+type Subscription {
+  "A placeholder query used by thecodingmachine\/graphqlite when there are no declared subscriptions."
+  dummySubscription: String
+}
