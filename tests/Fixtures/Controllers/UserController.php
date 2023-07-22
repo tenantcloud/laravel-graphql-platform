@@ -2,12 +2,10 @@
 
 namespace Tests\Fixtures\Controllers;
 
-use Carbon\CarbonImmutable;
-use Carbon\CarbonInterval;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
+use TenantCloud\GraphQLPlatform\Connection\UseConnections;
 use TenantCloud\GraphQLPlatform\MissingValue;
-use TenantCloud\GraphQLPlatform\Pagination\UseConnections;
 use TenantCloud\GraphQLPlatform\QueryComplexity\Cost;
 use Tests\Fixtures\Models\CreateUserData;
 use Tests\Fixtures\Models\UpdateUserData;
@@ -26,7 +24,7 @@ class UserController
 	public function listUsers(int $perPage = 15): LengthAwarePaginator
 	{
 		return new LengthAwarePaginatorImpl(
-			items: [$this->dummyUser()],
+			items: [User::dummy()],
 			total: 1,
 			perPage: $perPage,
 		);
@@ -35,7 +33,7 @@ class UserController
 	#[Query]
 	public function firstUser(): User
 	{
-		return $this->dummyUser();
+		return User::dummy();
 	}
 
 	#[Mutation]
@@ -46,7 +44,7 @@ class UserController
 	#[Mutation]
 	public function updateUser(UpdateUserData $data): User
 	{
-		$user = $this->dummyUser();
+		$user = User::dummy();
 
 		if ($data->name !== MissingValue::INSTANCE) {
 			$user = $user->with(name: $data->name);
@@ -57,14 +55,5 @@ class UserController
 		}
 
 		return $user->with(fileIds: $data->fileIds);
-	}
-
-	private function dummyUser(): User
-	{
-		return new User(
-			name: 'Alex',
-			createdAt: CarbonImmutable::create(2020, 1, 3),
-			somethingAfter: CarbonInterval::hour(),
-		);
 	}
 }

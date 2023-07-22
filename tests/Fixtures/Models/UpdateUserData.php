@@ -13,7 +13,7 @@ class UpdateUserData
 {
 	#[Field]
 	#[ID]
-	public int           $id;
+	public string           $id;
 
 	#[Field]
 	public string|MissingValue           $name = MissingValue::INSTANCE;
@@ -21,7 +21,7 @@ class UpdateUserData
 	#[Field]
 	public CarbonInterval|MissingValue|null  $somethingAfter = MissingValue::INSTANCE;
 
-	/** @var array<int> */
+	/** @var array<string> */
 	#[Field]
 	#[ID]
 	public array $fileIds = [];

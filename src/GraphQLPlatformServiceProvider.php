@@ -11,6 +11,9 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Laminas\Diactoros\ResponseFactory;
@@ -43,7 +46,7 @@ use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddlewa
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\PreventLazyLoadingFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\TransactionalFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\Laravel\SanePsr11LaravelContainerAdapter;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\QueryComplexity\ComplexityFieldMiddleware;
@@ -78,6 +81,7 @@ use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
 use TheCodingMachine\GraphQLite\Utils\NamespacedCache;
 use TheCodingMachine\GraphQLite\Utils\Namespaces\NamespaceFactory;
+use Webmozart\Assert\Assert;
 
 class GraphQLPlatformServiceProvider extends ServiceProvider
 {
@@ -196,7 +200,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			SchemaConfigurator::class,
 			fn (Application $app) => (new SchemaConfigurator())
-				->addFieldMiddleware(new LaravelPaginationFieldMiddleware())
 				->addFieldMiddleware(new TransactionalFieldMiddleware())
 				->addFieldMiddleware(new PreventLazyLoadingFieldMiddleware())
 				->addFieldMiddleware(new SecurityFieldMiddleware(
@@ -210,7 +213,9 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				))
 				->addFieldMiddleware(new ComplexityFieldMiddleware())
 				->addInputFieldMiddleware(new MissingValueInputFieldMiddleware())
-				->addInputFieldMiddleware(new IDInputFieldMiddleware())
+				->addInputFieldMiddleware(new IDInputFieldMiddleware(
+					$app->make(ArgumentResolver::class),
+				))
 				->addInputFieldMiddleware(new ModelIDInputFieldMiddleware())
 				->addInputFieldMiddleware(new SecurityInputFieldMiddleware(
 					$app->make('graphqlite.expression_language'),
@@ -252,6 +257,22 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				PrintCommand::class,
 			]);
 		}
+
+		Builder::macro('toGraphQLConnectable', function () {
+			Assert::isInstanceOf($this, Builder::class);
+
+			return new QueryBuilderConnectable($this);
+		});
+		EloquentBuilder::macro('toGraphQLConnectable', function () {
+			Assert::isInstanceOf($this, EloquentBuilder::class);
+
+			return new QueryBuilderConnectable($this);
+		});
+		Relation::macro('toGraphQLConnectable', function () {
+			Assert::isInstanceOf($this, Relation::class);
+
+			return new QueryBuilderConnectable($this);
+		});
 
 		$viewFactory->addNamespace(GraphQLPlatform::NAMESPACE, __DIR__ . '/../resources/views');
 

@@ -12,14 +12,14 @@ class PrintCommand extends Command
 
 	protected $description = 'Prints the GraphQL schema into a file.';
 
-	public function handle(SchemaRegistry $schemaRegistry, Filesystem $filesystem): void
+	public function handle(SchemaRegistry $schemaRegistry, Filesystem $filesystem): int
 	{
 		$schemaName = $this->option('name') ?: SchemaRegistry::DEFAULT;
 
 		if (!$schema = $schemaRegistry->get($schemaName)) {
 			$this->error("Schema '{$schemaName}' is not registered.");
 
-			return;
+			return self::FAILURE;
 		}
 
 		$printed = SchemaPrinter::doPrint($schema);
@@ -28,6 +28,8 @@ class PrintCommand extends Command
 			$this->normalizePath(base_path($this->argument('path'))),
 			$printed,
 		);
+
+		return self::SUCCESS;
 	}
 
 	private function normalizePath(string $path): string

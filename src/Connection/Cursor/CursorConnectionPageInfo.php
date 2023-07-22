@@ -1,8 +1,8 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Pagination;
+namespace TenantCloud\GraphQLPlatform\Connection\Cursor;
 
-final class ConnectionPageInfo
+final class CursorConnectionPageInfo
 {
 	public function __construct(
 		public readonly bool $hasNextPage,

@@ -4,15 +4,15 @@ namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Pagination\CursorPaginator as LaravelCursorPaginator;
-use TenantCloud\GraphQLPlatform\Pagination\ConnectionEdge;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionEdge;
 use Webmozart\Assert\Assert;
 
 /**
  * @template NodeType
  *
- * @template-implements ConnectionEdge<NodeType>
+ * @template-implements CursorConnectionEdge<NodeType>
  */
-class CursorPaginatorConnectionEdgeAdapter implements ConnectionEdge
+class CursorPaginatorCursorConnectionEdgeAdapter implements CursorConnectionEdge
 {
 	/**
 	 * @param CursorPaginator<NodeType> $paginator

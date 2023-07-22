@@ -3,16 +3,16 @@
 namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 
 use Illuminate\Contracts\Database\Query\Builder;
-use TenantCloud\GraphQLPlatform\Pagination\Connectable;
-use TenantCloud\GraphQLPlatform\Pagination\Connection;
-use TenantCloud\GraphQLPlatform\Pagination\ConnectionEdge;
-use TenantCloud\GraphQLPlatform\Pagination\OffsetConnection;
-use TenantCloud\GraphQLPlatform\Pagination\OffsetConnectionEdge;
+use TenantCloud\GraphQLPlatform\Connection\Connectable;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnection;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionEdge;
+use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnection;
+use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
 
 /**
  * @template-covariant NodeType
  *
- * @template-implements Connectable<NodeType, ConnectionEdge<NodeType>, OffsetConnectionEdge<NodeType>>
+ * @template-implements Connectable<NodeType, CursorConnectionEdge<NodeType>, OffsetConnectionEdge<NodeType>>
  */
 class QueryBuilderConnectable implements Connectable
 {
@@ -20,9 +20,9 @@ class QueryBuilderConnectable implements Connectable
 		private readonly Builder $query,
 	) {}
 
-	public function cursor(?int $first, ?string $after, ?int $last, ?string $before): Connection
+	public function cursor(?int $first, ?string $after, ?int $last, ?string $before): CursorConnection
 	{
-		return new CursorPaginatorConnectionAdapter(
+		return new CursorPaginatorCursorConnectionAdapter(
 			$this->query->cursorPaginate(perPage: $perPage, cursor: $cursor)
 		);
 	}

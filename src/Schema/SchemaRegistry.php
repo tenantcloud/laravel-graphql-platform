@@ -2,8 +2,8 @@
 
 namespace TenantCloud\GraphQLPlatform\Schema;
 
+use GraphQL\Type\Schema;
 use TenantCloud\Standard\Lazy\Lazy;
-use TheCodingMachine\GraphQLite\Schema;
 
 use function TenantCloud\Standard\Lazy\lazy;
 

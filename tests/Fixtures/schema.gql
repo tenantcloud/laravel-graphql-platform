@@ -1,12 +1,11 @@
 type SelectionResponse {
-  users: UserConnection!
+  users: UserOffsetConnection!
   selection: Any!
 }
 
-type UserConnection {
+type UserOffsetConnection {
   nodes: [User!]!
-  edges: [UserEdge]!
-  pageInfo: PageInfo!
+  edges: [UserOffsetEdge]!
 }
 
 "The `DateTime` scalar type represents time data, represented as an ISO-8601 encoded UTC date string."
@@ -14,6 +13,44 @@ scalar DateTime
 
 "The `Duration` scalar type represents a time duration conforming to the `ISO8601` standard, such as `P1W1DT13H23M34S`."
 scalar Duration
+
+type UserOffsetEdge {
+  node: User!
+}
+
+scalar Any
+
+type User {
+  name: String!
+  createdAt: DateTime!
+  somethingAfter: Duration
+  fileIds: [Int!]!
+}
+
+type Query {
+  listUsers(perPage: Int = 15): UserOffsetConnection!
+  firstUser: User!
+  clientSafeError: Int!
+  clientUnsafeError: Int!
+
+  """
+  Available in versions: >=2
+  
+  """
+  versionedField: String!
+
+  fullSelection: SelectionResponse!
+  nestedSelection: SelectionResponse!
+  offsetConnectable(offset: Int = null, limit: Int = null): UserOffsetConnection
+  cursorConnectable(first: Int = null, after: String = null, last: Int = null, before: String = null): UserConnection
+  connectable: UserFriendsConnectable!
+}
+
+type UserConnection {
+  nodes: [User!]!
+  edges: [UserEdge]!
+  pageInfo: PageInfo!
+}
 
 type UserEdge {
   node: User!
@@ -34,29 +71,29 @@ type PageInfo {
   endCursor: String
 }
 
-scalar Any
-
-type User {
-  name: String!
-  createdAt: DateTime!
-  somethingAfter: Duration
-  fileIds: [Int!]!
+type UserFriendsConnectable {
+  cursor(first: Int, after: String, last: Int, before: String): UserFriendsConnection!
+  offset(limit: Int, offset: Int): UserFriendsOffsetConnection!
 }
 
-type Query {
-  listUsers(perPage: Int = 15): UserConnection!
-  firstUser: User!
-  clientSafeError: Int!
-  clientUnsafeError: Int!
+type UserFriendsConnection {
+  nodes: [User!]!
+  edges: [UserFriendsEdge]!
+  pageInfo: PageInfo!
+}
 
-  """
-  Available in versions: >=2
-  
-  """
-  versionedField: String!
+type UserFriendsEdge {
+  node: User!
+  cursor: String
+}
 
-  fullSelection: SelectionResponse!
-  nestedSelection: SelectionResponse!
+type UserFriendsOffsetConnection {
+  nodes: [User!]!
+  edges: [UserFriendsOffsetEdge]!
+}
+
+type UserFriendsOffsetEdge {
+  node: User!
 }
 
 type Mutation {
@@ -81,7 +118,7 @@ scalar Void
 
 input UpdateUserDataInput {
   ""
-  id: Int!
+  id: ID!
 
   ""
   name: String
@@ -90,7 +127,7 @@ input UpdateUserDataInput {
   somethingAfter: Duration
 
   ""
-  fileIds: [Int!]! = []
+  fileIds: [ID!]! = []
 }
 
 """

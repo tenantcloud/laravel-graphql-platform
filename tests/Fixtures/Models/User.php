@@ -21,4 +21,13 @@ class User
 		/** @var array<int> $fileIds */
 		#[Field] public readonly array $fileIds = [],
 	) {}
+
+	public static function dummy(): self
+	{
+		return new self(
+			name: 'Alex',
+			createdAt: CarbonImmutable::create(2020, 1, 3),
+			somethingAfter: CarbonInterval::hour(),
+		);
+	}
 }

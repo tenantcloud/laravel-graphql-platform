@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Pagination;
+namespace TenantCloud\GraphQLPlatform\Connection;
 
 interface ProvidesTotalCount
 {

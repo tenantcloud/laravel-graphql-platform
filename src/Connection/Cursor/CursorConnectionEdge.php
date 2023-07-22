@@ -1,11 +1,11 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Pagination;
+namespace TenantCloud\GraphQLPlatform\Connection\Cursor;
 
 /**
  * @template-covariant NodeType
  */
-interface ConnectionEdge
+interface CursorConnectionEdge
 {
 	/**
 	 * @return NodeType

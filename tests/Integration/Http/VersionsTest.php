@@ -20,7 +20,7 @@ class VersionsTest extends TestCase
 				<<<'GRAPHQL'
 					query { versionedField }
 					GRAPHQL,
-				headers: ['Api-Version' => '1'],
+				headers: ['Version' => '1'],
 			)
 			->assertOk()
 			->assertJson([
@@ -38,7 +38,25 @@ class VersionsTest extends TestCase
 				<<<'GRAPHQL'
 					query { versionedField }
 					GRAPHQL,
-				headers: ['Api-Version' => '2'],
+				headers: ['Version' => '2'],
+			)
+			->assertOk()
+			->assertJson([
+				'data' => [
+					'versionedField' => 'v2',
+				],
+			]);
+	}
+
+	#[Test]
+	public function latest(): void
+	{
+		$this
+			->graphQL(
+				<<<'GRAPHQL'
+					query { versionedField }
+					GRAPHQL,
+				headers: ['Version' => 'latest'],
 			)
 			->assertOk()
 			->assertJson([

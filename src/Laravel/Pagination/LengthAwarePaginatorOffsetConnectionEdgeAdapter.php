@@ -3,7 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use TenantCloud\GraphQLPlatform\Pagination\OffsetConnectionEdge;
+use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
 
 /**
  * @template NodeType

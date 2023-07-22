@@ -6,6 +6,7 @@ use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\Helper as ServerHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
+use GraphQL\Type\Schema;
 use GraphQL\Upload\UploadMiddleware;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
@@ -16,7 +17,6 @@ use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use TheCodingMachine\GraphQLite\Context\Context;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
-use TheCodingMachine\GraphQLite\Schema;
 
 use function array_map;
 use function max;

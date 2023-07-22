@@ -26,13 +26,14 @@ class IDTest extends IntegrationTestCase
 						) {
 							name
 							somethingAfter
+							fileIds
 						}
 					}
 					GRAPHQL,
 			)
 			->assertSuccessful()
 			->assertData([
-				'name'    => 'Bruce',
+				'name'    => 'Alex',
 				'fileIds' => [456],
 			]);
 	}

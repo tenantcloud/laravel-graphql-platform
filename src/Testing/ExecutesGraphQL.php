@@ -6,10 +6,10 @@ use GraphQL\GraphQL;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
+use GraphQL\Type\Schema;
 use Illuminate\Foundation\Testing\TestCase;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TheCodingMachine\GraphQLite\Context\Context;
-use TheCodingMachine\GraphQLite\Schema;
 
 /**
  * @mixin TestCase

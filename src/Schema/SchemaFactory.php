@@ -4,12 +4,18 @@ namespace TenantCloud\GraphQLPlatform\Schema;
 
 use Mouf\Composer\ClassNameMapper;
 use Psr\Container\ContainerInterface;
+use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
+use TenantCloud\APIVersioning\Version\Version;
+use TenantCloud\APIVersioning\Version\VersionParser;
 use TenantCloud\GraphQLPlatform\Carbon\CarbonRootTypeMapper;
+use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\SanePsr11LaravelContainerAdapter;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
-use TenantCloud\GraphQLPlatform\Pagination\PaginationTypeMapper;
+use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\FieldsBuilder;
@@ -110,7 +116,7 @@ class SchemaFactory
 			$recursiveTypeMapper
 		);
 		$rootTypeMapper = new IteratorTypeMapper($rootTypeMapper, $topRootTypeMapper);
-		$rootTypeMapper = new PaginationTypeMapper(
+		$rootTypeMapper = $connectionTypeMapper = new ConnectionTypeMapper(
 			$rootTypeMapper,
 			$topRootTypeMapper,
 			$this->container->get(AnnotationReader::class),
@@ -135,6 +141,22 @@ class SchemaFactory
 			$fieldMiddlewarePipe,
 			$inputFieldMiddlewarePipe,
 		);
+
+		if ($configurator->forVersion) {
+			$fieldMiddlewarePipe->pipe(new ForVersionsFieldMiddleware(
+				$configurator->forVersion instanceof Version ?
+					$configurator->forVersion :
+					$this->container->get(VersionParser::class)->parse($configurator->forVersion),
+				$this->container->get(ConstraintChecker::class),
+			));
+		}
+
+		$fieldMiddlewarePipe->pipe(new ConnectionFieldMiddleware(
+			$connectionTypeMapper,
+			$this->container->get(CachedDocBlockFactory::class),
+			$this->container->get(ArgumentResolver::class)
+		));
+		$fieldMiddlewarePipe->pipe(new LaravelPaginationFieldMiddleware($connectionTypeMapper));
 
 		foreach ($configurator->fieldMiddlewares as $fieldMiddleware) {
 			$fieldMiddlewarePipe->pipe($fieldMiddleware);

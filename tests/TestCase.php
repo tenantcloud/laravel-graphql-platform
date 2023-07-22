@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use TenantCloud\APIVersioning\APIVersioningServiceProvider;
 use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use Tests\Fixtures\TypeMappers\AnyRootTypeMapper;
@@ -38,6 +39,7 @@ abstract class TestCase extends BaseTestCase
 	protected function getPackageProviders($app): array
 	{
 		return [
+			APIVersioningServiceProvider::class,
 			GraphQLPlatformServiceProvider::class,
 		];
 	}

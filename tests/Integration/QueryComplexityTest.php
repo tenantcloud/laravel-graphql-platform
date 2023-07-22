@@ -2,9 +2,14 @@
 
 namespace Tests\Integration;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
+use TenantCloud\GraphQLPlatform\QueryComplexity\ComplexityFieldMiddleware;
+use TenantCloud\GraphQLPlatform\QueryComplexity\Cost;
 
+#[CoversClass(Cost::class)]
+#[CoversClass(ComplexityFieldMiddleware::class)]
 class QueryComplexityTest extends IntegrationTestCase
 {
 	#[Test]

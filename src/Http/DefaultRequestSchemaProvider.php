@@ -2,9 +2,9 @@
 
 namespace TenantCloud\GraphQLPlatform\Http;
 
+use GraphQL\Type\Schema;
 use Illuminate\Http\Request;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
-use TheCodingMachine\GraphQLite\Schema;
 
 class DefaultRequestSchemaProvider implements RequestSchemaProvider
 {

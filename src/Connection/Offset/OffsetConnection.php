@@ -1,12 +1,12 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Pagination;
+namespace TenantCloud\GraphQLPlatform\Connection\Offset;
 
 /**
  * @template-covariant NodeType
- * @template-covariant EdgeType of ConnectionEdge<NodeType>
+ * @template-covariant EdgeType of OffsetConnectionEdge<NodeType>
  */
-interface Connection
+interface OffsetConnection
 {
 	/**
 	 * @return NodeType[]
@@ -17,6 +17,4 @@ interface Connection
 	 * @return EdgeType[]
 	 */
 	public function edges(): array;
-
-	public function pageInfo(): ConnectionPageInfo;
 }

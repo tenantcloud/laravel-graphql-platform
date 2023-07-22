@@ -4,17 +4,17 @@ namespace TenantCloud\GraphQLPlatform\Versioning;
 
 use GraphQL\Type\Definition\FieldDefinition;
 use Illuminate\Support\Str;
-use RuntimeException;
+use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
+use TenantCloud\APIVersioning\Version\Version;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
 use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
 
 class ForVersionsFieldMiddleware implements FieldMiddlewareInterface
 {
-	private const REGEX_VERSION_RULE = '([<>=]*)([\d.]*)';
-
 	public function __construct(
-		private readonly string $currentVersion,
+		private readonly Version $currentVersion,
+		private readonly ConstraintChecker $checker,
 	) {}
 
 	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): ?FieldDefinition
@@ -27,7 +27,7 @@ class ForVersionsFieldMiddleware implements FieldMiddlewareInterface
 
 		$queryFieldDescriptor = $this->addAvailableComment($queryFieldDescriptor, $forVersionsAnnotations);
 
-		$versionMatches = $this->compareVersions(
+		$versionMatches = $this->checker->compareVersions(
 			$this->currentVersion,
 			array_map(fn (ForVersions $forVersionsAnnotation) => $forVersionsAnnotation->constraint, $forVersionsAnnotations)
 		);
@@ -35,20 +35,6 @@ class ForVersionsFieldMiddleware implements FieldMiddlewareInterface
 		return $versionMatches ?
 			$fieldHandler->handle($queryFieldDescriptor) :
 			null;
-	}
-
-	public function parseRawVersion(string $rawVersionRule): array
-	{
-		preg_match('/' . self::REGEX_VERSION_RULE . '/', $rawVersionRule, $result);
-
-		if ($rawVersionRule !== $result[0]) {
-			throw new RuntimeException("Version {$rawVersionRule} didn't match " . self::REGEX_VERSION_RULE);
-		}
-
-		return [
-			'operator' => $result[1],
-			'version'  => $result[2],
-		];
 	}
 
 	private function addAvailableComment(QueryFieldDescriptor $queryFieldDescriptor, array $forVersionsAnnotations): QueryFieldDescriptor
@@ -63,18 +49,5 @@ class ForVersionsFieldMiddleware implements FieldMiddlewareInterface
 			->append($queryFieldDescriptor->getComment() ?? '');
 
 		return $queryFieldDescriptor->withComment($comment);
-	}
-
-	private function compareVersions(string $requestVersion, array $availableVersions): bool
-	{
-		foreach ($availableVersions as $rawVersionRule) {
-			$versionRule = $this->parseRawVersion($rawVersionRule);
-
-			if (version_compare($requestVersion, $versionRule['version'], $versionRule['operator'])) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

@@ -3,7 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Schema;
 
 use PackageVersions\Versions;
-use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
+use TenantCloud\APIVersioning\Version\Version;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
 use TheCodingMachine\GraphQLite\Mappers\TypeMapperFactoryInterface;
@@ -44,6 +44,7 @@ final class SchemaConfigurator
 		public readonly int|null $globTTL = 2,
 		public readonly array $fieldMiddlewares = [],
 		public readonly array $inputFieldMiddlewares = [],
+		public readonly string|Version|null $forVersion = null,
 	) {
 		$this->cacheNamespace = mb_substr(md5(Versions::getVersion('thecodingmachine/graphqlite')), 0, 8);
 	}
@@ -74,9 +75,9 @@ final class SchemaConfigurator
 		return $this->globTTL(2);
 	}
 
-	public function forVersion(string $version): self
+	public function forVersion(string|Version $version): self
 	{
-		return $this->addFieldMiddleware(new ForVersionsFieldMiddleware($version));
+		return $this->with(forVersion: $version);
 	}
 
 	/**

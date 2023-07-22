@@ -3,16 +3,16 @@
 namespace TenantCloud\GraphQLPlatform\Laravel\Pagination;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
-use TenantCloud\GraphQLPlatform\Pagination\Connection;
-use TenantCloud\GraphQLPlatform\Pagination\ConnectionEdge;
-use TenantCloud\GraphQLPlatform\Pagination\ConnectionPageInfo;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnection;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionEdge;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionPageInfo;
 
 /**
  * @template NodeType
  *
- * @template-implements Connection<NodeType, ConnectionEdge<NodeType>>
+ * @template-implements CursorConnection<NodeType, CursorConnectionEdge<NodeType>>
  */
-class CursorPaginatorConnectionAdapter implements Connection
+class CursorPaginatorCursorConnectionAdapter implements CursorConnection
 {
 	/**
 	 * @param CursorPaginator<NodeType> $paginator
@@ -29,14 +29,14 @@ class CursorPaginatorConnectionAdapter implements Connection
 	public function edges(): array
 	{
 		return array_map(
-			fn (mixed $item) => new CursorPaginatorConnectionEdgeAdapter($this->paginator, $item),
+			fn (mixed $item) => new CursorPaginatorCursorConnectionEdgeAdapter($this->paginator, $item),
 			$this->paginator->items()
 		);
 	}
 
-	public function pageInfo(): ConnectionPageInfo
+	public function pageInfo(): CursorConnectionPageInfo
 	{
-		return ConnectionPageInfo::fromCursors(
+		return CursorConnectionPageInfo::fromCursors(
 			startCursor: $this->paginator->previousCursor()?->encode(),
 			endCursor: $this->paginator->nextCursor()?->encode(),
 		);
