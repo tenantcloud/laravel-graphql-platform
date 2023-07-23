@@ -22,16 +22,16 @@ class ModelIDInputFieldMiddleware implements InputFieldMiddlewareInterface
 		/** @var ModelID|null $modelIDAnnotation */
 		$modelIDAnnotation = $inputFieldDescriptor->getMiddlewareAnnotations()->getAnnotationByType(ModelID::class);
 
-		$inputFieldDescriptor = $inputFieldDescriptor->withResolver(function (...$args) use ($modelIDAnnotation, $type, $inputFieldDescriptor) {
+		$inputFieldDescriptor = $inputFieldDescriptor->withResolver(function ($source, $id, ...$args) use ($modelIDAnnotation, $type, $inputFieldDescriptor) {
 			$query = $type->getName()::query();
 
 			if ($modelIDAnnotation?->lockForUpdate) {
 				$query = $query->lockForUpdate();
 			}
 
-			$model = $query->find($args[1]->val());
+			$model = $query->find($id->val());
 
-			return $inputFieldDescriptor->getResolver()($model);
+			return $inputFieldDescriptor->getResolver()($source, $model, ...$args);
 		});
 
 		return $inputFieldHandler->handle($inputFieldDescriptor);
