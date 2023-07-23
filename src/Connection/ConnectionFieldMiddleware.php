@@ -36,8 +36,8 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 	{
 		$reflector = $queryFieldDescriptor->getRefMethod() ?? $queryFieldDescriptor->getRefProperty();
 		$type = $reflector instanceof ReflectionMethod ?
-			$reflector->getReturnType() :
-			$reflector->getType();
+			$reflector?->getReturnType() :
+			$reflector?->getType();
 
 		if (
 			!$type instanceof ReflectionNamedType ||
