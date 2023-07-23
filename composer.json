@@ -17,7 +17,7 @@
         "laminas/laminas-diactoros": "^2.2.2",
         "tenantcloud/php-standard": "^2.0",
         "illuminate/contracts": "^9.0|^10.0",
-        "tenantcloud/laravel-api-versioning": "^1.0@alpha.2"
+        "tenantcloud/laravel-api-versioning": "1.0-alpha.2"
     },
     "require-dev": {
         "pestphp/pest": "^1.0|^2.8",
