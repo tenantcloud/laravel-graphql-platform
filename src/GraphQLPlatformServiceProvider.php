@@ -22,6 +22,7 @@ use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
 use Mouf\Composer\ClassNameMapper;
 use PackageVersions\Versions;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -136,7 +137,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->bind(AuthenticationServiceInterface::class, LaravelAuthenticationService::class);
 		$this->app->bind(AuthorizationServiceInterface::class, LaravelAuthorizationService::class);
 
-		$this->app->singleton(SanePsr11LaravelContainerAdapter::class);
+		$this->app->bind(ContainerInterface::class, SanePsr11LaravelContainerAdapter::class);
 		$this->app->singleton(
 			'graphqlite.symfony_cache',
 			fn (Application $app) => new Psr16Adapter(
