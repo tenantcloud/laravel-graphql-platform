@@ -6,6 +6,7 @@ use GraphQL\Error\DebugFlag;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema as WebonyxSchema;
 use GraphQL\Validator\DocumentValidator;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -22,7 +23,6 @@ use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
 use Mouf\Composer\ClassNameMapper;
 use PackageVersions\Versions;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -47,8 +47,9 @@ use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddlewa
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\PreventLazyLoadingFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\TransactionalFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Laravel\Octane\GiveNewApplicationInstanceToContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
-use TenantCloud\GraphQLPlatform\Laravel\SanePsr11LaravelContainerAdapter;
+use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\QueryComplexity\ComplexityFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Schema\NullAnnotationReader;
@@ -86,6 +87,8 @@ use Webmozart\Assert\Assert;
 
 class GraphQLPlatformServiceProvider extends ServiceProvider
 {
+	public const CONTAINER_HANDLE = 'graphql-platform.container_handle';
+
 	public function register(): void
 	{
 		$this->app->bind(WebonyxSchema::class, Schema::class);
@@ -137,7 +140,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->bind(AuthenticationServiceInterface::class, LaravelAuthenticationService::class);
 		$this->app->bind(AuthorizationServiceInterface::class, LaravelAuthorizationService::class);
 
-		$this->app->bind(ContainerInterface::class, SanePsr11LaravelContainerAdapter::class);
+		$this->app->singleton(self::CONTAINER_HANDLE, LaravelContainerHandle::class);
 		$this->app->singleton(
 			'graphqlite.symfony_cache',
 			fn (Application $app) => new Psr16Adapter(
@@ -190,7 +193,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->setTranslator(new LaravelCompositeTranslatorAdapter($app->make(Translator::class)))
 				->setConstraintValidatorFactory(
 					new SkipMissingValueConstraintValidatorFactory(
-						new ContainerConstraintValidatorFactory($app->make(SanePsr11LaravelContainerAdapter::class))
+						new ContainerConstraintValidatorFactory($app->make(self::CONTAINER_HANDLE))
 					)
 				)
 				->getValidator()
@@ -235,8 +238,8 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->addParameterMiddleware(new InjectSelectionParameterMiddleware())
 				->addParameterMiddleware(new ModelIDParameterMiddleware())
 				->addParameterMiddleware(new ResolveInfoParameterHandler())
-//				->addParameterMiddleware(new PrefetchParameterHandler($fieldsBuilder, $app->make(SanePsr11LaravelContainerAdapter::class)))
-				->addParameterMiddleware(new ContainerParameterHandler($app->make(SanePsr11LaravelContainerAdapter::class)))
+//				->addParameterMiddleware(new PrefetchParameterHandler($fieldsBuilder, $app->make(self::CONTAINER_HANDLE)))
+				->addParameterMiddleware(new ContainerParameterHandler($app->make(self::CONTAINER_HANDLE)))
 		);
 
 		$this->app->singleton(SchemaRegistry::class, fn (Application $app) => new SchemaRegistry(
@@ -251,12 +254,19 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		Router $router,
 		UrlGenerator $urlGenerator,
 		SchemaRegistry $schemaRegistry,
+		Dispatcher $events,
 	): void {
 		if ($this->app->runningInConsole()) {
 			$this->commands([
 				DebugCommand::class,
 				PrintCommand::class,
 			]);
+		}
+
+		if (class_exists(\Laravel\Octane\Octane::class)) {
+			$events->listen(\Laravel\Octane\Events\RequestReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+			$events->listen(\Laravel\Octane\Events\TaskReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+			$events->listen(\Laravel\Octane\Events\TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
 		}
 
 		Builder::macro('toGraphQLConnectable', function () {

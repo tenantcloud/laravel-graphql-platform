@@ -27,9 +27,7 @@ class GraphQLController
 	public const JSON_CONTENT_TYPE = 'application/json';
 
 	public function __construct(
-		private readonly Container $container,
 		private readonly ServerHelper $serverHelper,
-		private readonly ServerConfig $config,
 		private readonly HttpMessageFactoryInterface $httpMessageFactory,
 		private readonly HttpCodeDeciderInterface $httpCodeDecider,
 	) {}
@@ -37,19 +35,19 @@ class GraphQLController
 	/**
 	 * @param OperationParams|OperationParams[] $parsedBody
 	 */
-	private function handlePsr7Request(Schema $schema, array|OperationParams $parsedBody): JsonResponse
+	private function handlePsr7Request(Schema $schema, ServerConfig $config, array|OperationParams $parsedBody): JsonResponse
 	{
-		$this->config->setSchema($schema);
-		$this->config->setContext(new Context());
+		$config->setSchema($schema);
+		$config->setContext(new Context());
 
 		$result = match (true) {
-			is_array($parsedBody) => $this->serverHelper->executeBatch($this->config, $parsedBody),
-			default               => $this->serverHelper->executeOperation($this->config, $parsedBody),
+			is_array($parsedBody) => $this->serverHelper->executeBatch($config, $parsedBody),
+			default               => $this->serverHelper->executeOperation($config, $parsedBody),
 		};
 
 		if ($result instanceof ExecutionResult) {
 			return new JsonResponse(
-				data: $result->toArray($this->config->getDebugFlag()),
+				data: $result->toArray($config->getDebugFlag()),
 				status: $this->httpCodeDecider->decideHttpStatusCode($result),
 				headers: [
 					'Content-Type' => self::GRAPHQL_RESPONSE_CONTENT_TYPE . '; charset=utf-8',
@@ -62,7 +60,7 @@ class GraphQLController
 			$anySucceeded = (bool) Arr::first($statusCodes, fn (int $code) => $code < 300);
 
 			return new JsonResponse(
-				data: array_map(fn (ExecutionResult $result) => $result->toArray($this->config->getDebugFlag()), $result),
+				data: array_map(fn (ExecutionResult $result) => $result->toArray($config->getDebugFlag()), $result),
 				status: $anySucceeded ? Response::HTTP_MULTI_STATUS : max($statusCodes),
 				headers: [
 					'Content-Type' => self::GRAPHQL_RESPONSE_CONTENT_TYPE . '; charset=utf-8',
@@ -73,8 +71,12 @@ class GraphQLController
 		throw new RuntimeException('Unexpected response from StandardServer::executePsrRequest');
 	}
 
-	public function __invoke(Request $request, string $schemaProvider): JsonResponse
-	{
+	public function __invoke(
+		Request $request,
+		string $schemaProvider,
+		Container $container,
+		ServerConfig $config,
+	): JsonResponse {
 		$psr7Request = $this->httpMessageFactory->createRequest($request);
 
 		if (class_exists('\GraphQL\Upload\UploadMiddleware')) {
@@ -83,10 +85,11 @@ class GraphQLController
 			$psr7Request = $uploadMiddleware->processRequest($psr7Request);
 		}
 
-		$requestSchemaProvider = $this->container->make($schemaProvider);
+		$requestSchemaProvider = $container->make($schemaProvider);
 
 		return $this->handlePsr7Request(
 			$requestSchemaProvider($request),
+			$config,
 			$this->serverHelper->parsePsrRequest($psr7Request)
 		);
 	}

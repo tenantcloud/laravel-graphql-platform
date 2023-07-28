@@ -13,7 +13,7 @@ use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
-use TenantCloud\GraphQLPlatform\Laravel\SanePsr11LaravelContainerAdapter;
+use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
@@ -174,7 +174,7 @@ class SchemaFactory
 			$this->container->get(AnnotationReader::class),
 			$this->container->get(NamingStrategy::class),
 			$typeRegistry,
-			$this->container->get(SanePsr11LaravelContainerAdapter::class),
+			$this->container->get(LaravelContainerHandle::class),
 			$recursiveTypeMapper,
 			$fieldsBuilder
 		);
@@ -207,7 +207,7 @@ class SchemaFactory
 			$queryProviders[] = new GlobControllerQueryProvider(
 				$controllerNamespace,
 				$fieldsBuilder,
-				$this->container->get(SanePsr11LaravelContainerAdapter::class),
+				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
 				$namespacedCache,
 				$this->container->get(ClassNameMapper::class),

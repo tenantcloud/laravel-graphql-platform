@@ -8,15 +8,16 @@ use Psr\Container\NotFoundExceptionInterface;
 
 use function class_exists;
 
-/**
- * A container adapter around Laravel containers that adds a "sane" implementation of PSR-11.
- * Notably, "has" will return true if the class exists, since Laravel is an auto-wiring framework.
- */
-class SanePsr11LaravelContainerAdapter implements ContainerInterface
+class LaravelContainerHandle implements ContainerInterface
 {
 	public function __construct(
-		private readonly Container $container
+		private Container $container
 	) {}
+
+	public function setContainer(Container $container): void
+	{
+		$this->container = $container;
+	}
 
 	public function get(string $id): mixed
 	{
