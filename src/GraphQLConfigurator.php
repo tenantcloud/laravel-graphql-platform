@@ -13,12 +13,13 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Psr\SimpleCache\CacheInterface;
-use TenantCloud\GraphQLPlatform\Http\DefaultRequestSchemaProvider;
-use TenantCloud\GraphQLPlatform\Http\GraphQLController;
-use TenantCloud\GraphQLPlatform\Http\RequestSchemaProvider;
-use TenantCloud\GraphQLPlatform\PersistedQuery\CachePersistedQueryLoader;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
+use TenantCloud\GraphQLPlatform\Server\Http\DefaultRequestSchemaProvider;
+use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
+use TenantCloud\GraphQLPlatform\Server\Http\RequestSchemaProvider;
+use TheCodingMachine\GraphQLite\Server\PersistedQuery\CachePersistedQueryLoader;
+use TheCodingMachine\GraphQLite\Server\PersistedQuery\NotSupportedPersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Utils\Cloneable;
 
 /**
@@ -35,16 +36,16 @@ final class GraphQLConfigurator
 	 * @param ValidationRule[]                                                                   $validationRules
 	 */
 	public function __construct(
-		public readonly mixed $persistedQueryLoader = null,
+		public readonly mixed $persistedQueryLoader = new NotSupportedPersistedQueryLoader(),
 		public readonly array $routes = [],
 		public readonly array $schemas = [],
 		public readonly array $validationRules = [],
 	) {}
 
-	public function useAutomaticPersistedQueries(CacheInterface $cache, DateInterval $ttl = null): self
+	public function useAutomaticPersistedQueries(CacheInterface $cache, DateInterval $ttl = new CarbonInterval('P1D')): self
 	{
 		return $this->with(
-			persistedQueryLoader: new CachePersistedQueryLoader($cache, $ttl ?? CarbonInterval::day()),
+			persistedQueryLoader: new CachePersistedQueryLoader($cache, $ttl),
 		);
 	}
 

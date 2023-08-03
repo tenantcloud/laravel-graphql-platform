@@ -1,29 +1,60 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\ID;
+namespace TenantCloud\GraphQLPlatform\Scalars;
 
+use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\IntType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type;
-use TenantCloud\GraphQLPlatform\ID\ID as IDAnnotation;
+use TenantCloud\GraphQLPlatform\Scalars\ID\ID as IDAnnotation;
 use TheCodingMachine\GraphQLite\InputField;
 use TheCodingMachine\GraphQLite\InputFieldDescriptor;
+use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
+use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Parameters\InputTypeParameter;
 use TheCodingMachine\GraphQLite\Parameters\InputTypeParameterInterface;
+use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\ID;
 use Webmozart\Assert\Assert;
 
-class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
+class ScalarAttributeMiddleware
 {
 	public function __construct(
 		private readonly ArgumentResolver $argumentResolver,
 	) {}
+
+	/**
+	 * @param class-string $attribute
+	 */
+	public static function field(string $attribute): FieldMiddlewareInterface
+	{
+		return new class ($attribute) implements FieldMiddlewareInterface {
+			public function __construct(private readonly string $attribute)
+			{
+			}
+
+			public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
+			{
+				if (!ScalarAttributeMiddleware::hasAttribute($queryFieldDescriptor->getMiddlewareAnnotations(), $this->attribute)) {
+					return $fieldHandler->handle($queryFieldDescriptor);
+				}
+
+
+			}
+		};
+	}
+
+	private static function hasAttribute(): bool
+	{
+
+	}
 
 	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
@@ -32,6 +63,10 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 
 		if (!$idAnnotation) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);
+		}
+
+		if ($inputFieldDescriptor->getType() instanceof IDType) {
+			throw new \BadMethodCallException("Using #[ID] attribute on a field of ID type is u");
 		}
 
 		$type = $this->mapTypeToId($inputFieldDescriptor->getType());
@@ -58,12 +93,6 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 				$id = is_array($id) ?
 					array_map(fn (ID $id) => $id->val(), $id) :
 					$id?->val();
-
-				if ($type instanceof IntType || ($type instanceof ListOfType && $type->getWrappedType()->getWrappedType() instanceof IntType)) {
-					$id = is_array($id) ?
-						array_map(fn (string|int $id) => (int) $id, $id) :
-						($id === null ? $id : (int) $id);
-				}
 
 				return $inputFieldDescriptor->getResolver()($source, $id, ...$args);
 			});
@@ -99,5 +128,10 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 		}
 
 		return $type;
+	}
+
+	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
+	{
+		// TODO: Implement process() method.
 	}
 }

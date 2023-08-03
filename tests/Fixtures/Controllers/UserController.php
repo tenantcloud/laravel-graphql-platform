@@ -6,7 +6,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 use TenantCloud\GraphQLPlatform\Connection\UseConnections;
 use TenantCloud\GraphQLPlatform\MissingValue;
-use TenantCloud\GraphQLPlatform\QueryComplexity\Cost;
+use TenantCloud\GraphQLPlatform\Server\QueryComplexity\Cost;
 use Tests\Fixtures\Models\CreateUserData;
 use Tests\Fixtures\Models\UpdateUserData;
 use Tests\Fixtures\Models\User;

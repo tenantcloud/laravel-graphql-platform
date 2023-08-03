@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Http;
+namespace TenantCloud\GraphQLPlatform\Server\Http;
 
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\Helper as ServerHelper;
@@ -17,7 +17,6 @@ use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use TheCodingMachine\GraphQLite\Context\Context;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
-
 use function array_map;
 use function max;
 

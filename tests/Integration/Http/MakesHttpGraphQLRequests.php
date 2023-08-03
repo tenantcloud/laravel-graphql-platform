@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\TestResponse;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
-use TenantCloud\GraphQLPlatform\Http\GraphQLController;
+use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
 use Tests\TestCase;
 
 /**

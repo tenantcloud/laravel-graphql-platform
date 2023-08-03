@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\QueryComplexity;
+namespace TenantCloud\GraphQLPlatform\Server\QueryComplexity;
 
 use Attribute;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotationInterface;

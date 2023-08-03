@@ -7,14 +7,14 @@ use Psr\Container\ContainerInterface;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
-use TenantCloud\GraphQLPlatform\Carbon\CarbonRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
+use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
-use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
+use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
@@ -100,6 +100,7 @@ class SchemaFactory
 				$recursiveTypeMapper,
 				$this->container,
 				$namespacedCache,
+				$typeNamespaces,
 				$configurator->globTTL,
 			);
 

@@ -4,9 +4,9 @@ namespace Tests\Integration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use TenantCloud\GraphQLPlatform\Carbon\CarbonRootTypeMapper;
-use TenantCloud\GraphQLPlatform\Carbon\DateTimeType;
-use TenantCloud\GraphQLPlatform\Carbon\DurationType;
+use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
+use TenantCloud\GraphQLPlatform\Scalars\Carbon\DateTimeType;
+use TenantCloud\GraphQLPlatform\Scalars\Carbon\DurationType;
 
 #[CoversClass(CarbonRootTypeMapper::class)]
 #[CoversClass(DateTimeType::class)]

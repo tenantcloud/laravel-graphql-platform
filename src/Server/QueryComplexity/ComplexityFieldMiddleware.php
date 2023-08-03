@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\QueryComplexity;
+namespace TenantCloud\GraphQLPlatform\Server\QueryComplexity;
 
 use GraphQL\Type\Definition\FieldDefinition;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;

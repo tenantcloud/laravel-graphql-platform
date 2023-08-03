@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\ID;
+namespace TenantCloud\GraphQLPlatform\Scalars\ID;
 
 use Attribute;
 use RuntimeException;

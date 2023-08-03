@@ -4,7 +4,7 @@ namespace Tests\Fixtures\Models;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;
-use TenantCloud\GraphQLPlatform\QueryComplexity\Cost;
+use TenantCloud\GraphQLPlatform\Server\QueryComplexity\Cost;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 use TheCodingMachine\GraphQLite\Utils\Cloneable;

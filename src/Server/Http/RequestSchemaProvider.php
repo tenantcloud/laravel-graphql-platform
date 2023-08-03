@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Http;
+namespace TenantCloud\GraphQLPlatform\Server\Http;
 
 use GraphQL\Type\Schema;
 use Illuminate\Http\Request;

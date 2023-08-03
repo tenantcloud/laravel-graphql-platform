@@ -1,12 +1,13 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Http;
+namespace TenantCloud\GraphQLPlatform\Server\Http;
 
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\RequestError;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
+use TheCodingMachine\GraphQLite\Exceptions\GraphQLExceptionInterface;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 use Webmozart\Assert\Assert;
 
@@ -19,7 +20,10 @@ class GraphQLResponseHttpCodeDecider implements HttpCodeDeciderInterface
 	{
 		Assert::true($result->data !== null || $result->errors);
 
-		$isBadRequest = (bool) Arr::first($result->errors, fn (Error $error) => !$error->getPrevious() || $error->getPrevious() instanceof RequestError);
+		$isBadRequest = (bool) Arr::first(
+			$result->errors,
+			fn (Error $error) => !$error instanceof GraphQLExceptionInterface && (!$error->getPrevious() || $error->getPrevious() instanceof RequestError)
+		);
 
 		return match (true) {
 			// Spec states that any malformed GraphQL requests

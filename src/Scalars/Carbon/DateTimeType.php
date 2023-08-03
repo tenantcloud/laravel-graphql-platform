@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Carbon;
+namespace TenantCloud\GraphQLPlatform\Scalars\Carbon;
 
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;

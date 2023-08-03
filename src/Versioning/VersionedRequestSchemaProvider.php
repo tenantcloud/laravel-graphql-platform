@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use TenantCloud\APIVersioning\Version\LatestVersion;
 use TenantCloud\APIVersioning\Version\RequestVersionParser;
 use TenantCloud\APIVersioning\Version\VersionParser;
-use TenantCloud\GraphQLPlatform\Http\RequestSchemaProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
+use TenantCloud\GraphQLPlatform\Server\Http\RequestSchemaProvider;
 
 class VersionedRequestSchemaProvider implements RequestSchemaProvider
 {
