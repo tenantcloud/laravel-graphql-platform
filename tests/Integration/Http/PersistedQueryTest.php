@@ -4,8 +4,6 @@ namespace Tests\Integration\Http;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Psr16Cache;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\CachePersistedQueryLoader;
@@ -69,10 +67,10 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					[
-						'message' => 'Persisted query by that ID doesnt match the provided query; you are likely incorrectly hashing your query.',
+						'message'    => 'Persisted query by that ID doesnt match the provided query; you are likely incorrectly hashing your query.',
 						'extensions' => [
 							'code' => 'PERSISTED_QUERY_ID_INVALID',
-						]
+						],
 					],
 				],
 			]);
@@ -89,10 +87,10 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					[
-						'message' => 'Persisted query by that ID was not found and "query" was omitted.',
+						'message'    => 'Persisted query by that ID was not found and "query" was omitted.',
 						'extensions' => [
 							'code' => 'PERSISTED_QUERY_NOT_FOUND',
-						]
+						],
 					],
 				],
 			]);
@@ -118,10 +116,10 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 			->assertJson([
 				'errors' => [
 					[
-						'message' => 'Persisted queries are not supported by this server.',
+						'message'    => 'Persisted queries are not supported by this server.',
 						'extensions' => [
 							'code' => 'PERSISTED_QUERY_NOT_SUPPORTED',
-						]
+						],
 					],
 				],
 			]);

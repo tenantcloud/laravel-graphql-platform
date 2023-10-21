@@ -12,7 +12,7 @@ class GiveNewApplicationInstanceToContainerHandle
 {
 	public function handle(RequestReceived|TaskReceived|TickReceived $event): void
 	{
-		if (! $event->sandbox->resolved(GraphQLPlatformServiceProvider::CONTAINER_HANDLE)) {
+		if (!$event->sandbox->resolved(GraphQLPlatformServiceProvider::CONTAINER_HANDLE)) {
 			return;
 		}
 

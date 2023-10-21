@@ -57,7 +57,6 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
-use TenantCloud\GraphQLPlatform\Server\QueryComplexity\ComplexityFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
@@ -70,6 +69,7 @@ use TheCodingMachine\GraphQLite\Mappers\Parameters\InjectUserParameterHandler;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ResolveInfoParameterHandler;
 use TheCodingMachine\GraphQLite\Middlewares\AuthorizationFieldMiddleware;
 use TheCodingMachine\GraphQLite\Middlewares\AuthorizationInputFieldMiddleware;
+use TheCodingMachine\GraphQLite\Middlewares\CostFieldMiddleware;
 use TheCodingMachine\GraphQLite\Middlewares\SecurityFieldMiddleware;
 use TheCodingMachine\GraphQLite\Middlewares\SecurityInputFieldMiddleware;
 use TheCodingMachine\GraphQLite\NamingStrategy;
@@ -215,7 +215,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(AuthenticationServiceInterface::class),
 					$app->make(AuthorizationServiceInterface::class),
 				))
-				->addFieldMiddleware(new ComplexityFieldMiddleware())
+				->addFieldMiddleware(new CostFieldMiddleware())
 				->addInputFieldMiddleware(new MissingValueInputFieldMiddleware())
 				->addInputFieldMiddleware(new IDInputFieldMiddleware(
 					$app->make(ArgumentResolver::class),

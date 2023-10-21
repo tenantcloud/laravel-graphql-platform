@@ -73,8 +73,6 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 
 	private function mapTypeToId(InputType&Type $type): Type&InputType
 	{
-
-
 		$originalType = $type;
 
 		if ($type instanceof NonNull) {
