@@ -46,4 +46,14 @@ class ModelIDParameter implements InputTypeParameterInterface
 	{
 		return $this->delegate->getDefaultValue();
 	}
+
+	public function getName(): string
+	{
+		return $this->delegate->getName();
+	}
+
+	public function getDescription(): string
+	{
+		return $this->delegate->getDescription();
+	}
 }
