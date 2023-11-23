@@ -8,12 +8,16 @@ use TheCodingMachine\GraphQLite\InputField;
 use TheCodingMachine\GraphQLite\InputFieldDescriptor;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
+use TheCodingMachine\GraphQLite\Middlewares\SourceInputPropertyResolver;
+use TheCodingMachine\GraphQLite\Middlewares\SourceMethodResolver;
+use TheCodingMachine\GraphQLite\Middlewares\SourcePropertyResolver;
 
 class ModelIDInputFieldMiddleware implements InputFieldMiddlewareInterface
 {
 	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
-		$type = $inputFieldDescriptor->getRefProperty()->getType();
+		$originalResolver = $inputFieldDescriptor->getOriginalResolver();
+		$type = $originalResolver instanceof SourceInputPropertyResolver ? $originalResolver->propertyReflection()->getType() : null;
 
 		if (!$type instanceof ReflectionNamedType || !is_a($type->getName(), Model::class, true)) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);
