@@ -18,7 +18,6 @@ use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TheCodingMachine\GraphQLite\InvalidDocBlockRuntimeException;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
-use TheCodingMachine\GraphQLite\Middlewares\MagicPropertyResolver;
 use TheCodingMachine\GraphQLite\Middlewares\ServiceResolver;
 use TheCodingMachine\GraphQLite\Middlewares\SourceMethodResolver;
 use TheCodingMachine\GraphQLite\Middlewares\SourcePropertyResolver;
@@ -42,8 +41,8 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 
 		$reflector = match (true) {
 			$originalResolver instanceof SourcePropertyResolver => $originalResolver->propertyReflection(),
-			$originalResolver instanceof SourceMethodResolver => $originalResolver->methodReflection(),
-			$originalResolver instanceof ServiceResolver => (function () use ($originalResolver) {
+			$originalResolver instanceof SourceMethodResolver   => $originalResolver->methodReflection(),
+			$originalResolver instanceof ServiceResolver        => (function () use ($originalResolver) {
 				$callable = $originalResolver->callable();
 
 				return new ReflectionMethod($callable[0], $callable[1]);
