@@ -188,7 +188,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			ValidatorInterface::class,
 			fn (Application $app) => (new ValidatorBuilder())
-				->enableAnnotationMapping()
+				->enableAttributeMapping()
 				->setMappingCache($app->make('graphqlite.symfony_cache'))
 				->setTranslator(new LaravelCompositeTranslatorAdapter($app->make(Translator::class)))
 				->setConstraintValidatorFactory(
