@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Schema;
 
+use Kcs\ClassFinder\Finder\FinderInterface;
 use Mouf\Composer\ClassNameMapper;
 use Psr\Container\ContainerInterface;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
@@ -211,7 +212,7 @@ class SchemaFactory
 				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
 				$namespacedCache,
-				$this->container->get(ClassNameMapper::class),
+				$this->container->get('graphqlite.finder'),
 				null,
 			);
 		}

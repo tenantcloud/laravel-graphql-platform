@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Kcs\ClassFinder\Finder\ComposerFinder;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
@@ -166,8 +167,8 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			}
 		);
 		$this->app->singleton(
-			ClassNameMapper::class,
-			fn () => ClassNameMapper::createFromComposerFile(null, null, true),
+			'graphqlite.finder',
+			fn () => new ComposerFinder(),
 		);
 		$this->app->singleton(NamingStrategy::class);
 		$this->app->bind(NamingStrategyInterface::class, NamingStrategy::class);
@@ -177,7 +178,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			NamespaceFactory::class,
 			fn (Application $app) => new NamespaceFactory(
 				$app->make('graphqlite.namespaced_cache'),
-				$app->make(ClassNameMapper::class),
+				$app->make('graphqlite.finder'),
 				null
 			)
 		);
