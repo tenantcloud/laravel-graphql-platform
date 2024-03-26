@@ -21,8 +21,7 @@ final class SchemaConfigurator
 	public readonly string $cacheNamespace;
 
 	/**
-	 * @param string[]                         $controllerNamespaces
-	 * @param string[]                         $typeNamespaces
+	 * @param string[]                         $namespaces
 	 * @param QueryProviderInterface[]         $queryProviders
 	 * @param QueryProviderFactoryInterface[]  $queryProviderFactories
 	 * @param RootTypeMapperFactoryInterface[] $rootTypeMapperFactories
@@ -33,8 +32,7 @@ final class SchemaConfigurator
 	 * @param InputFieldMiddlewareInterface[]  $inputFieldMiddlewares
 	 */
 	public function __construct(
-		public readonly array $controllerNamespaces = [],
-		public readonly array $typeNamespaces = [],
+		public readonly array $namespaces = [],
 		public readonly array $queryProviders = [],
 		public readonly array $queryProviderFactories = [],
 		public readonly array $rootTypeMapperFactories = [],
@@ -81,23 +79,12 @@ final class SchemaConfigurator
 	}
 
 	/**
-	 * Registers a namespace that can contain GraphQL controllers.
+	 * Registers a namespace that can contain GraphQL controllers or types.
 	 */
-	public function addControllerNamespace(string $namespace): self
+	public function addNamespace(string $namespace): self
 	{
-		return $this->with(controllerNamespaces: [
-			...$this->controllerNamespaces,
-			$namespace,
-		]);
-	}
-
-	/**
-	 * Registers a namespace that can contain GraphQL types.
-	 */
-	public function addTypeNamespace(string $namespace): self
-	{
-		return $this->with(typeNamespaces: [
-			...$this->typeNamespaces,
+		return $this->with(namespaces: [
+			...$this->namespaces,
 			$namespace,
 		]);
 	}

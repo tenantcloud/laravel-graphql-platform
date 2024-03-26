@@ -2,8 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Schema;
 
-use Kcs\ClassFinder\Finder\FinderInterface;
-use Mouf\Composer\ClassNameMapper;
 use Psr\Container\ContainerInterface;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
@@ -61,7 +59,7 @@ class SchemaFactory
 			fn (string $namespace) => $this->container
 				->get(NamespaceFactory::class)
 				->createNamespace($namespace),
-			$configurator->typeNamespaces,
+			$configurator->namespaces,
 		);
 		$typeResolver = new TypeResolver();
 		$typeRegistry = new TypeRegistry();
@@ -205,9 +203,9 @@ class SchemaFactory
 
 		$queryProviders = [];
 
-		foreach ($configurator->controllerNamespaces as $controllerNamespace) {
+		foreach ($configurator->namespaces as $namespace) {
 			$queryProviders[] = new GlobControllerQueryProvider(
-				$controllerNamespace,
+				$namespace,
 				$fieldsBuilder,
 				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
