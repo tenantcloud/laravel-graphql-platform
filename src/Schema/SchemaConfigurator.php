@@ -2,7 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Schema;
 
-use PackageVersions\Versions;
 use TenantCloud\APIVersioning\Version\Version;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
@@ -17,8 +16,6 @@ use TheCodingMachine\GraphQLite\Utils\Cloneable;
 final class SchemaConfigurator
 {
 	use Cloneable;
-
-	public readonly string $cacheNamespace;
 
 	/**
 	 * @param string[]                         $namespaces
@@ -43,9 +40,7 @@ final class SchemaConfigurator
 		public readonly array $fieldMiddlewares = [],
 		public readonly array $inputFieldMiddlewares = [],
 		public readonly string|Version|null $forVersion = null,
-	) {
-		$this->cacheNamespace = mb_substr(md5(Versions::getVersion('thecodingmachine/graphqlite')), 0, 8);
-	}
+	) {}
 
 	/**
 	 * Sets the time to live time of the cache for annotations in files.

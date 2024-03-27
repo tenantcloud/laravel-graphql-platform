@@ -3,6 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Schema;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
@@ -54,7 +55,8 @@ class SchemaFactory
 
 	public function create(SchemaConfigurator $configurator): Schema
 	{
-		$namespacedCache = $this->container->get('graphqlite.namespaced_cache');
+		$psr16Cache = $this->container->get('graphqlite.psr16_cache');
+		$psr6Cache = $this->container->get('graphqlite.psr6_cache');
 		$typeNamespaces = array_map(
 			fn (string $namespace) => $this->container
 				->get(NamespaceFactory::class)
@@ -68,7 +70,7 @@ class SchemaFactory
 		$recursiveTypeMapper = new RecursiveTypeMapper(
 			$compositeTypeMapper,
 			$this->container->get(NamingStrategy::class),
-			$namespacedCache,
+			$psr16Cache,
 			$typeRegistry,
 			$this->container->get(AnnotationReader::class)
 		);
@@ -84,7 +86,7 @@ class SchemaFactory
 		$rootTypeMapper = new EnumTypeMapper(
 			$rootTypeMapper,
 			$this->container->get(AnnotationReader::class),
-			$this->container->get('graphqlite.symfony_cache'),
+			new ProxyAdapter($psr6Cache),
 			$typeNamespaces
 		);
 		$rootTypeMapper = new ModelIDTypeMapper($rootTypeMapper);
@@ -98,7 +100,7 @@ class SchemaFactory
 				$typeRegistry,
 				$recursiveTypeMapper,
 				$this->container,
-				$namespacedCache,
+				$psr16Cache,
 				$typeNamespaces,
 				$configurator->globTTL,
 			);
@@ -196,7 +198,7 @@ class SchemaFactory
 				$this->container->get(AnnotationReader::class),
 				$this->container->get(NamingStrategy::class),
 				$recursiveTypeMapper,
-				$namespacedCache,
+				$psr16Cache,
 				null,
 			));
 		}
@@ -209,7 +211,7 @@ class SchemaFactory
 				$fieldsBuilder,
 				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
-				$namespacedCache,
+				$psr16Cache,
 				$this->container->get('graphqlite.finder'),
 				null,
 			);
