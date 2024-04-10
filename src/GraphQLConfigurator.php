@@ -40,6 +40,7 @@ final class GraphQLConfigurator
 		public readonly array $routes = [],
 		public readonly array $schemas = [],
 		public readonly array $validationRules = [],
+		public readonly bool $devMode = false,
 	) {}
 
 	public function useAutomaticPersistedQueries(CacheInterface $cache, DateInterval $ttl = new CarbonInterval('P1D')): self
@@ -62,6 +63,11 @@ final class GraphQLConfigurator
 	public function disableIntrospection(): self
 	{
 		return $this->addValidationRule(new DisableIntrospection(DisableIntrospection::ENABLED));
+	}
+
+	public function devMode(bool $value = true): self
+	{
+		return $this->with(devMode: $value);
 	}
 
 	public function addValidationRule(ValidationRule $rule): self

@@ -2,8 +2,8 @@
 
 namespace TenantCloud\GraphQLPlatform\Schema;
 
+use Kcs\ClassFinder\Finder\ComposerFinder;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
@@ -18,12 +18,15 @@ use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
+use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderBoundCache;
+use TheCodingMachine\GraphQLite\Discovery\ClassFinder;
+use TheCodingMachine\GraphQLite\Discovery\KcsClassFinder;
 use TheCodingMachine\GraphQLite\FieldsBuilder;
 use TheCodingMachine\GraphQLite\GlobControllerQueryProvider;
 use TheCodingMachine\GraphQLite\InputTypeGenerator;
 use TheCodingMachine\GraphQLite\InputTypeUtils;
+use TheCodingMachine\GraphQLite\Mappers\ClassFinderTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\CompositeTypeMapper;
-use TheCodingMachine\GraphQLite\Mappers\GlobTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewarePipe;
 use TheCodingMachine\GraphQLite\Mappers\RecursiveTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\BaseTypeMapper;
@@ -38,14 +41,14 @@ use TheCodingMachine\GraphQLite\Mappers\Root\VoidTypeMapper;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewarePipe;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewarePipe;
 use TheCodingMachine\GraphQLite\NamingStrategy;
-use TheCodingMachine\GraphQLite\Reflection\CachedDocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockContextFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockFactory;
 use TheCodingMachine\GraphQLite\Schema;
 use TheCodingMachine\GraphQLite\TypeGenerator;
 use TheCodingMachine\GraphQLite\TypeRegistry;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
 use TheCodingMachine\GraphQLite\Types\TypeResolver;
-use TheCodingMachine\GraphQLite\Utils\Namespaces\NamespaceFactory;
 
 class SchemaFactory
 {
@@ -56,13 +59,7 @@ class SchemaFactory
 	public function create(SchemaConfigurator $configurator): Schema
 	{
 		$psr16Cache = $this->container->get('graphqlite.psr16_cache');
-		$psr6Cache = $this->container->get('graphqlite.psr6_cache');
-		$typeNamespaces = array_map(
-			fn (string $namespace) => $this->container
-				->get(NamespaceFactory::class)
-				->createNamespace($namespace),
-			$configurator->namespaces,
-		);
+		$classFinder = $this->classFinder($configurator);
 		$typeResolver = new TypeResolver();
 		$typeRegistry = new TypeRegistry();
 
@@ -86,8 +83,9 @@ class SchemaFactory
 		$rootTypeMapper = new EnumTypeMapper(
 			$rootTypeMapper,
 			$this->container->get(AnnotationReader::class),
-			new ProxyAdapter($psr6Cache),
-			$typeNamespaces
+			$this->container->get(DocBlockFactory::class),
+			$classFinder,
+			$this->container->get(ClassFinderBoundCache::class),
 		);
 		$rootTypeMapper = new ModelIDTypeMapper($rootTypeMapper);
 		$rootTypeMapper = new CarbonRootTypeMapper($rootTypeMapper);
@@ -101,8 +99,8 @@ class SchemaFactory
 				$recursiveTypeMapper,
 				$this->container,
 				$psr16Cache,
-				$typeNamespaces,
-				$configurator->globTTL,
+				$classFinder,
+				$this->container->get(ClassFinderBoundCache::class),
 			);
 
 			foreach (array_reverse($configurator->rootTypeMapperFactories) as $rootTypeMapperFactory) {
@@ -136,7 +134,8 @@ class SchemaFactory
 			$recursiveTypeMapper,
 			$this->container->get(ArgumentResolver::class),
 			$typeResolver,
-			$this->container->get(CachedDocBlockFactory::class),
+			$this->container->get(DocBlockFactory::class),
+			$this->container->get(DocBlockContextFactory::class),
 			$this->container->get(NamingStrategy::class),
 			$topRootTypeMapper,
 			$parameterMiddlewarePipe,
@@ -155,7 +154,7 @@ class SchemaFactory
 
 		$fieldMiddlewarePipe->pipe(new ConnectionFieldMiddleware(
 			$connectionTypeMapper,
-			$this->container->get(CachedDocBlockFactory::class),
+			$this->container->get(DocBlockFactory::class),
 			$this->container->get(ArgumentResolver::class)
 		));
 		$fieldMiddlewarePipe->pipe(new LaravelPaginationFieldMiddleware($connectionTypeMapper));
@@ -188,34 +187,28 @@ class SchemaFactory
 				null
 		);
 
-		foreach ($typeNamespaces as $ns) {
-			$compositeTypeMapper->addTypeMapper(new GlobTypeMapper(
-				$ns,
-				$typeGenerator,
-				$inputTypeGenerator,
-				$this->container->get(InputTypeUtils::class),
-				$this->container,
-				$this->container->get(AnnotationReader::class),
-				$this->container->get(NamingStrategy::class),
-				$recursiveTypeMapper,
-				$psr16Cache,
-				null,
-			));
-		}
+		$compositeTypeMapper->addTypeMapper(new ClassFinderTypeMapper(
+			$classFinder,
+			$typeGenerator,
+			$inputTypeGenerator,
+			$this->container->get(InputTypeUtils::class),
+			$this->container,
+			$this->container->get(AnnotationReader::class),
+			$this->container->get(NamingStrategy::class),
+			$recursiveTypeMapper,
+			$this->container->get(ClassFinderBoundCache::class),
+		));
 
-		$queryProviders = [];
 
-		foreach ($configurator->namespaces as $namespace) {
-			$queryProviders[] = new GlobControllerQueryProvider(
-				$namespace,
+		$queryProviders = [
+			new GlobControllerQueryProvider(
 				$fieldsBuilder,
 				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
-				$psr16Cache,
-				$this->container->get('graphqlite.finder'),
-				null,
-			);
-		}
+				$classFinder,
+				$this->container->get(ClassFinderBoundCache::class),
+			)
+		];
 
 		$aggregateQueryProvider = new AggregateQueryProvider($queryProviders);
 
@@ -225,5 +218,16 @@ class SchemaFactory
 			$typeResolver,
 			$topRootTypeMapper
 		);
+	}
+
+	private function classFinder(SchemaConfigurator $configurator): ClassFinder
+	{
+		$finder = new ComposerFinder();
+
+		foreach ($configurator->namespaces as $namespace) {
+			$finder->inNamespace($namespace);
+		}
+
+		return new KcsClassFinder($finder);
 	}
 }

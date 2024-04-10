@@ -17,17 +17,16 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Kcs\ClassFinder\Finder\ComposerFinder;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
 use PackageVersions\Versions;
+use phpDocumentor\Reflection\Types\ContextFactory;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
-use Psr\SimpleCache\CacheInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -60,7 +59,16 @@ use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
+use TheCodingMachine\CacheUtils\ClassBoundCache;
+use TheCodingMachine\CacheUtils\ClassBoundCacheContract;
+use TheCodingMachine\CacheUtils\ClassBoundCacheContractInterface;
+use TheCodingMachine\CacheUtils\ClassBoundMemoryAdapter;
+use TheCodingMachine\CacheUtils\FileBoundCache;
+use TheCodingMachine\CacheUtils\FileBoundCacheInterface;
 use TheCodingMachine\GraphQLite\AnnotationReader;
+use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderBoundCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\FileModificationClassFinderBoundCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderBoundCache;
 use TheCodingMachine\GraphQLite\Exceptions\WebonyxErrorHandler;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 use TheCodingMachine\GraphQLite\InputTypeUtils;
@@ -74,14 +82,18 @@ use TheCodingMachine\GraphQLite\Middlewares\SecurityFieldMiddleware;
 use TheCodingMachine\GraphQLite\Middlewares\SecurityInputFieldMiddleware;
 use TheCodingMachine\GraphQLite\NamingStrategy;
 use TheCodingMachine\GraphQLite\NamingStrategyInterface;
-use TheCodingMachine\GraphQLite\Reflection\CachedDocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\CachedDocBlockContextFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\CachedDocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockContextFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\PhpDocumentorDocBlockContextFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\PhpDocumentorDocBlockFactory;
 use TheCodingMachine\GraphQLite\Schema;
 use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\AuthorizationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\SecurityExpressionLanguageProvider;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
-use TheCodingMachine\GraphQLite\Utils\Namespaces\NamespaceFactory;
 use Webmozart\Assert\Assert;
 
 class GraphQLPlatformServiceProvider extends ServiceProvider
@@ -91,8 +103,8 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 	public function register(): void
 	{
 		$this->registerContainer();
-		$this->registerUtils();
 		$this->registerCache();
+		$this->registerUtils();
 		$this->registerSchema();
 		$this->registerHttp();
 		$this->registerConnections();
@@ -121,8 +133,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			$events->listen(\Laravel\Octane\Events\TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
 		}
 
-		$this->registerConnections();
-
 		$viewFactory->addNamespace(GraphQLPlatform::NAMESPACE, __DIR__ . '/../resources/views');
 
 		foreach ($graphQLConfigurator->schemas as $name => $configurator) {
@@ -144,9 +154,30 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(InputTypeUtils::class);
 
 		$this->app->singleton(
-			CachedDocBlockFactory::class,
-			fn (Application $app) => new CachedDocBlockFactory($app->make('graphqlite.psr16_cache'))
+			DocBlockContextFactory::class,
+			fn (Application $app) => new CachedDocBlockContextFactory(
+				$app->make(ClassBoundCacheContractInterface::class),
+				new PhpDocumentorDocBlockContextFactory(new ContextFactory())
+			),
 		);
+		$this->app->singleton(
+			DocBlockFactory::class,
+			fn (Application $app) => new CachedDocBlockFactory(
+				$app->make(ClassBoundCacheContractInterface::class),
+				new PhpDocumentorDocBlockFactory(
+					\phpDocumentor\Reflection\DocBlockFactory::createInstance(),
+					$app->make(DocBlockContextFactory::class),
+				),
+			),
+		);
+
+		$this->app->singleton(
+			ClassFinderBoundCache::class,
+			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
+				new FileModificationClassFinderBoundCache($app->make('graphqlite.psr16_cache')) :
+            	new HardClassFinderBoundCache($app->make('graphqlite.psr16_cache'))
+		);
+
 		$this->app->singleton(
 			AnnotationReader::class,
 			fn () => new AnnotationReader(new NullAnnotationReader(), AnnotationReader::LAX_MODE)
@@ -160,24 +191,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 				return $expressionLanguage;
 			}
-		);
-		$this->app->singleton(
-			'graphqlite.finder',
-			function (Application $app) {
-				/** @var CacheInterface $cache */
-				$cache = $app->make('graphqlite.psr16_cache');
-
-				return (new ComposerFinder())
-					->pathFilter(fn (string $path) => true);
-			},
-		);
-		$this->app->singleton(
-			NamespaceFactory::class,
-			fn (Application $app) => new NamespaceFactory(
-				$app->make('graphqlite.psr16_cache'),
-				$app->make('graphqlite.finder'),
-				null
-			)
 		);
 	}
 
@@ -197,11 +210,31 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			'graphqlite.psr16_cache',
 			fn (Application $app) => new Psr16Cache($app->make('graphqlite.psr6_cache'))
 		);
+
+		$this->app->singleton(FileBoundCacheInterface::class,
+			fn (Application $app) => new FileBoundCache($app->make('graphqlite.psr16_cache')),
+		);
+
+		$this->app->singleton(ClassBoundCacheContractInterface::class,
+			fn (Application $app) => new ClassBoundCacheContract(
+				new ClassBoundMemoryAdapter(
+					new ClassBoundCache(
+						fileBoundCache: $app->make(FileBoundCacheInterface::class),
+						analyzeParentClasses: false,
+						analyzeTraits: false,
+						analyzeInterfaces: false,
+					)
+				)
+			),
+		);
 	}
 
 	private function registerSchema(): void
 	{
-		$this->app->singleton(GraphQLConfigurator::class);
+		$this->app->singleton(
+			GraphQLConfigurator::class,
+			fn (Application $app) => new GraphQLConfigurator(devMode: $app->isLocal() || $app->runningUnitTests())
+		);
 		$this->app->singleton(SchemaRegistry::class, fn (Application $app) => new SchemaRegistry(
 			$app->make(SchemaFactory::class),
 			$app->factory(SchemaConfigurator::class),

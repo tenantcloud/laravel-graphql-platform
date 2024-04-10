@@ -36,37 +36,10 @@ final class SchemaConfigurator
 		public readonly array $typeMappers = [],
 		public readonly array $typeMapperFactories = [],
 		public readonly array $parameterMiddlewares = [],
-		public readonly int|null $globTTL = 2,
 		public readonly array $fieldMiddlewares = [],
 		public readonly array $inputFieldMiddlewares = [],
 		public readonly string|Version|null $forVersion = null,
 	) {}
-
-	/**
-	 * Sets the time to live time of the cache for annotations in files.
-	 * By default this is set to 2 seconds which is ok for development environments.
-	 * Set this to "null" (i.e. infinity) for production environments.
-	 */
-	public function globTTL(int|null $globTTL): self
-	{
-		return $this->with(globTTL: $globTTL);
-	}
-
-	/**
-	 * Sets GraphQLite in "prod" mode (cache settings optimized for best performance).
-	 */
-	public function prodMode(): self
-	{
-		return $this->globTTL(null);
-	}
-
-	/**
-	 * Sets GraphQLite in "dev" mode (this is the default mode: cache settings optimized for best developer experience).
-	 */
-	public function devMode(): self
-	{
-		return $this->globTTL(2);
-	}
 
 	public function forVersion(string|Version $version): self
 	{
