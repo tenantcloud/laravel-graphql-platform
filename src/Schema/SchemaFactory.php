@@ -2,13 +2,13 @@
 
 namespace TenantCloud\GraphQLPlatform\Schema;
 
-use Kcs\ClassFinder\Finder\ComposerFinder;
 use Psr\Container\ContainerInterface;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
+use TenantCloud\GraphQLPlatform\Discovery\Composer\ComposerClassFinder;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
@@ -20,7 +20,6 @@ use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderBoundCache;
 use TheCodingMachine\GraphQLite\Discovery\ClassFinder;
-use TheCodingMachine\GraphQLite\Discovery\KcsClassFinder;
 use TheCodingMachine\GraphQLite\FieldsBuilder;
 use TheCodingMachine\GraphQLite\GlobControllerQueryProvider;
 use TheCodingMachine\GraphQLite\InputTypeGenerator;
@@ -222,12 +221,6 @@ class SchemaFactory
 
 	private function classFinder(SchemaConfigurator $configurator): ClassFinder
 	{
-		$finder = new ComposerFinder();
-
-		foreach ($configurator->namespaces as $namespace) {
-			$finder->inNamespace($namespace);
-		}
-
-		return new KcsClassFinder($finder);
+		return ComposerClassFinder::default($configurator->namespaces);
 	}
 }
