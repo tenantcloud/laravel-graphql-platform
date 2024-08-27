@@ -2,7 +2,8 @@
 
 namespace TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection;
 
-use TenantCloud\GraphQLPlatform\Discovery\Composer\File\FileFinder;
+use ReflectionClass;
+use Throwable;
 
 class MemoizedReflectionFactory implements ReflectionFactory
 {
@@ -10,11 +11,9 @@ class MemoizedReflectionFactory implements ReflectionFactory
 
 	public function __construct(
 		private readonly ReflectionFactory $reflectionFactory,
-	)
-	{
-	}
+	) {}
 
-	public function getOrNull(string $class): ?\ReflectionClass
+	public function getOrNull(string $class): ?ReflectionClass
 	{
 		if (array_key_exists($class, $this->cache)) {
 			return $this->cache[$class];
@@ -22,7 +21,7 @@ class MemoizedReflectionFactory implements ReflectionFactory
 
 		try {
 			return $this->cache[$class] = $this->reflectionFactory->getOrNull($class);
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			return $this->cache[$class] = null;
 		}
 	}

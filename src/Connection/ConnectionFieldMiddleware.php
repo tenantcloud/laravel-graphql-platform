@@ -31,8 +31,8 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 {
 	public function __construct(
 		private readonly ConnectionTypeMapper $connectionTypeMapper,
-		private readonly DocBlockFactory      $docBlockFactory,
-		private readonly ArgumentResolver     $argumentResolver,
+		private readonly DocBlockFactory $docBlockFactory,
+		private readonly ArgumentResolver $argumentResolver,
 	) {}
 
 	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): ?FieldDefinition

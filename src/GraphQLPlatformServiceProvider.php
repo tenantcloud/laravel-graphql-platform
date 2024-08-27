@@ -49,7 +49,6 @@ use TenantCloud\GraphQLPlatform\Laravel\Octane\GiveNewApplicationInstanceToConta
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Scalars\ID\IDInputFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Schema\NullAnnotationReader;
 use TenantCloud\GraphQLPlatform\Schema\PrintCommand;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
@@ -59,16 +58,13 @@ use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
-use TheCodingMachine\CacheUtils\ClassBoundCache;
-use TheCodingMachine\CacheUtils\ClassBoundCacheContract;
-use TheCodingMachine\CacheUtils\ClassBoundCacheContractInterface;
-use TheCodingMachine\CacheUtils\ClassBoundMemoryAdapter;
-use TheCodingMachine\CacheUtils\FileBoundCache;
-use TheCodingMachine\CacheUtils\FileBoundCacheInterface;
 use TheCodingMachine\GraphQLite\AnnotationReader;
-use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderBoundCache;
-use TheCodingMachine\GraphQLite\Discovery\Cache\FileModificationClassFinderBoundCache;
-use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderBoundCache;
+use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
+use TheCodingMachine\GraphQLite\Cache\FileModificationClassBoundCache;
+use TheCodingMachine\GraphQLite\Cache\HardClassBoundCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\FileModificationClassFinderComputedCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Exceptions\WebonyxErrorHandler;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 use TheCodingMachine\GraphQLite\InputTypeUtils;
@@ -156,14 +152,14 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			DocBlockContextFactory::class,
 			fn (Application $app) => new CachedDocBlockContextFactory(
-				$app->make(ClassBoundCacheContractInterface::class),
+				$app->make(ClassBoundCache::class),
 				new PhpDocumentorDocBlockContextFactory(new ContextFactory())
 			),
 		);
 		$this->app->singleton(
 			DocBlockFactory::class,
 			fn (Application $app) => new CachedDocBlockFactory(
-				$app->make(ClassBoundCacheContractInterface::class),
+				$app->make(ClassBoundCache::class),
 				new PhpDocumentorDocBlockFactory(
 					\phpDocumentor\Reflection\DocBlockFactory::createInstance(),
 					$app->make(DocBlockContextFactory::class),
@@ -171,18 +167,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			),
 		);
 
-		$this->app->singleton(
-			ClassFinderBoundCache::class,
-			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
-				new FileModificationClassFinderBoundCache($app->make('graphqlite.psr16_cache')) :
-            	new HardClassFinderBoundCache($app->make('graphqlite.psr16_cache'))
-		);
-
-		$this->app->singleton(
-			AnnotationReader::class,
-			fn () => new AnnotationReader(new NullAnnotationReader(), AnnotationReader::LAX_MODE)
-		);
-
+		$this->app->singleton(AnnotationReader::class);
 		$this->app->singleton(
 			'graphqlite.expression_language',
 			function (Application $app) {
@@ -211,21 +196,18 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			fn (Application $app) => new Psr16Cache($app->make('graphqlite.psr6_cache'))
 		);
 
-		$this->app->singleton(FileBoundCacheInterface::class,
-			fn (Application $app) => new FileBoundCache($app->make('graphqlite.psr16_cache')),
+		$this->app->singleton(
+			ClassBoundCache::class,
+			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
+				new FileModificationClassBoundCache($app->make('graphqlite.psr16_cache')) :
+				new HardClassBoundCache($app->make('graphqlite.psr16_cache'))
 		);
 
-		$this->app->singleton(ClassBoundCacheContractInterface::class,
-			fn (Application $app) => new ClassBoundCacheContract(
-				new ClassBoundMemoryAdapter(
-					new ClassBoundCache(
-						fileBoundCache: $app->make(FileBoundCacheInterface::class),
-						analyzeParentClasses: false,
-						analyzeTraits: false,
-						analyzeInterfaces: false,
-					)
-				)
-			),
+		$this->app->singleton(
+			ClassFinderComputedCache::class,
+			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
+				new FileModificationClassFinderComputedCache($app->make('graphqlite.psr16_cache')) :
+				new HardClassFinderComputedCache($app->make('graphqlite.psr16_cache'))
 		);
 	}
 

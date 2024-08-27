@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Discovery\Composer;
 
+use AppendIterator;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use Generator;
@@ -15,6 +16,7 @@ use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\MemoizedReflection
 use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\NativeReflectionFactory;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\ReflectionFactory;
 use TheCodingMachine\GraphQLite\Discovery\ClassFinder;
+
 use function Safe\preg_match;
 
 class ComposerClassFinder implements ClassFinder
@@ -31,19 +33,17 @@ class ComposerClassFinder implements ClassFinder
 	 * @param string[] $namespaces
 	 */
 	public function __construct(
-		private readonly ClassLoader  $classLoader,
-		private readonly FileFinder   $fileFinder,
-		private readonly ReflectionFactory   $reflectionFactory,
-		private readonly array|null   $namespaces,
+		private readonly ClassLoader $classLoader,
+		private readonly FileFinder $fileFinder,
+		private readonly ReflectionFactory $reflectionFactory,
+		private readonly array|null $namespaces,
 		private Closure|null $pathFilter = null,
-	) {
-	}
+	) {}
 
 	public static function default(
 		array|null $namespaces,
 		Closure|null $pathCallback = null
-	): self
-	{
+	): self {
 		static $loader, $fileFinder, $reflectionFactory;
 		$loader ??= self::findClassLoader();
 		$fileFinder ??= new MemoizedFileFinder(new GlobFileFinder());
@@ -56,6 +56,35 @@ class ComposerClassFinder implements ClassFinder
 			$namespaces,
 			$pathCallback,
 		);
+	}
+
+	public function withPathFilter(callable $filter): ClassFinder
+	{
+		$that = clone $this;
+		$that->pathFilter = $filter;
+
+		return $that;
+	}
+
+	public function getIterator(): Generator
+	{
+		$iterator = new AppendIterator();
+		$iterator->append($this->searchInClassMap());
+		$iterator->append($this->searchInPsrMap());
+
+		foreach ($iterator as $class => $file) {
+			if (!$this->classHasNamespace($class, $this->namespaces)) {
+				continue;
+			}
+
+			if ($this->pathFilter && !($this->pathFilter)($file)) {
+				continue;
+			}
+
+			if ($reflection = $this->reflectionFactory->getOrNull($class)) {
+				yield $class => $reflection;
+			}
+		}
 	}
 
 	private static function findClassLoader(): ClassLoader
@@ -87,42 +116,13 @@ class ComposerClassFinder implements ClassFinder
 
 		$autoloadFilesFn = $vendorDir . '/composer/autoload_files.php';
 
-		if (! file_exists($autoloadFilesFn)) {
+		if (!file_exists($autoloadFilesFn)) {
 			return $this->autoloadFiles = [];
 		}
 
 		$files = include $autoloadFilesFn;
 
 		return $this->autoloadFiles = array_flip($files);
-	}
-
-	public function withPathFilter(callable $filter): ClassFinder
-	{
-		$that = clone $this;
-		$that->pathFilter = $filter;
-
-		return $that;
-	}
-
-	public function getIterator(): Generator
-	{
-		$iterator = new \AppendIterator();
-		$iterator->append($this->searchInClassMap());
-		$iterator->append($this->searchInPsrMap());
-
-		foreach ($iterator as $class => $file) {
-			if (! $this->classHasNamespace($class, $this->namespaces)) {
-				continue;
-			}
-
-			if ($this->pathFilter && ! ($this->pathFilter)($file)) {
-				continue;
-			}
-
-			if ($reflection = $this->reflectionFactory->getOrNull($class)) {
-				yield $class => $reflection;
-			}
-		}
 	}
 
 	/**
@@ -153,7 +153,7 @@ class ComposerClassFinder implements ClassFinder
 
 		$find = function (array $prefixes, bool $appendNamespace): Generator {
 			foreach ($prefixes as $namespace => $rootPath) {
-				$rootPathLen = strlen($rootPath);
+				$rootPathLen = mb_strlen($rootPath);
 
 				foreach ($this->fileFinder->find($rootPath) as $path) {
 					if (isset($this->autoloadFiles()[$path])) {
@@ -165,7 +165,7 @@ class ComposerClassFinder implements ClassFinder
 						str_replace(
 							'/',
 							'\\',
-							substr($path, $rootPathLen, -4)
+							mb_substr($path, $rootPathLen, -4)
 						),
 						'\\'
 					);
@@ -176,7 +176,7 @@ class ComposerClassFinder implements ClassFinder
 						continue;
 					}
 
-					if (! preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $class)) {
+					if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $class)) {
 						continue;
 					}
 
@@ -189,17 +189,20 @@ class ComposerClassFinder implements ClassFinder
 			$this->psr4Prefixes ??= iterator_to_array($this->traversePrefixes($this->classLoader->getPrefixesPsr4())),
 			true
 		);
+
 		yield from $find(
 			$this->psr0Prefixes ??= iterator_to_array($this->traversePrefixes($this->classLoader->getPrefixes())),
 			false
 		);
 	}
 
-	/** @param array<string, string[]|string> $prefixes */
+	/**
+	 * @param array<string, string[]|string> $prefixes
+	 */
 	private function traversePrefixes(array $prefixes): Generator
 	{
 		foreach ($prefixes as $namespacePrefix => $dirs) {
-			if (! $this->namespacesCollide($namespacePrefix, $this->namespaces)) {
+			if (!$this->namespacesCollide($namespacePrefix, $this->namespaces)) {
 				continue;
 			}
 

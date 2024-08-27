@@ -9,6 +9,7 @@ use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
+
 use function Safe\glob;
 
 class GlobFileFinder implements FileFinder
@@ -26,7 +27,7 @@ class GlobFileFinder implements FileFinder
 				);
 
 				foreach ($files as $filepath => $info) {
-					if (! $info->isFile() || $info->getExtension() !== 'php') {
+					if (!$info->isFile() || $info->getExtension() !== 'php') {
 						continue;
 					}
 

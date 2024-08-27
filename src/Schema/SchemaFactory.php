@@ -18,7 +18,8 @@ use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
-use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderBoundCache;
+use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Discovery\ClassFinder;
 use TheCodingMachine\GraphQLite\FieldsBuilder;
 use TheCodingMachine\GraphQLite\GlobControllerQueryProvider;
@@ -84,7 +85,7 @@ class SchemaFactory
 			$this->container->get(AnnotationReader::class),
 			$this->container->get(DocBlockFactory::class),
 			$classFinder,
-			$this->container->get(ClassFinderBoundCache::class),
+			$this->container->get(ClassFinderComputedCache::class),
 		);
 		$rootTypeMapper = new ModelIDTypeMapper($rootTypeMapper);
 		$rootTypeMapper = new CarbonRootTypeMapper($rootTypeMapper);
@@ -99,7 +100,8 @@ class SchemaFactory
 				$this->container,
 				$psr16Cache,
 				$classFinder,
-				$this->container->get(ClassFinderBoundCache::class),
+				$this->container->get(ClassFinderComputedCache::class),
+				$this->container->get(ClassBoundCache::class),
 			);
 
 			foreach (array_reverse($configurator->rootTypeMapperFactories) as $rootTypeMapperFactory) {
@@ -195,9 +197,8 @@ class SchemaFactory
 			$this->container->get(AnnotationReader::class),
 			$this->container->get(NamingStrategy::class),
 			$recursiveTypeMapper,
-			$this->container->get(ClassFinderBoundCache::class),
+			$this->container->get(ClassFinderComputedCache::class),
 		));
-
 
 		$queryProviders = [
 			new GlobControllerQueryProvider(
@@ -205,8 +206,8 @@ class SchemaFactory
 				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
 				$classFinder,
-				$this->container->get(ClassFinderBoundCache::class),
-			)
+				$this->container->get(ClassFinderComputedCache::class),
+			),
 		];
 
 		$aggregateQueryProvider = new AggregateQueryProvider($queryProviders);

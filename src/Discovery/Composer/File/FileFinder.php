@@ -3,7 +3,6 @@
 namespace TenantCloud\GraphQLPlatform\Discovery\Composer\File;
 
 use Iterator;
-use Traversable;
 
 interface FileFinder
 {
