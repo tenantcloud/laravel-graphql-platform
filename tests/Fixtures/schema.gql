@@ -131,13 +131,21 @@ input UpdateUserDataInput {
   ""
   id: ID!
 
-  ""
+  """
+  
+  
+  Length(max: 255, min: 1)
+  """
   name: String
 
   ""
   somethingAfter: Duration
 
-  ""
+  """
+  
+  
+  AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])
+  """
   fileIds: [ID!]! = []
 }
 

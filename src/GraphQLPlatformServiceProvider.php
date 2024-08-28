@@ -55,6 +55,8 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
+use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
+use TenantCloud\GraphQLPlatform\Validation\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
@@ -252,15 +254,14 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(AuthenticationServiceInterface::class),
 					$app->make(AuthorizationServiceInterface::class),
 				))
-//				->addInputFieldMiddleware(new DescribeValidationInputFieldMiddleware(
-//					$app->make(MetadataFactoryInterface::class),
-//					new ReflectionConstraintDescriptionProvider(),
-//				))
+				->addInputFieldMiddleware(new DescribeValidationInputFieldMiddleware(
+					$app->make(MetadataFactoryInterface::class),
+					new ReflectionConstraintDescriptionProvider(),
+				))
 				->addParameterMiddleware(new InjectUserParameterHandler($app->make(AuthenticationServiceInterface::class)))
 				->addParameterMiddleware(new InjectSelectionParameterMiddleware())
 				->addParameterMiddleware(new ModelIDParameterMiddleware())
 				->addParameterMiddleware(new ResolveInfoParameterHandler())
-//				->addParameterMiddleware(new PrefetchParameterHandler($fieldsBuilder, $app->make(self::CONTAINER_HANDLE)))
 				->addParameterMiddleware(new ContainerParameterHandler($app->make(self::CONTAINER_HANDLE)))
 		);
 	}
