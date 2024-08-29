@@ -8,7 +8,6 @@ use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
-use TenantCloud\GraphQLPlatform\Discovery\Composer\ComposerClassFinder;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
@@ -20,7 +19,6 @@ use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
-use TheCodingMachine\GraphQLite\Discovery\ClassFinder;
 use TheCodingMachine\GraphQLite\FieldsBuilder;
 use TheCodingMachine\GraphQLite\GlobControllerQueryProvider;
 use TheCodingMachine\GraphQLite\InputTypeGenerator;
@@ -51,6 +49,7 @@ use TheCodingMachine\GraphQLite\TypeRegistry;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
 use TheCodingMachine\GraphQLite\Types\TypeResolver;
+use Webmozart\Assert\Assert;
 
 class SchemaFactory
 {
@@ -60,8 +59,9 @@ class SchemaFactory
 
 	public function create(SchemaConfigurator $configurator): Schema
 	{
+		Assert::notNull($configurator->classFinder, 'You must provide a ClassFinder to find the classes.');
+
 		$psr16Cache = $this->container->get('graphqlite.psr16_cache');
-		$classFinder = $this->classFinder($configurator);
 		$typeResolver = new TypeResolver();
 		$typeRegistry = new TypeRegistry();
 
@@ -86,7 +86,7 @@ class SchemaFactory
 			$rootTypeMapper,
 			$this->container->get(AnnotationReader::class),
 			$this->container->get(DocBlockFactory::class),
-			$classFinder,
+			$configurator->classFinder,
 			$this->container->get(ClassFinderComputedCache::class),
 		);
 		$rootTypeMapper = new ModelIDTypeMapper($rootTypeMapper);
@@ -101,7 +101,7 @@ class SchemaFactory
 				$recursiveTypeMapper,
 				$this->container,
 				$psr16Cache,
-				$classFinder,
+				$configurator->classFinder,
 				$this->container->get(ClassFinderComputedCache::class),
 				$this->container->get(ClassBoundCache::class),
 			);
@@ -195,7 +195,7 @@ class SchemaFactory
 		);
 
 		$compositeTypeMapper->addTypeMapper(new ClassFinderTypeMapper(
-			$classFinder,
+			$configurator->classFinder,
 			$typeGenerator,
 			$inputTypeGenerator,
 			$this->container->get(InputTypeUtils::class),
@@ -211,7 +211,7 @@ class SchemaFactory
 				$fieldsBuilder,
 				$this->container->get(LaravelContainerHandle::class),
 				$this->container->get(AnnotationReader::class),
-				$classFinder,
+				$configurator->classFinder,
 				$this->container->get(ClassFinderComputedCache::class),
 			),
 		];
@@ -224,10 +224,5 @@ class SchemaFactory
 			$typeResolver,
 			$topRootTypeMapper
 		);
-	}
-
-	private function classFinder(SchemaConfigurator $configurator): ClassFinder
-	{
-		return ComposerClassFinder::default($configurator->namespaces);
 	}
 }

@@ -3,7 +3,6 @@
 namespace TenantCloud\GraphQLPlatform\Discovery\Composer;
 
 use AppendIterator;
-use Closure;
 use Composer\Autoload\ClassLoader;
 use Generator;
 use Kcs\ClassFinder\PathNormalizer;
@@ -37,12 +36,12 @@ class ComposerClassFinder implements ClassFinder
 		private readonly FileFinder $fileFinder,
 		private readonly ReflectionFactory $reflectionFactory,
 		private readonly array|null $namespaces,
-		private Closure|null $pathFilter = null,
+		private array $pathFilters = [],
 	) {}
 
 	public static function default(
 		array|null $namespaces,
-		Closure|null $pathCallback = null
+		array $pathFilters = []
 	): self {
 		static $loader, $fileFinder, $reflectionFactory;
 		$loader ??= self::findClassLoader();
@@ -54,14 +53,14 @@ class ComposerClassFinder implements ClassFinder
 			$fileFinder,
 			$reflectionFactory,
 			$namespaces,
-			$pathCallback,
+			$pathFilters,
 		);
 	}
 
 	public function withPathFilter(callable $filter): ClassFinder
 	{
 		$that = clone $this;
-		$that->pathFilter = $filter;
+		$that->pathFilters[] = $filter;
 
 		return $that;
 	}
@@ -77,7 +76,7 @@ class ComposerClassFinder implements ClassFinder
 				continue;
 			}
 
-			if ($this->pathFilter && !($this->pathFilter)($file)) {
+			if (!$this->matchesPathFilters($file)) {
 				continue;
 			}
 
@@ -244,5 +243,16 @@ class ComposerClassFinder implements ClassFinder
 		}
 
 		return false;
+	}
+
+	private function matchesPathFilters(string $file): bool
+	{
+		foreach ($this->pathFilters as $pathFilter) {
+			if (!$pathFilter($file)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

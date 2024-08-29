@@ -24,7 +24,7 @@ abstract class TestCase extends BaseTestCase
 			$this->app->extend(
 				SchemaConfigurator::class,
 				fn (SchemaConfigurator $configurator) => $configurator
-					->addNamespace('Tests\\Fixtures')
+					->usingComposerClassFinder(['Tests\\Fixtures'])
 					->addRootTypeMapperFactory(new class () implements RootTypeMapperFactoryInterface {
 						public function create(RootTypeMapperInterface $next, RootTypeMapperFactoryContext $context): RootTypeMapperInterface
 						{
