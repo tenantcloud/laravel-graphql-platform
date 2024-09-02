@@ -60,7 +60,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 			return $fieldHandler->handle($queryFieldDescriptor);
 		}
 
-		$docBlock = $this->docBlockFactory->createFromReflector($reflector);
+		$docBlock = $this->docBlockFactory->create($reflector);
 		$phpDocType = $reflector instanceof ReflectionMethod ?
 			$this->getDocBlocReturnType($docBlock, $reflector) :
 			$this->getDocBlockPropertyType($docBlock, $reflector);

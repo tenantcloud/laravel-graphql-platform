@@ -41,7 +41,6 @@ use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewarePipe;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewarePipe;
 use TheCodingMachine\GraphQLite\NamingStrategy;
 use TheCodingMachine\GraphQLite\ParameterizedCallableResolver;
-use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockContextFactory;
 use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockFactory;
 use TheCodingMachine\GraphQLite\Schema;
 use TheCodingMachine\GraphQLite\TypeGenerator;
@@ -138,7 +137,6 @@ class SchemaFactory
 			$this->container->get(ArgumentResolver::class),
 			$typeResolver,
 			$this->container->get(DocBlockFactory::class),
-			$this->container->get(DocBlockContextFactory::class),
 			$this->container->get(NamingStrategy::class),
 			$topRootTypeMapper,
 			$parameterMiddlewarePipe,

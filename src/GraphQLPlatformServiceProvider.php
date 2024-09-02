@@ -62,11 +62,11 @@ use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFa
 use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
-use TheCodingMachine\GraphQLite\Cache\FileModificationClassBoundCache;
-use TheCodingMachine\GraphQLite\Cache\HardClassBoundCache;
+use TheCodingMachine\GraphQLite\Cache\FilesSnapshot;
+use TheCodingMachine\GraphQLite\Cache\SnapshotClassBoundCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
-use TheCodingMachine\GraphQLite\Discovery\Cache\FileModificationClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderComputedCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\SnapshotClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Exceptions\WebonyxErrorHandler;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 use TheCodingMachine\GraphQLite\InputTypeUtils;
@@ -80,11 +80,8 @@ use TheCodingMachine\GraphQLite\Middlewares\SecurityFieldMiddleware;
 use TheCodingMachine\GraphQLite\Middlewares\SecurityInputFieldMiddleware;
 use TheCodingMachine\GraphQLite\NamingStrategy;
 use TheCodingMachine\GraphQLite\NamingStrategyInterface;
-use TheCodingMachine\GraphQLite\Reflection\DocBlock\CachedDocBlockContextFactory;
 use TheCodingMachine\GraphQLite\Reflection\DocBlock\CachedDocBlockFactory;
-use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockContextFactory;
 use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockFactory;
-use TheCodingMachine\GraphQLite\Reflection\DocBlock\PhpDocumentorDocBlockContextFactory;
 use TheCodingMachine\GraphQLite\Reflection\DocBlock\PhpDocumentorDocBlockFactory;
 use TheCodingMachine\GraphQLite\Schema;
 use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
@@ -152,20 +149,10 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(InputTypeUtils::class);
 
 		$this->app->singleton(
-			DocBlockContextFactory::class,
-			fn (Application $app) => new CachedDocBlockContextFactory(
-				$app->make(ClassBoundCache::class),
-				new PhpDocumentorDocBlockContextFactory(new ContextFactory())
-			),
-		);
-		$this->app->singleton(
 			DocBlockFactory::class,
 			fn (Application $app) => new CachedDocBlockFactory(
 				$app->make(ClassBoundCache::class),
-				new PhpDocumentorDocBlockFactory(
-					\phpDocumentor\Reflection\DocBlockFactory::createInstance(),
-					$app->make(DocBlockContextFactory::class),
-				),
+				PhpDocumentorDocBlockFactory::default(),
 			),
 		);
 
@@ -200,15 +187,16 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 		$this->app->singleton(
 			ClassBoundCache::class,
-			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
-				new FileModificationClassBoundCache($app->make('graphqlite.psr16_cache')) :
-				new HardClassBoundCache($app->make('graphqlite.psr16_cache'))
+			fn (Application $app) => new SnapshotClassBoundCache(
+				$app->make('graphqlite.psr16_cache'),
+				$app->make(GraphQLConfigurator::class)->devMode ? FilesSnapshot::forClass(...) : FilesSnapshot::alwaysUnchanged(...),
+			)
 		);
 
 		$this->app->singleton(
 			ClassFinderComputedCache::class,
 			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
-				new FileModificationClassFinderComputedCache($app->make('graphqlite.psr16_cache')) :
+				new SnapshotClassFinderComputedCache($app->make('graphqlite.psr16_cache')) :
 				new HardClassFinderComputedCache($app->make('graphqlite.psr16_cache'))
 		);
 	}
