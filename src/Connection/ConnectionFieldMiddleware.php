@@ -23,7 +23,7 @@ use TheCodingMachine\GraphQLite\Middlewares\SourceMethodResolver;
 use TheCodingMachine\GraphQLite\Middlewares\SourcePropertyResolver;
 use TheCodingMachine\GraphQLite\Parameters\InputTypeParameter;
 use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
-use TheCodingMachine\GraphQLite\Reflection\CachedDocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockFactory;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use Webmozart\Assert\Assert;
 
@@ -31,7 +31,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 {
 	public function __construct(
 		private readonly ConnectionTypeMapper $connectionTypeMapper,
-		private readonly CachedDocBlockFactory $cachedDocBlockFactory,
+		private readonly DocBlockFactory $docBlockFactory,
 		private readonly ArgumentResolver $argumentResolver,
 	) {}
 
@@ -60,7 +60,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 			return $fieldHandler->handle($queryFieldDescriptor);
 		}
 
-		$docBlock = $this->cachedDocBlockFactory->getDocBlock($reflector);
+		$docBlock = $this->docBlockFactory->create($reflector);
 		$phpDocType = $reflector instanceof ReflectionMethod ?
 			$this->getDocBlocReturnType($docBlock, $reflector) :
 			$this->getDocBlockPropertyType($docBlock, $reflector);

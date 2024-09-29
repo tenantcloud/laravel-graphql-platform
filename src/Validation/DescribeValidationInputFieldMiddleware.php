@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Validation;
 
+use ReflectionProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
@@ -11,7 +12,8 @@ use TheCodingMachine\GraphQLite\InputField;
 use TheCodingMachine\GraphQLite\InputFieldDescriptor;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
-use TypeError;
+use TheCodingMachine\GraphQLite\Middlewares\SourceConstructorParameterResolver;
+use TheCodingMachine\GraphQLite\Middlewares\SourceInputPropertyResolver;
 
 class DescribeValidationInputFieldMiddleware implements InputFieldMiddlewareInterface
 {
@@ -22,23 +24,24 @@ class DescribeValidationInputFieldMiddleware implements InputFieldMiddlewareInte
 
 	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
-		try {
-			$typeClass = $inputFieldDescriptor
-				->getRefProperty()
-				->getDeclaringClass()
-				->getName();
-		} catch (TypeError) {
+		$originalResolver = $inputFieldDescriptor->getOriginalResolver();
+		$propertyReflection = match (true) {
+			$originalResolver instanceof SourceInputPropertyResolver        => $originalResolver->propertyReflection(),
+			$originalResolver instanceof SourceConstructorParameterResolver => new ReflectionProperty(
+				$originalResolver->className(),
+				$originalResolver->parameterName(),
+			),
+			default => null,
+		};
+
+		if (!$propertyReflection) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
 		/** @var PropertyMetadataInterface[] $propertyMetadata */
 		$propertyMetadata = $this->metadataFactory
-			->getMetadataFor($typeClass)
-			->getPropertyMetadata(
-				$inputFieldDescriptor
-					->getRefProperty()
-					->getName()
-			);
+			->getMetadataFor($propertyReflection->getDeclaringClass()->getName())
+			->getPropertyMetadata($propertyReflection->getName());
 
 		if (!$propertyMetadata) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);
@@ -55,7 +58,7 @@ class DescribeValidationInputFieldMiddleware implements InputFieldMiddlewareInte
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
-		$inputFieldDescriptor->setComment($inputFieldDescriptor->getComment() . "\n\n{$constraints}");
+		$inputFieldDescriptor = $inputFieldDescriptor->withComment($inputFieldDescriptor->getComment() . "\n\n{$constraints}");
 
 		return $inputFieldHandler->handle($inputFieldDescriptor);
 	}

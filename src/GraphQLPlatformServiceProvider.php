@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Kcs\ClassFinder\Finder\ComposerFinder;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
@@ -27,7 +26,6 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
-use Psr\SimpleCache\CacheInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -50,17 +48,24 @@ use TenantCloud\GraphQLPlatform\Laravel\Octane\GiveNewApplicationInstanceToConta
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Scalars\ID\IDInputFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Schema\NullAnnotationReader;
 use TenantCloud\GraphQLPlatform\Schema\PrintCommand;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
+use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
+use TenantCloud\GraphQLPlatform\Validation\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
 use TheCodingMachine\GraphQLite\AnnotationReader;
+use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
+use TheCodingMachine\GraphQLite\Cache\FilesSnapshot;
+use TheCodingMachine\GraphQLite\Cache\SnapshotClassBoundCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderComputedCache;
+use TheCodingMachine\GraphQLite\Discovery\Cache\SnapshotClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Exceptions\WebonyxErrorHandler;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 use TheCodingMachine\GraphQLite\InputTypeUtils;
@@ -74,14 +79,15 @@ use TheCodingMachine\GraphQLite\Middlewares\SecurityFieldMiddleware;
 use TheCodingMachine\GraphQLite\Middlewares\SecurityInputFieldMiddleware;
 use TheCodingMachine\GraphQLite\NamingStrategy;
 use TheCodingMachine\GraphQLite\NamingStrategyInterface;
-use TheCodingMachine\GraphQLite\Reflection\CachedDocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\CachedDocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\DocBlockFactory;
+use TheCodingMachine\GraphQLite\Reflection\DocBlock\PhpDocumentorDocBlockFactory;
 use TheCodingMachine\GraphQLite\Schema;
 use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\AuthorizationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\SecurityExpressionLanguageProvider;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
-use TheCodingMachine\GraphQLite\Utils\Namespaces\NamespaceFactory;
 use Webmozart\Assert\Assert;
 
 class GraphQLPlatformServiceProvider extends ServiceProvider
@@ -91,8 +97,8 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 	public function register(): void
 	{
 		$this->registerContainer();
-		$this->registerUtils();
 		$this->registerCache();
+		$this->registerUtils();
 		$this->registerSchema();
 		$this->registerHttp();
 		$this->registerConnections();
@@ -121,8 +127,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			$events->listen(\Laravel\Octane\Events\TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
 		}
 
-		$this->registerConnections();
-
 		$viewFactory->addNamespace(GraphQLPlatform::NAMESPACE, __DIR__ . '/../resources/views');
 
 		foreach ($graphQLConfigurator->schemas as $name => $configurator) {
@@ -144,14 +148,14 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(InputTypeUtils::class);
 
 		$this->app->singleton(
-			CachedDocBlockFactory::class,
-			fn (Application $app) => new CachedDocBlockFactory($app->make('graphqlite.psr16_cache'))
-		);
-		$this->app->singleton(
-			AnnotationReader::class,
-			fn () => new AnnotationReader(new NullAnnotationReader(), AnnotationReader::LAX_MODE)
+			DocBlockFactory::class,
+			fn (Application $app) => new CachedDocBlockFactory(
+				$app->make(ClassBoundCache::class),
+				PhpDocumentorDocBlockFactory::default(),
+			),
 		);
 
+		$this->app->singleton(AnnotationReader::class);
 		$this->app->singleton(
 			'graphqlite.expression_language',
 			function (Application $app) {
@@ -160,24 +164,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 				return $expressionLanguage;
 			}
-		);
-		$this->app->singleton(
-			'graphqlite.finder',
-			function (Application $app) {
-				/** @var CacheInterface $cache */
-				$cache = $app->make('graphqlite.psr16_cache');
-
-				return (new ComposerFinder())
-					->pathFilter(fn (string $path) => true);
-			},
-		);
-		$this->app->singleton(
-			NamespaceFactory::class,
-			fn (Application $app) => new NamespaceFactory(
-				$app->make('graphqlite.psr16_cache'),
-				$app->make('graphqlite.finder'),
-				null
-			)
 		);
 	}
 
@@ -197,11 +183,29 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			'graphqlite.psr16_cache',
 			fn (Application $app) => new Psr16Cache($app->make('graphqlite.psr6_cache'))
 		);
+
+		$this->app->singleton(
+			ClassBoundCache::class,
+			fn (Application $app) => new SnapshotClassBoundCache(
+				$app->make('graphqlite.psr16_cache'),
+				$app->make(GraphQLConfigurator::class)->devMode ? FilesSnapshot::forClass(...) : FilesSnapshot::alwaysUnchanged(...),
+			)
+		);
+
+		$this->app->singleton(
+			ClassFinderComputedCache::class,
+			fn (Application $app) => $app->make(GraphQLConfigurator::class)->devMode ?
+				new SnapshotClassFinderComputedCache($app->make('graphqlite.psr16_cache')) :
+				new HardClassFinderComputedCache($app->make('graphqlite.psr16_cache'))
+		);
 	}
 
 	private function registerSchema(): void
 	{
-		$this->app->singleton(GraphQLConfigurator::class);
+		$this->app->singleton(
+			GraphQLConfigurator::class,
+			fn (Application $app) => new GraphQLConfigurator(devMode: $app->isLocal() || $app->runningUnitTests())
+		);
 		$this->app->singleton(SchemaRegistry::class, fn (Application $app) => new SchemaRegistry(
 			$app->make(SchemaFactory::class),
 			$app->factory(SchemaConfigurator::class),
@@ -237,15 +241,14 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(AuthenticationServiceInterface::class),
 					$app->make(AuthorizationServiceInterface::class),
 				))
-//				->addInputFieldMiddleware(new DescribeValidationInputFieldMiddleware(
-//					$app->make(MetadataFactoryInterface::class),
-//					new ReflectionConstraintDescriptionProvider(),
-//				))
+				->addInputFieldMiddleware(new DescribeValidationInputFieldMiddleware(
+					$app->make(MetadataFactoryInterface::class),
+					new ReflectionConstraintDescriptionProvider(),
+				))
 				->addParameterMiddleware(new InjectUserParameterHandler($app->make(AuthenticationServiceInterface::class)))
 				->addParameterMiddleware(new InjectSelectionParameterMiddleware())
 				->addParameterMiddleware(new ModelIDParameterMiddleware())
 				->addParameterMiddleware(new ResolveInfoParameterHandler())
-//				->addParameterMiddleware(new PrefetchParameterHandler($fieldsBuilder, $app->make(self::CONTAINER_HANDLE)))
 				->addParameterMiddleware(new ContainerParameterHandler($app->make(self::CONTAINER_HANDLE)))
 		);
 	}

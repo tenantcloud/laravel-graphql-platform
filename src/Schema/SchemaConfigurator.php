@@ -3,6 +3,8 @@
 namespace TenantCloud\GraphQLPlatform\Schema;
 
 use TenantCloud\APIVersioning\Version\Version;
+use TenantCloud\GraphQLPlatform\Discovery\Composer\ComposerClassFinder;
+use TheCodingMachine\GraphQLite\Discovery\ClassFinder;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
 use TheCodingMachine\GraphQLite\Mappers\TypeMapperFactoryInterface;
@@ -18,7 +20,6 @@ final class SchemaConfigurator
 	use Cloneable;
 
 	/**
-	 * @param string[]                         $namespaces
 	 * @param QueryProviderInterface[]         $queryProviders
 	 * @param QueryProviderFactoryInterface[]  $queryProviderFactories
 	 * @param RootTypeMapperFactoryInterface[] $rootTypeMapperFactories
@@ -29,59 +30,33 @@ final class SchemaConfigurator
 	 * @param InputFieldMiddlewareInterface[]  $inputFieldMiddlewares
 	 */
 	public function __construct(
-		public readonly array $namespaces = [],
+		public readonly ?ClassFinder $classFinder = null,
 		public readonly array $queryProviders = [],
 		public readonly array $queryProviderFactories = [],
 		public readonly array $rootTypeMapperFactories = [],
 		public readonly array $typeMappers = [],
 		public readonly array $typeMapperFactories = [],
 		public readonly array $parameterMiddlewares = [],
-		public readonly int|null $globTTL = 2,
 		public readonly array $fieldMiddlewares = [],
 		public readonly array $inputFieldMiddlewares = [],
 		public readonly string|Version|null $forVersion = null,
 	) {}
-
-	/**
-	 * Sets the time to live time of the cache for annotations in files.
-	 * By default this is set to 2 seconds which is ok for development environments.
-	 * Set this to "null" (i.e. infinity) for production environments.
-	 */
-	public function globTTL(int|null $globTTL): self
-	{
-		return $this->with(globTTL: $globTTL);
-	}
-
-	/**
-	 * Sets GraphQLite in "prod" mode (cache settings optimized for best performance).
-	 */
-	public function prodMode(): self
-	{
-		return $this->globTTL(null);
-	}
-
-	/**
-	 * Sets GraphQLite in "dev" mode (this is the default mode: cache settings optimized for best developer experience).
-	 */
-	public function devMode(): self
-	{
-		return $this->globTTL(2);
-	}
 
 	public function forVersion(string|Version $version): self
 	{
 		return $this->with(forVersion: $version);
 	}
 
-	/**
-	 * Registers a namespace that can contain GraphQL controllers or types.
-	 */
-	public function addNamespace(string $namespace): self
+	public function usingClassFinder(ClassFinder $classFinder): self
 	{
-		return $this->with(namespaces: [
-			...$this->namespaces,
-			$namespace,
-		]);
+		return $this->with(classFinder: $classFinder);
+	}
+
+	public function usingComposerClassFinder(array $namespaces, callable $pathFilter = null): self
+	{
+		return $this->usingClassFinder(
+			ComposerClassFinder::default($namespaces, $pathFilter ? [$pathFilter] : []),
+		);
 	}
 
 	/**

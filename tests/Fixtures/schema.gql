@@ -23,12 +23,21 @@ scalar Any
 type User {
 	name: String!
 	createdAt: DateTime!
+
+	"""
+	Cost: complexity = 3, multipliers = [], defaultMultiplier = null
+	"""
 	somethingAfter: Duration
+
 	fileIds: [Int!]!
 }
 
 type Query {
+	"""
+	Cost: complexity = 10, multipliers = [perPage], defaultMultiplier = null
+	"""
 	listUsers(perPage: Int = 15): UserOffsetConnection!
+
 	firstUser: User!
 	clientSafeError: Int!
 	clientUnsafeError: Int!
@@ -132,13 +141,17 @@ input UpdateUserDataInput {
 	""
 	id: ID!
 
-	""
+	"""
+	Length(max: 255, min: 1)
+	"""
 	name: String
 
 	""
 	somethingAfter: Duration
 
-	""
+	"""
+	AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])
+	"""
 	fileIds: [ID!]! = []
 }
 
