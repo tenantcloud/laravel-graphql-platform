@@ -1,11 +1,11 @@
 type SelectionResponse {
-  users: UserOffsetConnection!
-  selection: Any!
+	users: UserOffsetConnection!
+	selection: Any!
 }
 
 type UserOffsetConnection {
-  nodes: [User!]!
-  edges: [UserOffsetEdge]!
+	nodes: [User!]!
+	edges: [UserOffsetEdge]!
 }
 
 "The `DateTime` scalar type represents time data, represented as an ISO-8601 encoded UTC date string."
@@ -15,138 +15,144 @@ scalar DateTime
 scalar Duration
 
 type UserOffsetEdge {
-  node: User!
+	node: User!
 }
 
 scalar Any
 
 type User {
-  name: String!
-  createdAt: DateTime!
+	name: String!
+	createdAt: DateTime!
 
-  """
-  
-  Cost: complexity = 3, multipliers = [], defaultMultiplier = null
-  """
-  somethingAfter: Duration
+	"""
+	Cost: complexity = 3, multipliers = [], defaultMultiplier = null
+	"""
+	somethingAfter: Duration
 
-  fileIds: [Int!]!
+	fileIds: [Int!]!
 }
 
 type Query {
-  """
-  
-  Cost: complexity = 10, multipliers = [perPage], defaultMultiplier = null
-  """
-  listUsers(perPage: Int = 15): UserOffsetConnection!
+	"""
+	Cost: complexity = 10, multipliers = [perPage], defaultMultiplier = null
+	"""
+	listUsers(perPage: Int = 15): UserOffsetConnection!
 
-  firstUser: User!
-  clientSafeError: Int!
-  clientUnsafeError: Int!
+	firstUser: User!
+	clientSafeError: Int!
+	clientUnsafeError: Int!
 
-  """
-  Available in versions: >=2
-  
-  """
-  versionedField: String!
+	"""
+	Available in versions: >=2
+	"""
+	versionedField: String!
 
-  fullSelection: SelectionResponse!
-  nestedSelection: SelectionResponse!
-  offsetConnectable(offset: Int = null, limit: Int = null): UserOffsetConnection
-  cursorConnectable(first: Int = null, after: String = null, last: Int = null, before: String = null): UserConnection
-  connectable: UserFriendsConnectable!
+	fullSelection: SelectionResponse!
+	nestedSelection: SelectionResponse!
+	offsetConnectable(
+		offset: Int = null
+		limit: Int = null
+	): UserOffsetConnection
+	cursorConnectable(
+		first: Int = null
+		after: String = null
+		last: Int = null
+		before: String = null
+	): UserConnection
+	connectable: UserFriendsConnectable!
 }
 
 type UserConnection {
-  nodes: [User!]!
-  edges: [UserEdge]!
-  pageInfo: PageInfo!
+	nodes: [User!]!
+	edges: [UserEdge]!
+	pageInfo: PageInfo!
 }
 
 type UserEdge {
-  node: User!
-  cursor: String
+	node: User!
+	cursor: String
 }
 
 type PageInfo {
-  "Determine if there are more items in the data source after these."
-  hasNextPage: Boolean!
+	"Determine if there are more items in the data source after these."
+	hasNextPage: Boolean!
 
-  "Determine if there are more items in the data source before these."
-  hasPreviousPage: Boolean!
+	"Determine if there are more items in the data source before these."
+	hasPreviousPage: Boolean!
 
-  "A cursor for the first item."
-  startCursor: String
+	"A cursor for the first item."
+	startCursor: String
 
-  "A cursor for the last item."
-  endCursor: String
+	"A cursor for the last item."
+	endCursor: String
 }
 
 type UserFriendsConnectable {
-  cursor(first: Int, after: String, last: Int, before: String): UserFriendsConnection!
-  offset(limit: Int, offset: Int): UserFriendsOffsetConnection!
+	cursor(
+		first: Int
+		after: String
+		last: Int
+		before: String
+	): UserFriendsConnection!
+	offset(limit: Int, offset: Int): UserFriendsOffsetConnection!
 }
 
 type UserFriendsConnection {
-  nodes: [User!]!
-  edges: [UserFriendsEdge]!
-  pageInfo: PageInfo!
+	nodes: [User!]!
+	edges: [UserFriendsEdge]!
+	pageInfo: PageInfo!
 }
 
 type UserFriendsEdge {
-  node: User!
-  cursor: String
+	node: User!
+	cursor: String
 }
 
 type UserFriendsOffsetConnection {
-  nodes: [User!]!
-  edges: [UserFriendsOffsetEdge]!
+	nodes: [User!]!
+	edges: [UserFriendsOffsetEdge]!
 }
 
 type UserFriendsOffsetEdge {
-  node: User!
+	node: User!
 }
 
 type Mutation {
-  createUser(data: CreateUserDataInput!): Void
-  updateUser(data: UpdateUserDataInput!): User!
-  uploadFile(file: Upload!): String!
+	createUser(data: CreateUserDataInput!): Void
+	updateUser(data: UpdateUserDataInput!): User!
+	uploadFile(file: Upload!): String!
 }
 
 input CreateUserDataInput {
-  ""
-  name: String!
+	""
+	name: String!
 
-  ""
-  createdAt: DateTime!
+	""
+	createdAt: DateTime!
 
-  ""
-  somethingAfter: Duration!
+	""
+	somethingAfter: Duration!
 }
 
 "The `Void` scalar type represents no value being returned."
 scalar Void
 
 input UpdateUserDataInput {
-  ""
-  id: ID!
+	""
+	id: ID!
 
-  """
-  
-  
-  Length(max: 255, min: 1)
-  """
-  name: String
+	"""
+	Length(max: 255, min: 1)
+	"""
+	name: String
 
-  ""
-  somethingAfter: Duration
+	""
+	somethingAfter: Duration
 
-  """
-  
-  
-  AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])
-  """
-  fileIds: [ID!]! = []
+	"""
+	AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])
+	"""
+	fileIds: [ID!]! = []
 }
 
 """
@@ -156,6 +162,6 @@ The `Upload` special type represents a file to be uploaded in the same HTTP requ
 scalar Upload
 
 type Subscription {
-  "A placeholder query used by thecodingmachine\/graphqlite when there are no declared subscriptions."
-  dummySubscription: String
+	"A placeholder query used by thecodingmachine/graphqlite when there are no declared subscriptions."
+	dummySubscription: String
 }
