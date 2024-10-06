@@ -1,15 +1,36 @@
-<style>
-	body {
-		margin: 0;
-	}
-</style>
+<html>
+	<head>
+		<title>GraphQL Explorer</title>
 
-<div style="width: 100%; height: 100%;" id="embedded-sandbox"></div>
+		<style>
+			body {
+				margin: 0;
+			}
 
-<script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script>
-<script>
-	new window.EmbeddedSandbox({
-		target: '#embedded-sandbox',
-		initialEndpoint: @js($endpoint),
-	});
-</script>
+			#embedded-sandbox {
+				width: 100vw;
+				height: 100vh;
+				position: absolute;
+				top: 0;
+			}
+		</style>
+
+		<script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script>
+		<script>
+			new window.EmbeddedSandbox({
+				target: '#embedded-sandbox',
+				initialEndpoint: @js($endpoint),
+				runTelemetry: false,
+				initialState: {
+					headers: {
+						Accept: 'application/graphql-response+json, application/json, */*',
+						Version: @js($latestVersion),
+					}
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<div id="embedded-sandbox"></div>
+	</body>
+</html>

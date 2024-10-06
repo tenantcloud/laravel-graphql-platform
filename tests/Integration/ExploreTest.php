@@ -16,6 +16,8 @@ class ExploreTest extends IntegrationTestCase
 		$this->get('/graphql/explore')
 			->assertOk()
 			->assertViewIs(GraphQLPlatform::namespaced('explore'))
-			->assertViewHas('endpoint', 'http://localhost/graphql');
+			->assertViewHas('endpoint', 'http://localhost/graphql')
+			->assertViewHas('latestVersion', 'latest')
+			->assertSeeText('GraphQL Explorer');
 	}
 }

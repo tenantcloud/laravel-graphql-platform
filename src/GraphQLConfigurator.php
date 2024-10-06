@@ -13,6 +13,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Psr\SimpleCache\CacheInterface;
+use TenantCloud\APIVersioning\Version\LatestVersion;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\Http\DefaultRequestSchemaProvider;
@@ -89,10 +90,12 @@ final class GraphQLConfigurator
 			$router->view(
 				$endpoint,
 				GraphQLPlatform::namespaced('explore'),
-				['endpoint' => match (true) {
-					$router->has($graphQLEndpoint) => $urlGenerator->route($graphQLEndpoint),
-					default                        => $urlGenerator->to($graphQLEndpoint),
-				}],
+				[
+					'endpoint' => $router->has($graphQLEndpoint) ?
+						$urlGenerator->route($graphQLEndpoint) :
+						$urlGenerator->to($graphQLEndpoint),
+					'latestVersion' => (string) new LatestVersion(),
+				],
 			),
 			$callback,
 		));
