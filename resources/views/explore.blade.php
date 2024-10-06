@@ -16,21 +16,23 @@
 		</style>
 
 		<script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script>
+	</head>
+	<body>
+		<div id="embedded-sandbox"></div>
+
 		<script>
 			new window.EmbeddedSandbox({
 				target: '#embedded-sandbox',
 				initialEndpoint: @js($endpoint),
 				runTelemetry: false,
 				initialState: {
+					document: null,
 					headers: {
-						Accept: 'application/graphql-response+json, application/json, */*',
-						Version: @js($latestVersion),
-					}
+						accept: 'application/graphql-response+json, application/json, */*',
+						version: @js($latestVersion),
+					},
 				}
 			});
 		</script>
-	</head>
-	<body>
-		<div id="embedded-sandbox"></div>
 	</body>
 </html>
