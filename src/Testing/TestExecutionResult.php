@@ -126,11 +126,7 @@ class TestExecutionResult extends ExecutionResult
 	 */
 	public function dump(): self
 	{
-		dump([
-			'data'       => $this->data,
-			'errors'     => $this->errors,
-			'extensions' => $this->extensions,
-		]);
+		dump($this->toArray());
 
 		return $this;
 	}

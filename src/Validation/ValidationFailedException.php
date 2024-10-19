@@ -3,32 +3,45 @@
 namespace TenantCloud\GraphQLPlatform\Validation;
 
 use InvalidArgumentException;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
-use TheCodingMachine\GraphQLite\Exceptions\GraphQLAggregateExceptionInterface;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
+use TheCodingMachine\GraphQLite\Exceptions\GraphQLExceptionInterface;
 
-class ValidationFailedException extends InvalidArgumentException implements GraphQLAggregateExceptionInterface
+class ValidationFailedException extends InvalidArgumentException implements GraphQLExceptionInterface
 {
-	private function __construct(
-		public readonly ConstraintViolationListInterface $constraintViolationList,
+	public function __construct(
+		public readonly ConstraintViolationListInterface $violations,
+		public readonly array $path,
+		private readonly PropertyPathMapper $propertyPathMapper,
 	) {
 		parent::__construct('Validation failed.');
 	}
 
-	public static function throw(ConstraintViolationListInterface $constraintViolationList): void
+	public function isClientSafe(): bool
 	{
-		if ($constraintViolationList->count() > 0) {
-			throw new self($constraintViolationList);
-		}
+		return true;
 	}
 
-	public function getExceptions(): array
+	public function getCategory(): string
 	{
-		$exceptions = [];
+		return 'Validate';
+	}
 
-		foreach ($this->constraintViolationList as $violation) {
-			$exceptions[] = new ConstraintViolationException($violation);
-		}
+	public function getExtensions(): array
+	{
+		$violations = collect($this->violations)
+			->map(function (ConstraintViolationInterface $violation) {
+				return [
+					'path'    => [...$this->path, ...$this->propertyPathMapper->map($violation->getPropertyPath(), $violation->getRoot())],
+					'code'    => $violation->getCode(),
+					'message' => (string) $violation->getMessage(),
+				];
+			})
+			->all();
 
-		return $exceptions;
+		return [
+			'errors' => $violations,
+		];
 	}
 }

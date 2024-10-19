@@ -1,13 +1,11 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Validation;
+namespace TenantCloud\GraphQLPlatform\Validation\ConstraintDescription;
 
 use ReflectionProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
-use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ConstraintDescription;
-use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ConstraintDescriptionProvider;
 use TheCodingMachine\GraphQLite\InputField;
 use TheCodingMachine\GraphQLite\InputFieldDescriptor;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;

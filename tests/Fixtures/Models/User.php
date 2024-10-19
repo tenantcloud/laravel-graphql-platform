@@ -22,6 +22,15 @@ class User
 		#[Field] public readonly array $fileIds = [],
 	) {}
 
+	/**
+	 * @param array<Nested> $nest
+	 */
+	#[Field]
+	public function avatar(array $nest, int $size): string
+	{
+		return '';
+	}
+
 	public static function dummy(): self
 	{
 		return new self(

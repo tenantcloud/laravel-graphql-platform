@@ -3,6 +3,8 @@
 namespace TenantCloud\GraphQLPlatform\Schema;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
@@ -14,6 +16,10 @@ use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddlew
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
+use TenantCloud\GraphQLPlatform\Validation\ValidationParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
@@ -46,7 +52,6 @@ use TheCodingMachine\GraphQLite\Schema;
 use TheCodingMachine\GraphQLite\TypeGenerator;
 use TheCodingMachine\GraphQLite\TypeRegistry;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
-use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
 use TheCodingMachine\GraphQLite\Types\TypeResolver;
 use Webmozart\Assert\Assert;
 
@@ -127,6 +132,12 @@ class SchemaFactory
 
 		$lastTopRootTypeMapper->setNext($rootTypeMapper);
 
+		$propertyMapping = new PropertyMapping();
+		$propertyPathMapper = new PropertyPathMapper(
+			$propertyMapping,
+			PropertyAccess::createPropertyAccessor(),
+		);
+
 		$fieldMiddlewarePipe = new FieldMiddlewarePipe();
 		$inputFieldMiddlewarePipe = new InputFieldMiddlewarePipe();
 		$parameterMiddlewarePipe = new ParameterMiddlewarePipe();
@@ -160,6 +171,12 @@ class SchemaFactory
 		));
 		$fieldMiddlewarePipe->pipe(new LaravelPaginationFieldMiddleware($connectionTypeMapper));
 
+		$inputFieldMiddlewarePipe->pipe(new PropertyMappingInputFieldMiddleware($propertyMapping));
+
+		$parameterMiddlewarePipe->pipe(new ValidationParameterMiddleware(
+			$this->container->get(ValidatorInterface::class),
+			$propertyPathMapper,
+		));
 		$parameterMiddlewarePipe->pipe(new PrefetchParameterMiddleware(
 			new ParameterizedCallableResolver($fieldsBuilder, $this->container)
 		));
@@ -187,9 +204,6 @@ class SchemaFactory
 		$inputTypeGenerator = new InputTypeGenerator(
 			$this->container->get(InputTypeUtils::class),
 			$fieldsBuilder,
-			$this->container->has(InputTypeValidatorInterface::class) ?
-				$this->container->get(InputTypeValidatorInterface::class) :
-				null
 		);
 
 		$compositeTypeMapper->addTypeMapper(new ClassFinderTypeMapper(

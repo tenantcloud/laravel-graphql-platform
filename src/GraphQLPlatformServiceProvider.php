@@ -54,11 +54,10 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
+use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
-use TenantCloud\GraphQLPlatform\Validation\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
-use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
 use TheCodingMachine\GraphQLite\Cache\FilesSnapshot;
@@ -87,7 +86,6 @@ use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\AuthorizationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\SecurityExpressionLanguageProvider;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
-use TheCodingMachine\GraphQLite\Types\InputTypeValidatorInterface;
 use Webmozart\Assert\Assert;
 
 class GraphQLPlatformServiceProvider extends ServiceProvider
@@ -298,8 +296,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->getValidator()
 		);
 		$this->app->bind(MetadataFactoryInterface::class, ValidatorInterface::class);
-		$this->app->singleton(SymfonyInputTypeValidator::class);
-		$this->app->bind(InputTypeValidatorInterface::class, SymfonyInputTypeValidator::class);
 	}
 
 	private function registerConnections(): void

@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Unique;
+use Symfony\Component\Validator\Constraints\Valid;
 use TenantCloud\GraphQLPlatform\MissingValue;
 use TenantCloud\GraphQLPlatform\Scalars\ID\ID;
 use TheCodingMachine\GraphQLite\Annotations\Field;
@@ -34,4 +35,9 @@ class UpdateUserData
 		new EqualTo([123]),
 	])]
 	public array $fileIds = [];
+
+	/** @var array<Nested>|MissingValue */
+	#[Field(name: 'nested')]
+	#[Valid]
+	public mixed $nest = MissingValue::INSTANCE;
 }
