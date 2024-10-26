@@ -23,11 +23,6 @@ class ValidationFailedException extends InvalidArgumentException implements Grap
 		return true;
 	}
 
-	public function getCategory(): string
-	{
-		return 'Validate';
-	}
-
 	public function getExtensions(): array
 	{
 		$violations = collect($this->violations)

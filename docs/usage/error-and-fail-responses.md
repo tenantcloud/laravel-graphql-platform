@@ -117,12 +117,6 @@ to display an error message from the backend and let the user deal with it
 
 In all of the cases, the client usually either has a global handling logic for the error, or cannot do anything about it.
 
-To do so in code, 
-
-```php
-class Controller {
-	public function login(): LoginAuthenticated | LoginEmailNotConfirmedResult | LoginCodeTwoFactorRequired | LoginEmailTwoFactorRequired {}
-}
 ```
 
 ### Failures as non-GraphQL errors
