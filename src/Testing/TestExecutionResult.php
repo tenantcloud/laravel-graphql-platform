@@ -35,7 +35,9 @@ class TestExecutionResult extends ExecutionResult
 
 	public function assertSuccessful(): self
 	{
-		Assert::assertSame([], $this->errors, 'Request was not successful. These errors have occurred:');
+		$this->assertErrors(
+			fn (AssertableJson $json) => Assert::assertSame([], $json->toArray(), 'Request was not successful. These errors have occurred:')
+		);
 
 		return $this;
 	}
