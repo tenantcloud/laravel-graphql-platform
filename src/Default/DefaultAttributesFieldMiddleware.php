@@ -1,9 +1,9 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Foundation;
+namespace TenantCloud\GraphQLPlatform\Default;
 
 use GraphQL\Type\Definition\FieldDefinition;
-use TheCodingMachine\GraphQLite\Annotations\AbstractRequest;
+use Illuminate\Support\Arr;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotationInterface;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotations;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
@@ -60,17 +60,31 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 			return $fieldHandler->handle($queryFieldDescriptor);
 		}
 
-		$attributes = $queryFieldDescriptor->getMiddlewareAnnotations()->getAnnotationsByType(MiddlewareAnnotationInterface::class);
+		$middlewareAnnotations = $queryFieldDescriptor->getMiddlewareAnnotations();
+		$withoutDefault = $middlewareAnnotations->getAnnotationByType(WithoutDefault::class)?->attributes ?? [];
 
-		$addedAttributes = array_filter(
-			$this->attributes,
-			fn(MiddlewareAnnotationInterface $attribute) => !$queryFieldDescriptor->getMiddlewareAnnotations()->getAnnotationsByType($attribute::class)
+		$addedAttributes = collect($this->attributes)
+			->reject(fn (MiddlewareAnnotationInterface $attribute) => in_array($attribute::class, $withoutDefault, true))
+			->reject(
+				fn (MiddlewareAnnotationInterface $attribute) => $middlewareAnnotations->getAnnotationsByType($attribute::class)
+			)
+			->all();
+
+		return $fieldHandler->handle(
+			$this->addAttributes($queryFieldDescriptor, $addedAttributes)
 		);
+	}
 
-		$queryFieldDescriptor = $queryFieldDescriptor->withMiddlewareAnnotations(
-			new MiddlewareAnnotations([...$attributes, ...$addedAttributes])
+	private function addAttributes(QueryFieldDescriptor $descriptor, array $attributes): QueryFieldDescriptor
+	{
+		if (!$attributes) {
+			return $descriptor;
+		}
+
+		$existingAttributes = $descriptor->getMiddlewareAnnotations()->getAnnotationsByType(MiddlewareAnnotationInterface::class);
+
+		return $descriptor->withMiddlewareAnnotations(
+			new MiddlewareAnnotations([...$existingAttributes, ...$attributes])
 		);
-
-		return $fieldHandler->handle($queryFieldDescriptor);
 	}
 }
