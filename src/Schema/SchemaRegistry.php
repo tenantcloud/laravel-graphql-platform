@@ -3,6 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Schema;
 
 use GraphQL\Type\Schema;
+use Illuminate\Support\Arr;
 use TenantCloud\Standard\Lazy\Lazy;
 
 use function TenantCloud\Standard\Lazy\lazy;
@@ -21,6 +22,14 @@ class SchemaRegistry
 		private readonly SchemaFactory $schemaFactory,
 		private readonly mixed $defaultSchemaConfigurator,
 	) {}
+
+	/**
+	 * @return list<string>
+	 */
+	public function names(): array
+	{
+		return array_keys($this->schemas);
+	}
 
 	public function get(string $name): ?Schema
 	{

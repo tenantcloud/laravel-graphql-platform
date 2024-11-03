@@ -117,33 +117,36 @@ final class SchemaConfigurator
 	/**
 	 * Registers a parameter middleware.
 	 */
-	public function addParameterMiddleware(ParameterMiddlewareInterface $parameterMiddleware): self
+	public function addParameterMiddleware(ParameterMiddlewareInterface $parameterMiddleware, bool $prepend = false): self
 	{
 		return $this->with(parameterMiddlewares: [
+			...($prepend ? [$parameterMiddleware] : []),
 			...$this->parameterMiddlewares,
-			$parameterMiddleware,
+			...(!$prepend ? [$parameterMiddleware] : []),
 		]);
 	}
 
 	/**
-	 * Registers a field middleware (used to parse custom annotations that modify the GraphQLite behaviour in Fields/Queries/Mutations.
+	 * Registers a field middleware (used to parse custom annotations that modify the GraphQLite behaviour in Fields/Queries/Mutations).
 	 */
-	public function addFieldMiddleware(FieldMiddlewareInterface $fieldMiddleware): self
+	public function addFieldMiddleware(FieldMiddlewareInterface $fieldMiddleware, bool $prepend = false): self
 	{
 		return $this->with(fieldMiddlewares: [
+			...($prepend ? [$fieldMiddleware] : []),
 			...$this->fieldMiddlewares,
-			$fieldMiddleware,
+			...(!$prepend ? [$fieldMiddleware] : []),
 		]);
 	}
 
 	/**
-	 * Registers a input field middleware (used to parse custom annotations that modify the GraphQLite behaviour in Fields/Queries/Mutations.
+	 * Registers a input field middleware (used to parse custom annotations that modify the GraphQLite behaviour in Fields/Queries/Mutations).
 	 */
-	public function addInputFieldMiddleware(InputFieldMiddlewareInterface $inputFieldMiddleware): self
+	public function addInputFieldMiddleware(InputFieldMiddlewareInterface $inputFieldMiddleware, bool $prepend = false): self
 	{
 		return $this->with(inputFieldMiddlewares: [
+			...($prepend ? [$inputFieldMiddleware] : []),
 			...$this->inputFieldMiddlewares,
-			$inputFieldMiddleware,
+			...(!$prepend ? [$inputFieldMiddleware] : []),
 		]);
 	}
 }
