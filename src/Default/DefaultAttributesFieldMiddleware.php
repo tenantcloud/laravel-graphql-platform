@@ -11,6 +11,7 @@ use TheCodingMachine\GraphQLite\Annotations\Query;
 use TheCodingMachine\GraphQLite\Annotations\Subscription;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
+use TheCodingMachine\GraphQLite\Middlewares\ServiceResolver;
 use TheCodingMachine\GraphQLite\Middlewares\SourceMethodResolver;
 use TheCodingMachine\GraphQLite\Middlewares\SourcePropertyResolver;
 use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
@@ -41,6 +42,7 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 			$reflection = match (true) {
 				$originalResolver instanceof SourcePropertyResolver => $originalResolver->propertyReflection(),
 				$originalResolver instanceof SourceMethodResolver => $originalResolver->methodReflection(),
+				$originalResolver instanceof ServiceResolver => new \ReflectionMethod(...$originalResolver->callable()),
 				default => null,
 			};
 
@@ -64,9 +66,9 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 		$withoutDefault = $middlewareAnnotations->getAnnotationByType(WithoutDefault::class)?->attributes ?? [];
 
 		$addedAttributes = collect($this->attributes)
-			->reject(fn (MiddlewareAnnotationInterface $attribute) => in_array($attribute::class, $withoutDefault, true))
+			->reject(fn(MiddlewareAnnotationInterface $attribute) => in_array($attribute::class, $withoutDefault, true))
 			->reject(
-				fn (MiddlewareAnnotationInterface $attribute) => $middlewareAnnotations->getAnnotationsByType($attribute::class)
+				fn(MiddlewareAnnotationInterface $attribute) => $middlewareAnnotations->getAnnotationsByType($attribute::class)
 			)
 			->all();
 
