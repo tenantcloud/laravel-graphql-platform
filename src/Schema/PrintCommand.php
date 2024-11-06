@@ -24,6 +24,7 @@ class PrintCommand extends Command
 			$path = $all ? "{$basePath}/{$schemaName}.graphql" : $basePath;
 			$printed = SchemaPrinter::doPrint($schemaRegistry->getOrFail($schemaName));
 
+			$filesystem->ensureDirectoryExists(dirname($path));
 			$filesystem->put($path, $printed);
 
 			$this->info("Printed schema [{$schemaName}] to [{$path}]");

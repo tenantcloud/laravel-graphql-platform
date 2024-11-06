@@ -31,6 +31,8 @@ class PrintCommandTest extends TestCase
 
 		$filesystem = $this->mock(Filesystem::class);
 		$filesystem->expects()
+			->ensureDirectoryExists(Matchers::endsWith('testbench-core/laravel'));
+		$filesystem->expects()
 			->put(Matchers::endsWith('/schema.gql'), $expected);
 
 		$this
@@ -54,6 +56,8 @@ class PrintCommandTest extends TestCase
 			->andReturn($schema);
 
 		$filesystem = $this->mock(Filesystem::class);
+		$filesystem->expects()
+			->ensureDirectoryExists(Matchers::endsWith('testbench-core/laravel'));
 		$filesystem->expects()
 			->put(Matchers::endsWith('/schema.gql'), $expected);
 
@@ -83,6 +87,9 @@ class PrintCommandTest extends TestCase
 			->andReturn($schemaB);
 
 		$filesystem = $this->mock(Filesystem::class);
+		$filesystem->expects()
+			->ensureDirectoryExists(Matchers::endsWith('testbench-core/laravel/base'))
+			->times(2);
 		$filesystem->expects()
 			->put(Matchers::endsWith('base/a.graphql'), $expectedA);
 		$filesystem->expects()
