@@ -34,7 +34,7 @@ class UpdateUserData
 	#[ID]
 	#[AtLeastOneOf([
 		new Unique(),
-		new EqualTo([123]),
+		new EqualTo([123, 9999999999, 9999999999, 9999999999, 9999999999]),
 	])]
 	public array $fileIds = [];
 

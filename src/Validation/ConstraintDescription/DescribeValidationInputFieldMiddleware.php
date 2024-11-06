@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Validation\ConstraintDescription;
 
+use Illuminate\Support\Str;
 use ReflectionProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -49,14 +50,19 @@ class DescribeValidationInputFieldMiddleware implements InputFieldMiddlewareInte
 			->flatMap(fn (PropertyMetadataInterface $metadata) => $metadata->getConstraints())
 			->map(fn (Constraint $constraint) => $this->constraintDescriptionProvider->provide($constraint))
 			->filter()
-			->map(fn (ConstraintDescription $constraintDescription) => (string) $constraintDescription)
-			->join("\n");
+			->map(fn (ConstraintDescription $constraintDescription) => (string) $constraintDescription);
 
-		if (!$constraints) {
+		if ($constraints->isEmpty()) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
-		$inputFieldDescriptor = $inputFieldDescriptor->withComment($inputFieldDescriptor->getComment() . "\n\n{$constraints}");
+		$constraintsString = $constraints->join(", ");
+
+		if (Str::length($constraintsString) > 70) {
+			$constraintsString = "\n" . $constraints->join("\n");
+		}
+
+		$inputFieldDescriptor = $inputFieldDescriptor->withComment($inputFieldDescriptor->getComment() . "\n\nConstraints: {$constraintsString}");
 
 		return $inputFieldHandler->handle($inputFieldDescriptor);
 	}

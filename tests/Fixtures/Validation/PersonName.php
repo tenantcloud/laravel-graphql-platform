@@ -13,7 +13,7 @@ class PersonName extends Compound
 	protected function getConstraints(array $options): array
 	{
 		return [
-			new Length(min: 1, max: 32, options: $options),
+			new Length(min: 0, max: 32, options: $options),
 			new Charset(['UTF-8']),
 		];
 	}

@@ -46,9 +46,9 @@ class ValidationTest extends IntegrationTestCase
 
 		Assert::assertArraySubset([
 			['name' => 'id', 'description' => null],
-			['name' => 'name', 'description' => "Length(max: 255, min: 1)\nPersonName"],
+			['name' => 'name', 'description' => 'Constraints: Length(max: 255, min: 1), PersonName'],
 			['name' => 'somethingAfter', 'description' => null],
-			['name' => 'fileIds', 'description' => 'AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])'],
+			['name' => 'fileIds', 'description' => "Constraints: \nAtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])"],
 		], $type['inputFields']);
 	}
 
