@@ -3,7 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Default;
 
 use GraphQL\Type\Definition\FieldDefinition;
-use Illuminate\Support\Arr;
+use ReflectionMethod;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotationInterface;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotations;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
@@ -19,31 +19,28 @@ use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
 class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 {
 	/**
-	 * @param list<MiddlewareAnnotationInterface> $attributes
+	 * @param list<MiddlewareAnnotationInterface>  $attributes
 	 * @param callable(QueryFieldDescriptor): bool $filter
 	 */
 	public function __construct(
 		private readonly array $attributes,
 		private readonly mixed $filter,
-	)
-	{
-	}
+	) {}
 
 	public static function forOperationFields(
 		array $middleware,
-		bool  $queries = true,
-		bool  $mutations = true,
-		bool  $subscriptions = true
-	): self
-	{
+		bool $queries = true,
+		bool $mutations = true,
+		bool $subscriptions = true
+	): self {
 		return new self($middleware, function (QueryFieldDescriptor $descriptor) use ($subscriptions, $mutations, $queries): bool {
 			$originalResolver = $descriptor->getOriginalResolver();
 
 			$reflection = match (true) {
 				$originalResolver instanceof SourcePropertyResolver => $originalResolver->propertyReflection(),
-				$originalResolver instanceof SourceMethodResolver => $originalResolver->methodReflection(),
-				$originalResolver instanceof ServiceResolver => new \ReflectionMethod(...$originalResolver->callable()),
-				default => null,
+				$originalResolver instanceof SourceMethodResolver   => $originalResolver->methodReflection(),
+				$originalResolver instanceof ServiceResolver        => new ReflectionMethod(...$originalResolver->callable()),
+				default                                             => null,
 			};
 
 			if (!$reflection) {
@@ -66,9 +63,9 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 		$withoutDefault = $middlewareAnnotations->getAnnotationByType(WithoutDefault::class)?->attributes ?? [];
 
 		$addedAttributes = collect($this->attributes)
-			->reject(fn(MiddlewareAnnotationInterface $attribute) => in_array($attribute::class, $withoutDefault, true))
+			->reject(fn (MiddlewareAnnotationInterface $attribute) => in_array($attribute::class, $withoutDefault, true))
 			->reject(
-				fn(MiddlewareAnnotationInterface $attribute) => $middlewareAnnotations->getAnnotationsByType($attribute::class)
+				fn (MiddlewareAnnotationInterface $attribute) => $middlewareAnnotations->getAnnotationsByType($attribute::class)
 			)
 			->all();
 

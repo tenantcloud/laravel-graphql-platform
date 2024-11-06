@@ -15,7 +15,6 @@ use Illuminate\Routing\Router;
 use Psr\SimpleCache\CacheInterface;
 use TenantCloud\APIVersioning\Version\LatestVersion;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
-use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\Http\DefaultRequestSchemaProvider;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
 use TenantCloud\GraphQLPlatform\Server\Http\RequestSchemaProvider;

@@ -21,12 +21,12 @@ class PrintCommand extends Command
 		[$schemaNames, $all] = $this->schemaNames($schemaRegistry);
 
 		foreach ($schemaNames as $schemaName) {
-			$path = $all ? "$basePath/$schemaName.graphql" : $basePath;
+			$path = $all ? "{$basePath}/{$schemaName}.graphql" : $basePath;
 			$printed = SchemaPrinter::doPrint($schemaRegistry->getOrFail($schemaName));
 
 			$filesystem->put($path, $printed);
 
-			$this->info("Printed schema [$schemaName] to [$path]");
+			$this->info("Printed schema [{$schemaName}] to [{$path}]");
 		}
 
 		return self::SUCCESS;

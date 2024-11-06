@@ -59,7 +59,7 @@ class PrintCommandTest extends TestCase
 
 		$this
 			->artisan(PrintCommand::class, [
-				'path' => 'schema.gql',
+				'path'   => 'schema.gql',
 				'--name' => 'custom',
 			])
 			->assertSuccessful();
@@ -90,7 +90,7 @@ class PrintCommandTest extends TestCase
 
 		$this
 			->artisan(PrintCommand::class, [
-				'path' => 'base',
+				'path'  => 'base',
 				'--all' => true,
 			])
 			->assertSuccessful();

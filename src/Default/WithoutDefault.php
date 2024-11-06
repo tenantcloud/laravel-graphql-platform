@@ -13,7 +13,5 @@ class WithoutDefault implements MiddlewareAnnotationInterface
 	 */
 	public function __construct(
 		public readonly string|array $attributes,
-	)
-	{
-	}
+	) {}
 }
