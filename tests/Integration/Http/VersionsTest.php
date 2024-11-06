@@ -90,7 +90,7 @@ class VersionsTest extends TestCase
 		$app->extend(
 			GraphQLConfigurator::class,
 			fn (GraphQLConfigurator $configurator) => $configurator
-				->addDefaultSchema(fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
+				->addSchema('default', fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
 				->addSchema('v2', fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
 				->addSchema('v1', fn (SchemaConfigurator $configurator) => $configurator->forVersion('1'))
 				->addGraphQLRoute(schemaProvider: VersionedRequestSchemaProvider::class)

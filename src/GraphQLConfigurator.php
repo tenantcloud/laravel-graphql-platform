@@ -124,11 +124,6 @@ final class GraphQLConfigurator
 		));
 	}
 
-	public function addDefaultSchema(callable|SchemaConfigurator $configurator = null): self
-	{
-		return $this->addSchema(SchemaRegistry::DEFAULT, $configurator);
-	}
-
 	public function addSchema(string $name, callable|SchemaConfigurator $configurator = null): self
 	{
 		return $this->with(

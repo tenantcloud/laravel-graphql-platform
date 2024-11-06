@@ -26,7 +26,7 @@ class VersionedRequestSchemaProvider implements RequestSchemaProvider
 		);
 
 		if ($version instanceof LatestVersion) {
-			return $this->schemaRegistry->getOrFail(SchemaRegistry::DEFAULT);
+			return $this->schemaRegistry->first();
 		}
 
 		$schema = $this->schemaRegistry->get("v{$version}");

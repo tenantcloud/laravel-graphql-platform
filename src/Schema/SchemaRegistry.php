@@ -10,8 +10,6 @@ use function TenantCloud\Standard\Lazy\lazy;
 
 class SchemaRegistry
 {
-	public const DEFAULT = 'default';
-
 	/** @var array<string, Lazy<Schema>> */
 	private array $schemas = [];
 
@@ -31,6 +29,11 @@ class SchemaRegistry
 		return array_keys($this->schemas);
 	}
 
+	public function first(): ?Schema
+	{
+		return $this->getOrFail(Arr::first($this->names()));
+	}
+
 	public function get(string $name): ?Schema
 	{
 		return ($this->schemas[$name] ?? null)?->value();
@@ -47,7 +50,7 @@ class SchemaRegistry
 			$configurator = match (true) {
 				$configurator instanceof SchemaConfigurator => $configurator,
 				default                                     => $configurator(
-					($this->defaultSchemaConfigurator)()
+					($this->defaultSchemaConfigurator)(),
 				),
 			};
 

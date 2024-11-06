@@ -5,6 +5,7 @@ namespace TenantCloud\GraphQLPlatform\Schema;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
 
 class PrintCommand extends Command
@@ -20,9 +21,12 @@ class PrintCommand extends Command
 		[$schemaNames, $all] = $this->schemaNames($schemaRegistry);
 
 		foreach ($schemaNames as $schemaName) {
+			$path = $all ? "$basePath/$schemaName.graphql" : $basePath;
 			$printed = SchemaPrinter::doPrint($schemaRegistry->getOrFail($schemaName));
 
-			$filesystem->put($all ? "$basePath/$schemaName.graphql" : $basePath, $printed);
+			$filesystem->put($path, $printed);
+
+			$this->info("Printed schema [$schemaName] to [$path]");
 		}
 
 		return self::SUCCESS;
@@ -39,7 +43,7 @@ class PrintCommand extends Command
 			return [$names, true];
 		}
 
-		$name = $this->option('name') ?: SchemaRegistry::DEFAULT;
+		$name = $this->option('name') ?: Arr::first($names);
 
 		Assert::inArray($name, $names);
 

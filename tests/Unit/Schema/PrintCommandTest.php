@@ -24,9 +24,9 @@ class PrintCommandTest extends TestCase
 		$schemaRegistry = $this->mock(SchemaRegistry::class);
 		$schemaRegistry->expects()
 			->names()
-			->andReturn([SchemaRegistry::DEFAULT]);
+			->andReturn(['default']);
 		$schemaRegistry->expects()
-			->getOrFail(SchemaRegistry::DEFAULT)
+			->getOrFail('default')
 			->andReturn($schema);
 
 		$filesystem = $this->mock(Filesystem::class);
@@ -48,7 +48,7 @@ class PrintCommandTest extends TestCase
 		$schemaRegistry = $this->mock(SchemaRegistry::class);
 		$schemaRegistry->expects()
 			->names()
-			->andReturn([SchemaRegistry::DEFAULT, 'custom']);
+			->andReturn(['default', 'custom']);
 		$schemaRegistry->expects()
 			->getOrFail('custom')
 			->andReturn($schema);

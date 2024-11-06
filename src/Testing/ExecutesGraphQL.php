@@ -28,9 +28,9 @@ trait ExecutesGraphQL
 		string|Schema $schema = null,
 	): TestExecutionResult {
 		if (!$schema instanceof Schema) {
-			$schema = $this->app
-				->make(SchemaRegistry::class)
-				->getOrFail($schema ?? SchemaRegistry::DEFAULT);
+			$schema = $schema ?
+				$this->app->make(SchemaRegistry::class)->getOrFail($schema) :
+				$this->app->make(SchemaRegistry::class)->first();
 		}
 
 		$serverHelper = $this->app->make(Helper::class);

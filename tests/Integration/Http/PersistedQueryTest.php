@@ -105,7 +105,7 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 				->with(persistedQueryLoader: new NotSupportedPersistedQueryLoader())
 				->addGraphQLRoute()
 				->addExploreRoute()
-				->addDefaultSchema(fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
+				->addSchema('default', fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
 		);
 
 		$this

@@ -23,7 +23,7 @@ abstract class IntegrationTestCase extends TestCase
 				->useAutomaticPersistedQueries(new Psr16Cache(new ArrayAdapter()))
 				->addGraphQLRoute()
 				->addExploreRoute()
-				->addDefaultSchema(fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
+				->addSchema('default', fn (SchemaConfigurator $configurator) => $configurator->forVersion('2'))
 		);
 	}
 }
