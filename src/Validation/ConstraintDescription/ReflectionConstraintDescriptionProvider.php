@@ -31,6 +31,10 @@ class ReflectionConstraintDescriptionProvider implements ConstraintDescriptionPr
 
 			$value = $property->getValue($constraint);
 
+			if ($property->getName() === 'payload' && $value === null) {
+				continue;
+			}
+
 			if ($property->hasDefaultValue() && $value == $property->getDefaultValue()) {
 				continue;
 			}

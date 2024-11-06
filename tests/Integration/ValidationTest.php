@@ -11,18 +11,26 @@ use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ConstraintDescr
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidator;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
-use TenantCloud\GraphQLPlatform\Validation\SymfonyInputTypeValidator;
+use TenantCloud\GraphQLPlatform\Validation\ValidatingParameter;
 use TenantCloud\GraphQLPlatform\Validation\ValidationFailedException;
+use TenantCloud\GraphQLPlatform\Validation\ValidationParameterMiddleware;
 
 #[CoversClass(ConstraintDescription::class)]
 #[CoversClass(ReflectionConstraintDescriptionProvider::class)]
 #[CoversClass(DescribeValidationInputFieldMiddleware::class)]
+#[CoversClass(PropertyMapping::class)]
+#[CoversClass(PropertyMappingInputFieldMiddleware::class)]
+#[CoversClass(PropertyPathMapper::class)]
 #[CoversClass(LaravelCompositeTranslatorAdapter::class)]
 #[CoversClass(SkipMissingValueConstraintValidator::class)]
 #[CoversClass(SkipMissingValueConstraintValidatorFactory::class)]
-#[CoversClass(SymfonyInputTypeValidator::class)]
+#[CoversClass(ValidatingParameter::class)]
+#[CoversClass(ValidationParameterMiddleware::class)]
 #[CoversClass(ValidationFailedException::class)]
 class ValidationTest extends IntegrationTestCase
 {
@@ -37,10 +45,10 @@ class ValidationTest extends IntegrationTestCase
 		$type = Arr::first($result['types'], fn (array $data) => $data['name'] === 'UpdateUserDataInput');
 
 		Assert::assertArraySubset([
-			['name' => 'id', 'description' => ''],
-			['name' => 'name', 'description' => "\n\nLength(max: 255, min: 1)"],
-			['name' => 'somethingAfter', 'description' => ''],
-			['name' => 'fileIds', 'description' => "\n\nAtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])"],
+			['name' => 'id', 'description' => null],
+			['name' => 'name', 'description' => "Length(max: 255, min: 1)\nPersonName"],
+			['name' => 'somethingAfter', 'description' => null],
+			['name' => 'fileIds', 'description' => 'AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])'],
 		], $type['inputFields']);
 	}
 

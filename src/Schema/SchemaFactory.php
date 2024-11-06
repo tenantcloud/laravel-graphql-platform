@@ -16,6 +16,8 @@ use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddlew
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
+use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
@@ -192,6 +194,9 @@ class SchemaFactory
 		foreach ($configurator->parameterMiddlewares as $parameterMiddleware) {
 			$parameterMiddlewarePipe->pipe($parameterMiddleware);
 		}
+
+		$fieldMiddlewarePipe->pipe(new TrimDescriptionsFieldMiddleware());
+		$inputFieldMiddlewarePipe->pipe(new TrimDescriptionsInputFieldMiddleware());
 
 		$typeGenerator = new TypeGenerator(
 			$this->container->get(AnnotationReader::class),

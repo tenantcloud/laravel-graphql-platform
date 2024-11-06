@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\Valid;
 use TenantCloud\GraphQLPlatform\MissingValue;
 use TenantCloud\GraphQLPlatform\Scalars\ID\ID;
+use Tests\Fixtures\Validation\PersonName;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Input;
 
@@ -22,6 +23,7 @@ class UpdateUserData
 
 	#[Field]
 	#[Length(min: 1, max: 255)]
+	#[PersonName]
 	public string|MissingValue           $name = MissingValue::INSTANCE;
 
 	#[Field]
