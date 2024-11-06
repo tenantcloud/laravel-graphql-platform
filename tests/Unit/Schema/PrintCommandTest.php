@@ -17,42 +17,108 @@ use Tests\TestCase;
 class PrintCommandTest extends TestCase
 {
 	#[Test]
-	public function printsSchemaToAFile(): void
+	public function printsDefaultSchemaToAFile(): void
 	{
+		[$schema, $expected] = $this->fakeSchema();
+
 		$schemaRegistry = $this->mock(SchemaRegistry::class);
 		$schemaRegistry->expects()
-			->get(SchemaRegistry::DEFAULT)
-			->andReturn(new Schema([
-				'query' => new ObjectType([
-					'name'   => 'Type',
-					'fields' => [
-						'a' => [
-							'type' => Type::int(),
-						],
-					],
-				]),
-			]));
+			->names()
+			->andReturn([SchemaRegistry::DEFAULT]);
+		$schemaRegistry->expects()
+			->getOrFail(SchemaRegistry::DEFAULT)
+			->andReturn($schema);
 
 		$filesystem = $this->mock(Filesystem::class);
 		$filesystem->expects()
-			->put(
-				Matchers::endsWith('/schema.gql'),
-				<<<'GRAPHQL'
-					schema {
-					  query: Type
-					}
-
-					type Type {
-					  a: Int
-					}
-
-					GRAPHQL
-			);
+			->put(Matchers::endsWith('/schema.gql'), $expected);
 
 		$this
 			->artisan(PrintCommand::class, [
 				'path' => 'schema.gql',
 			])
 			->assertSuccessful();
+	}
+
+	#[Test]
+	public function printsSpecifiedSchemaToAFile(): void
+	{
+		[$schema, $expected] = $this->fakeSchema();
+
+		$schemaRegistry = $this->mock(SchemaRegistry::class);
+		$schemaRegistry->expects()
+			->names()
+			->andReturn([SchemaRegistry::DEFAULT, 'custom']);
+		$schemaRegistry->expects()
+			->getOrFail('custom')
+			->andReturn($schema);
+
+		$filesystem = $this->mock(Filesystem::class);
+		$filesystem->expects()
+			->put(Matchers::endsWith('/schema.gql'), $expected);
+
+		$this
+			->artisan(PrintCommand::class, [
+				'path' => 'schema.gql',
+				'--name' => 'custom',
+			])
+			->assertSuccessful();
+	}
+
+	#[Test]
+	public function printsAllSchemasToFiles(): void
+	{
+		[$schemaA, $expectedA] = $this->fakeSchema();
+		[$schemaB, $expectedB] = $this->fakeSchema('b');
+
+		$schemaRegistry = $this->mock(SchemaRegistry::class);
+		$schemaRegistry->expects()
+			->names()
+			->andReturn(['a', 'b']);
+		$schemaRegistry->expects()
+			->getOrFail('a')
+			->andReturn($schemaA);
+		$schemaRegistry->expects()
+			->getOrFail('b')
+			->andReturn($schemaB);
+
+		$filesystem = $this->mock(Filesystem::class);
+		$filesystem->expects()
+			->put(Matchers::endsWith('base/a.graphql'), $expectedA);
+		$filesystem->expects()
+			->put(Matchers::endsWith('base/b.graphql'), $expectedB);
+
+		$this
+			->artisan(PrintCommand::class, [
+				'path' => 'base',
+				'--all' => true,
+			])
+			->assertSuccessful();
+	}
+
+	private function fakeSchema(string $identifier = 'a'): array
+	{
+		return [
+			new Schema([
+				'query' => new ObjectType([
+					'name'   => 'Type',
+					'fields' => [
+						$identifier => [
+							'type' => Type::int(),
+						],
+					],
+				]),
+			]),
+			<<<GRAPHQL
+				schema {
+				  query: Type
+				}
+
+				type Type {
+				  {$identifier}: Int
+				}
+
+				GRAPHQL
+		];
 	}
 }
