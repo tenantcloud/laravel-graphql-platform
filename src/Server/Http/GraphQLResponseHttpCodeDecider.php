@@ -22,7 +22,11 @@ class GraphQLResponseHttpCodeDecider implements HttpCodeDeciderInterface
 
 		$isBadRequest = (bool) Arr::first(
 			$result->errors,
-			fn (Error $error) => !$error instanceof GraphQLExceptionInterface && (!$error->getPrevious() || $error->getPrevious() instanceof RequestError)
+			fn (Error $error) => !$error instanceof GraphQLExceptionInterface && (
+				!$error->getPrevious() ||
+				$error->getPrevious() instanceof RequestError ||
+				$error->getPrevious() instanceof Error
+			)
 		);
 
 		return match (true) {

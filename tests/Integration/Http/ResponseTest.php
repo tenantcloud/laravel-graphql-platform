@@ -8,11 +8,10 @@ use PHPUnit\Framework\Attributes\Test;
 class ResponseTest extends HttpIntegrationTestCase
 {
 	/**
-	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#invalid-parameters
 	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#invalid-parameters-1
 	 */
 	#[Test]
-	public function invalidShape(): void
+	public function invalidParameters(): void
 	{
 		$this
 			->graphQL(
@@ -36,11 +35,10 @@ class ResponseTest extends HttpIntegrationTestCase
 	}
 
 	/**
-	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#document-parsing-failure
 	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#document-parsing-failure-1
 	 */
 	#[Test]
-	public function invalidQuery(): void
+	public function documentParsingFailure(): void
 	{
 		$this
 			->graphQL(
@@ -62,7 +60,6 @@ class ResponseTest extends HttpIntegrationTestCase
 	}
 
 	/**
-	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#document-validation-failure
 	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#document-validation-failure-1
 	 */
 	#[Test]
@@ -88,7 +85,34 @@ class ResponseTest extends HttpIntegrationTestCase
 	}
 
 	/**
-	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#field-errors-encountered-during-execution
+	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#variable-coercion-failure-1
+	 */
+	#[Test]
+	public function variableCoercionFailure(): void
+	{
+		$this
+			->graphQL(
+				<<<'GRAPHQL'
+					query ($perPage: Int!) {
+						listUsers(perPage: $perPage) {
+							__typename
+						}
+					}
+					GRAPHQL,
+				['perPage' => 'String']
+			)
+			->assertBadRequest()
+			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
+			->assertJsonMissingPath('data')
+			->assertJsonCount(1, 'errors')
+			->assertJson([
+				'errors' => [
+					['message' => 'Variable "$perPage" got invalid value "String"; Int cannot represent non-integer value: "String"'],
+				],
+			]);
+	}
+
+	/**
 	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#field-errors-encountered-during-execution-1
 	 */
 	#[Test]
@@ -121,7 +145,6 @@ class ResponseTest extends HttpIntegrationTestCase
 	}
 
 	/**
-	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#field-errors-encountered-during-execution
 	 * https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md#field-errors-encountered-during-execution-1
 	 */
 	#[Test]
