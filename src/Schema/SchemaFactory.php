@@ -23,6 +23,7 @@ use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputField
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
 use TenantCloud\GraphQLPlatform\Validation\ValidationParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Versioning\ForVersionsInputFieldMiddleware;
 use TheCodingMachine\GraphQLite\AggregateQueryProvider;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
@@ -158,12 +159,12 @@ class SchemaFactory
 		);
 
 		if ($configurator->forVersion) {
-			$fieldMiddlewarePipe->pipe(new ForVersionsFieldMiddleware(
-				$configurator->forVersion instanceof Version ?
-					$configurator->forVersion :
-					$this->container->get(VersionParser::class)->parse($configurator->forVersion),
-				$this->container->get(ConstraintChecker::class),
-			));
+			$version = $configurator->forVersion instanceof Version ?
+				$configurator->forVersion :
+				$this->container->get(VersionParser::class)->parse($configurator->forVersion);
+
+			$fieldMiddlewarePipe->pipe(new ForVersionsFieldMiddleware($version, $this->container->get(ConstraintChecker::class)));
+			$inputFieldMiddlewarePipe->pipe(new ForVersionsInputFieldMiddleware($version, $this->container->get(ConstraintChecker::class)));
 		}
 
 		$fieldMiddlewarePipe->pipe(new ConnectionFieldMiddleware(

@@ -15,11 +15,7 @@ scalar DateTime
 scalar Duration
 
 input NestedInput {
-  """
-  
-  
-  Length(max: 4, min: 3)
-  """
+  "Constraints: Length(max: 4, min: 3)"
   name: String!
 }
 
@@ -33,10 +29,7 @@ type User {
   name: String!
   createdAt: DateTime!
 
-  """
-  
-  Cost: complexity = 3, multipliers = [], defaultMultiplier = null
-  """
+  "Cost: complexity = 3, multipliers = [], defaultMultiplier = null"
   somethingAfter: Duration
 
   fileIds: [Int!]!
@@ -44,27 +37,26 @@ type User {
 }
 
 type Query {
-  """
-  
-  Cost: complexity = 10, multipliers = [perPage], defaultMultiplier = null
-  """
+  "Cost: complexity = 10, multipliers = [perPage], defaultMultiplier = null"
   listUsers(perPage: Int = 15): UserOffsetConnection!
 
   firstUser: User!
   clientSafeError: Int!
   clientUnsafeError: Int!
 
-  """
-  Available in versions: >=2
-  
-  """
-  versionedField: String!
+  "Available in versions: >=2"
+  versionedField(data: VersionedInput!): String!
 
   fullSelection: SelectionResponse!
   nestedSelection: SelectionResponse!
   offsetConnectable(offset: Int = null, limit: Int = null): UserOffsetConnection
   cursorConnectable(first: Int = null, after: String = null, last: Int = null, before: String = null): UserConnection
   connectable: UserFriendsConnectable!
+}
+
+input VersionedInput {
+  "Available in versions: >=2"
+  id: String!
 }
 
 type UserConnection {
@@ -124,13 +116,8 @@ type Mutation {
 }
 
 input CreateUserDataInput {
-  ""
   name: String!
-
-  ""
   createdAt: DateTime!
-
-  ""
   somethingAfter: Duration!
 }
 
@@ -138,27 +125,17 @@ input CreateUserDataInput {
 scalar Void
 
 input UpdateUserDataInput {
-  ""
   id: ID!
 
-  """
-  
-  
-  Length(max: 255, min: 1)
-  """
+  "Constraints: Length(max: 255, min: 1), PersonName"
   name: String
-
-  ""
   somethingAfter: Duration
 
   """
-  
-  
-  AtLeastOneOf(constraints: [Unique, EqualTo(value: [123])])
+  Constraints: 
+  AtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])
   """
   fileIds: [ID!]! = []
-
-  ""
   nested: [NestedInput!]
 }
 

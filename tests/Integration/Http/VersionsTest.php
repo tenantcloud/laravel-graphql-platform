@@ -18,10 +18,15 @@ class VersionsTest extends TestCase
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					query { versionedField }
+					query {
+						versionedField(data: {
+							id: 123
+						})
+					}
 					GRAPHQL,
 				headers: ['Version' => '1'],
 			)
+			->dd()
 			->assertOk()
 			->assertJson([
 				'data' => [
@@ -36,7 +41,11 @@ class VersionsTest extends TestCase
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					query { versionedField }
+					query {
+						versionedField(data: {
+							id: "String"
+						})
+					}
 					GRAPHQL,
 				headers: ['Version' => '2'],
 			)
@@ -54,7 +63,11 @@ class VersionsTest extends TestCase
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					query { versionedField }
+					query {
+						versionedField(data: {
+							id: "String"
+						})
+					}
 					GRAPHQL,
 				headers: ['Version' => 'latest'],
 			)
@@ -72,7 +85,11 @@ class VersionsTest extends TestCase
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					query { versionedField }
+					query {
+						versionedField(data: {
+							id: "String"
+						})
+					}
 					GRAPHQL,
 			)
 			->assertOk()
