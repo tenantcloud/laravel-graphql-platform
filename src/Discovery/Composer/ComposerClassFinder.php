@@ -28,6 +28,8 @@ class ComposerClassFinder implements ClassFinder
 
 	private readonly array $autoloadFiles;
 
+	private readonly string $hash;
+
 	/**
 	 * @param string[] $namespaces
 	 */
@@ -84,6 +86,11 @@ class ComposerClassFinder implements ClassFinder
 				yield $class => $reflection;
 			}
 		}
+	}
+
+	public function hash(): string
+	{
+		return $this->hash ??= md5(implode(',', $this->namespaces ?? '__ALL__'));
 	}
 
 	private static function findClassLoader(): ClassLoader

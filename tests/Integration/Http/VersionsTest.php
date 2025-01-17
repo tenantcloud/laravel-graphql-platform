@@ -26,7 +26,6 @@ class VersionsTest extends TestCase
 					GRAPHQL,
 				headers: ['Version' => '1'],
 			)
-			->dd()
 			->assertOk()
 			->assertJson([
 				'data' => [
