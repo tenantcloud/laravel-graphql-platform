@@ -13,11 +13,8 @@ readonly class VersionedInput
 		#[Field(name: 'id')]
 		#[ForVersions('>=2')]
 		public string $id,
-
 		#[Field(name: 'id')]
 		#[ForVersions('<=1')]
 		public int $idV1 = 0,
-	)
-	{
-	}
+	) {}
 }

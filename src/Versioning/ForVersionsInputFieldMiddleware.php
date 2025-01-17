@@ -2,17 +2,13 @@
 
 namespace TenantCloud\GraphQLPlatform\Versioning;
 
-use GraphQL\Type\Definition\FieldDefinition;
 use Illuminate\Support\Str;
 use TenantCloud\APIVersioning\Constraint\ConstraintChecker;
 use TenantCloud\APIVersioning\Version\Version;
 use TheCodingMachine\GraphQLite\InputField;
 use TheCodingMachine\GraphQLite\InputFieldDescriptor;
-use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
-use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
-use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
 
 class ForVersionsInputFieldMiddleware implements InputFieldMiddlewareInterface
 {

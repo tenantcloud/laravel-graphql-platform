@@ -56,7 +56,7 @@ class DescribeValidationInputFieldMiddleware implements InputFieldMiddlewareInte
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
-		$constraintsString = $constraints->join(", ");
+		$constraintsString = $constraints->join(', ');
 
 		if (Str::length($constraintsString) > 70) {
 			$constraintsString = "\n" . $constraints->join("\n");
