@@ -36,6 +36,9 @@ class PropertyMappingInputFieldMiddleware implements InputFieldMiddlewareInterfa
 		return $field;
 	}
 
+	/**
+	 * @return array{ class-string, string }|null
+	 */
 	private function classNameAndProperty(InputFieldDescriptor $descriptor): ?array
 	{
 		$resolver = $descriptor->getOriginalResolver();

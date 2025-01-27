@@ -4,7 +4,7 @@ namespace TenantCloud\GraphQLPlatform\Connection\Offset;
 
 /**
  * @template-covariant NodeType
- * @template-covariant EdgeType of OffsetConnectionEdge<NodeType>
+ * @template-covariant EdgeType of OffsetConnectionEdge<NodeType> = OffsetConnectionEdge<NodeType>
  */
 interface OffsetConnectable
 {

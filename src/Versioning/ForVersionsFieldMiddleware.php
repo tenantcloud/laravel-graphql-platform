@@ -37,6 +37,9 @@ class ForVersionsFieldMiddleware implements FieldMiddlewareInterface
 			null;
 	}
 
+	/**
+	 * @param list<ForVersions> $forVersionsAnnotations
+	 */
 	private function addAvailableComment(QueryFieldDescriptor $queryFieldDescriptor, array $forVersionsAnnotations): QueryFieldDescriptor
 	{
 		$comment = Str::of('Available in versions: ')

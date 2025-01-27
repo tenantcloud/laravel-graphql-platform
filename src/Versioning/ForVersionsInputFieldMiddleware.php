@@ -37,6 +37,9 @@ class ForVersionsInputFieldMiddleware implements InputFieldMiddlewareInterface
 			null;
 	}
 
+	/**
+	 * @param list<ForVersions> $forVersionsAnnotations
+	 */
 	private function addAvailableComment(InputFieldDescriptor $inputFieldDescriptor, array $forVersionsAnnotations): InputFieldDescriptor
 	{
 		$comment = Str::of('Available in versions: ')

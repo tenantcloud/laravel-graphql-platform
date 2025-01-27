@@ -7,6 +7,7 @@ use Throwable;
 
 class MemoizedReflectionFactory implements ReflectionFactory
 {
+	/** @var array<class-string, ReflectionClass<object>|null> */
 	private array $cache = [];
 
 	public function __construct(

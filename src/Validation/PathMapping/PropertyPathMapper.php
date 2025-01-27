@@ -12,6 +12,11 @@ class PropertyPathMapper
 		private readonly PropertyAccessor $propertyAccessor,
 	) {}
 
+	/**
+	 * @param object|array<mixed, mixed> $root
+	 *
+	 * @return list<string>
+	 */
 	public function map(string $propertyPath, object|array $root): array
 	{
 		return Str::of($propertyPath)
@@ -37,6 +42,9 @@ class PropertyPathMapper
 			->all();
 	}
 
+	/**
+	 * @return array{ array{ string, list<string> }, string, list<string> }
+	 */
 	private function parsePropertyPathPart(string $part): array
 	{
 		preg_match_all('/\[([^\[\]]+)\]/A', $part, $prePathMatches);

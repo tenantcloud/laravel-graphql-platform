@@ -7,13 +7,17 @@ use GraphQL\Type\Definition\Type;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
+use phpDocumentor\Reflection\Types\Collection;
+use phpDocumentor\Reflection\Types\Object_;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectable;
 use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnection;
+use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionEdge;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectable;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnection;
+use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
 use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TheCodingMachine\GraphQLite\InvalidDocBlockRuntimeException;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
@@ -50,7 +54,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 			default => null,
 		};
 		$type = $reflector instanceof ReflectionMethod ?
-			$reflector?->getReturnType() :
+			$reflector->getReturnType() :
 			$reflector?->getType();
 
 		if (
@@ -64,7 +68,8 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 		$phpDocType = $reflector instanceof ReflectionMethod ?
 			$this->getDocBlocReturnType($docBlock, $reflector) :
 			$this->getDocBlockPropertyType($docBlock, $reflector);
-		assert($phpDocType !== null);
+
+		Assert::isInstanceOfAny($phpDocType, [Object_::class, Collection::class], 'Connectable must specify a type using phpdoc: OffsetConnectable<Model>');
 
 		$queryFieldDescriptor = match ($type->getName()) {
 			CursorConnectable::class => $this->mapCursorConnectable(
@@ -86,7 +91,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 
 	private function mapCursorConnectable(
 		QueryFieldDescriptor $queryFieldDescriptor,
-		\phpDocumentor\Reflection\Type $type,
+		Object_|Collection $type,
 		ReflectionMethod|ReflectionProperty $reflector,
 		DocBlock $docBlockObj
 	): QueryFieldDescriptor {
@@ -146,14 +151,14 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 
 				Assert::isInstanceOf($result, CursorConnectable::class);
 
-				/** @var CursorConnectable $result */
+				/** @var CursorConnectable<mixed, CursorConnectionEdge<mixed>> $result */
 				return $result->cursor($first, $after, $last, $before);
 			});
 	}
 
 	private function mapOffsetConnectable(
 		QueryFieldDescriptor $queryFieldDescriptor,
-		\phpDocumentor\Reflection\Type $type,
+		Object_|Collection $type,
 		ReflectionMethod|ReflectionProperty $reflector,
 		DocBlock $docBlockObj
 	): QueryFieldDescriptor {
@@ -195,7 +200,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 
 				Assert::isInstanceOf($result, OffsetConnectable::class);
 
-				/** @var OffsetConnectable $result */
+				/** @var OffsetConnectable<mixed, OffsetConnectionEdge<mixed>> $result */
 				return $result->offset($limit, $offset);
 			});
 	}

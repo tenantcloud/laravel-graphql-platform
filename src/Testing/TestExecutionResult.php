@@ -42,6 +42,12 @@ class TestExecutionResult extends ExecutionResult
 		return $this;
 	}
 
+	/**
+	 * @param array<mixed, mixed>|int|float|string|bool|callable(AssertableJson): void|null $field
+	 * @param array<mixed, mixed>|int|float|string|bool|callable(AssertableJson): void|null $expected
+	 *
+	 * @return $this
+	 */
 	public function assertData(callable|array|int|float|string|bool|null $field, callable|array|int|float|string|bool|null $expected = null): self
 	{
 		if (func_num_args() === 1) {

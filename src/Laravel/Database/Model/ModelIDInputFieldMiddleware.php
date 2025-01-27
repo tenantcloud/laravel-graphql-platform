@@ -27,7 +27,6 @@ class ModelIDInputFieldMiddleware implements InputFieldMiddlewareInterface
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
-		/** @var ModelID|null $modelIDAnnotation */
 		$modelIDAnnotation = $inputFieldDescriptor->getMiddlewareAnnotations()->getAnnotationByType(ModelID::class);
 
 		$inputFieldDescriptor = $inputFieldDescriptor->withResolver(function ($source, $id, ...$args) use ($modelIDAnnotation, $type, $inputFieldDescriptor) {

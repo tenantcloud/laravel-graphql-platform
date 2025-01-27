@@ -14,11 +14,14 @@ parameters:
 		- tests
 
 	ignoreErrors:
+		# PHPStan is wrong here.
+		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
+		- '#Readonly property TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder::\$\w+ is assigned outside of the constructor\.#'
+		- '#Using nullsafe property access "\?->attributes" on left side of \?\? is unnecessary\. Use -> instead\.#'
 		# Vendor wrong return type
 		- '#Method TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult::fromExecutionResult\(\) should return TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult but returns GraphQL\\Executor\\ExecutionResult\.#i'
+		- '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\ExpectsHigherOrderMessage::#'
 		# Vendor inherited without types
-		- '#Method TenantCloud\\GraphQLPlatform\\Schema\\NamespacedCache::(getMultiple|setMultiple|deleteMultiple|namespacedKeys)\(\) (has parameter|return type) .*#i'
-		- '#Method TenantCloud\\GraphQLPlatform\\Schema\\NullAnnotationReader::getClassAnnotation(s?)\(\) has parameter \$class with generic class ReflectionClass but does not specify its types#i'
 		- '#Method TenantCloud\\GraphQLPlatform\\Validation\\LaravelCompositeTranslatorAdapter::trans\(\) has parameter \$parameters with no value type specified in iterable type array\.#i'
 		-
 			message: '#no value type specified#i'

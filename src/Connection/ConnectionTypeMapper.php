@@ -111,6 +111,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 			$type = Type::nonNull($type);
 		}
 
+		/** @phpstan-ignore-next-line */
 		$typeName = $type instanceof NonNull ? $type->getWrappedType()->name : $type->name;
 
 		return [$type, $typeName];
@@ -295,7 +296,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		);
 
 		[$docNodeType, $docEdgeType] = PhpDocTypes::genericToTypes($type) + [1 => null];
-		[$nodeType, $nodeName] = $this->guessType($docNodeType, $useConnections?->nodeType, $reflector, $docBlockObj);
+		[$nodeType, $nodeName] = $this->guessType($docNodeType, $useConnections->nodeType, $reflector, $docBlockObj);
 
 		$prefix = $this->guessConnectionPrefix($useConnections, $nodeName);
 

@@ -23,7 +23,7 @@ class QueryBuilderConnectable implements Connectable
 	public function cursor(?int $first, ?string $after, ?int $last, ?string $before): CursorConnection
 	{
 		return new CursorPaginatorCursorConnectionAdapter(
-			$this->query->cursorPaginate(perPage: $perPage, cursor: $cursor)
+			$this->query->cursorPaginate(perPage: $first, cursor: $after)
 		);
 	}
 

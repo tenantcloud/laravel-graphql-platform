@@ -4,7 +4,7 @@ namespace TenantCloud\GraphQLPlatform\Connection\Cursor;
 
 /**
  * @template-covariant NodeType
- * @template-covariant EdgeType of CursorConnectionEdge<NodeType>
+ * @template-covariant EdgeType of CursorConnectionEdge<NodeType> = CursorConnectionEdge<NodeType>
  */
 interface CursorConnectable
 {

@@ -10,6 +10,7 @@ class NativeReflectionFactory implements ReflectionFactory
 	{
 		try {
 			return new ReflectionClass($class);
+			/* @phpstan-ignore-next-line */
 		} catch (\Throwable) {
 			return null;
 		}

@@ -2,7 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation;
 
-use App\Helpers\ReflectionHelper;
 use GraphQL\Type\Definition\FieldDefinition;
 use Illuminate\Database\LazyLoadingViolationException;
 use RuntimeException;
@@ -17,26 +16,26 @@ class PreventLazyLoadingFieldMiddleware implements FieldMiddlewareInterface
 	{
 		$preventLazyLoadingMiddleware = $queryFieldDescriptor->getMiddlewareAnnotations()->getAnnotationByType(PreventLazyLoading::class);
 
-		//		if (!$preventLazyLoadingMiddleware) {
-		return $fieldHandler->handle($queryFieldDescriptor);
-		//		}
+		if (!$preventLazyLoadingMiddleware) {
+			return $fieldHandler->handle($queryFieldDescriptor);
+		}
 
-		$resolver = $queryFieldDescriptor->getResolver();
+		$originalResolver = $queryFieldDescriptor->getOriginalResolver();
 
-		if (!$resolver instanceof MagicPropertyResolver) {
+		if (!$originalResolver instanceof MagicPropertyResolver) {
 			throw new RuntimeException('You cannot use #[PreventLazyLoading] attribute on fields not using #[MagicField].');
 		}
 
-		$relationName = ReflectionHelper::getNonPublicProperty($resolver, 'propertyName', MagicPropertyResolver::class);
+		$relationName = $originalResolver->propertyName();
 
-		$queryFieldDescriptor->setResolver(function (...$args) use ($relationName, $resolver) {
-			$model = $resolver->getObject();
+		$queryFieldDescriptor = $queryFieldDescriptor->withResolver(function (mixed $source, ...$args) use ($queryFieldDescriptor, $relationName, $originalResolver) {
+			$model = $originalResolver->executionSource($source);
 
 			if (!$model->relationLoaded($relationName)) {
 				throw new LazyLoadingViolationException($model, $relationName);
 			}
 
-			return $resolver(...$args);
+			return $queryFieldDescriptor->getResolver()($source, ...$args);
 		});
 
 		return $fieldHandler->handle($queryFieldDescriptor);

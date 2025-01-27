@@ -7,6 +7,7 @@ use Iterator;
 
 class MemoizedFileFinder implements FileFinder
 {
+	/** @var array<string, list<string>> */
 	private array $cache = [];
 
 	public function __construct(

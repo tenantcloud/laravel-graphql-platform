@@ -9,8 +9,8 @@ use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
 
 /**
  * @template-covariant NodeType
- * @template-covariant CursorConnectionEdgeType of CursorConnectionEdge<NodeType>
- * @template-covariant OffsetConnectionEdgeType of OffsetConnectionEdge<NodeType>
+ * @template-covariant CursorConnectionEdgeType of CursorConnectionEdge<NodeType> = CursorConnectionEdge<NodeType>
+ * @template-covariant OffsetConnectionEdgeType of OffsetConnectionEdge<NodeType> = OffsetConnectionEdge<NodeType>
  *
  * @template-extends CursorConnectable<NodeType, CursorConnectionEdgeType>
  * @template-extends OffsetConnectable<NodeType, OffsetConnectionEdgeType>

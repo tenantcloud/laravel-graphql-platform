@@ -5,6 +5,7 @@ namespace TenantCloud\GraphQLPlatform\Discovery\Composer;
 use AppendIterator;
 use Composer\Autoload\ClassLoader;
 use Generator;
+use Iterator;
 use Kcs\ClassFinder\PathNormalizer;
 use RuntimeException;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
@@ -26,12 +27,14 @@ class ComposerClassFinder implements ClassFinder
 	/** @var array<string, string> */
 	private readonly array $psr0Prefixes;
 
+	/** @var array<string, string> */
 	private readonly array $autoloadFiles;
 
 	private readonly string $hash;
 
 	/**
-	 * @param string[] $namespaces
+	 * @param list<string>|null            $namespaces
+	 * @param list<callable(string): bool> $pathFilters
 	 */
 	public function __construct(
 		private readonly ClassLoader $classLoader,
@@ -41,6 +44,10 @@ class ComposerClassFinder implements ClassFinder
 		private array $pathFilters = [],
 	) {}
 
+	/**
+	 * @param list<string>|null            $namespaces
+	 * @param list<callable(string): bool> $pathFilters
+	 */
 	public static function default(
 		array|null $namespaces,
 		array $pathFilters = []
@@ -59,6 +66,9 @@ class ComposerClassFinder implements ClassFinder
 		);
 	}
 
+	/**
+	 * @param callable(string): bool $filter
+	 */
 	public function withPathFilter(callable $filter): ClassFinder
 	{
 		$that = clone $this;
@@ -69,6 +79,7 @@ class ComposerClassFinder implements ClassFinder
 
 	public function getIterator(): Generator
 	{
+		/** @var AppendIterator<class-string, string, Iterator<class-string, string>> $iterator */
 		$iterator = new AppendIterator();
 		$iterator->append($this->searchInClassMap());
 		$iterator->append($this->searchInPsrMap());
@@ -108,6 +119,9 @@ class ComposerClassFinder implements ClassFinder
 		throw new RuntimeException('Cannot find a valid composer class loader in registered autoloader functions. Cannot continue.');
 	}
 
+	/**
+	 * @return array<string, string>
+	 */
 	private function autoloadFiles(): array
 	{
 		if (isset($this->autoloadFiles)) {
@@ -133,6 +147,8 @@ class ComposerClassFinder implements ClassFinder
 
 	/**
 	 * Searches for class definitions in class map.
+	 *
+	 * @return Generator<class-string, string>
 	 */
 	private function searchInClassMap(): Generator
 	{
@@ -149,6 +165,8 @@ class ComposerClassFinder implements ClassFinder
 	 *
 	 * NOTE: If the class loader has been generated with ClassMapAuthoritative flag,
 	 * this method will not yield any element.
+	 *
+	 * @return Generator<class-string, string>
 	 */
 	private function searchInPsrMap(): Generator
 	{
@@ -204,6 +222,8 @@ class ComposerClassFinder implements ClassFinder
 
 	/**
 	 * @param array<string, string[]|string> $prefixes
+	 *
+	 * @return Generator<string, string>
 	 */
 	private function traversePrefixes(array $prefixes): Generator
 	{
@@ -220,6 +240,10 @@ class ComposerClassFinder implements ClassFinder
 		}
 	}
 
+	/**
+	 * @param class-string      $class
+	 * @param list<string>|null $namespaces
+	 */
 	private function classHasNamespace(string $class, ?array $namespaces): bool
 	{
 		if ($namespaces === null) {
@@ -235,6 +259,9 @@ class ComposerClassFinder implements ClassFinder
 		return false;
 	}
 
+	/**
+	 * @param list<string>|null $namespaces
+	 */
 	private function namespacesCollide(string $namespacePrefix, ?array $namespaces): bool
 	{
 		if ($namespaces === null) {

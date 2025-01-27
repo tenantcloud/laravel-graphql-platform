@@ -4,6 +4,7 @@ namespace TenantCloud\GraphQLPlatform\Validation\PathMapping;
 
 class PropertyMapping
 {
+	/** @var array<class-string, array<string, string>> */
 	private array $map = [];
 
 	public function __construct() {}

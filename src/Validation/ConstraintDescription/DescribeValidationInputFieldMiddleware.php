@@ -5,6 +5,7 @@ namespace TenantCloud\GraphQLPlatform\Validation\ConstraintDescription;
 use Illuminate\Support\Str;
 use ReflectionProperty;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use TheCodingMachine\GraphQLite\InputField;
@@ -37,10 +38,10 @@ class DescribeValidationInputFieldMiddleware implements InputFieldMiddlewareInte
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
-		/** @var PropertyMetadataInterface[] $propertyMetadata */
-		$propertyMetadata = $this->metadataFactory
-			->getMetadataFor($propertyReflection->getDeclaringClass()->getName())
-			->getPropertyMetadata($propertyReflection->getName());
+		/** @var ClassMetadataInterface $classMetadata */
+		$classMetadata = $this->metadataFactory
+			->getMetadataFor($propertyReflection->getDeclaringClass()->getName());
+		$propertyMetadata = $classMetadata->getPropertyMetadata($propertyReflection->getName());
 
 		if (!$propertyMetadata) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);

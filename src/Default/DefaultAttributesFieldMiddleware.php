@@ -27,6 +27,9 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 		private readonly mixed $filter,
 	) {}
 
+	/**
+	 * @param list<MiddlewareAnnotationInterface> $middleware
+	 */
 	public static function forOperationFields(
 		array $middleware,
 		bool $queries = true,
@@ -65,7 +68,7 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 		$addedAttributes = collect($this->attributes)
 			->reject(fn (MiddlewareAnnotationInterface $attribute) => in_array($attribute::class, $withoutDefault, true))
 			->reject(
-				fn (MiddlewareAnnotationInterface $attribute) => $middlewareAnnotations->getAnnotationsByType($attribute::class)
+				fn (MiddlewareAnnotationInterface $attribute) => (bool) $middlewareAnnotations->getAnnotationsByType($attribute::class)
 			)
 			->all();
 
@@ -74,6 +77,9 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 		);
 	}
 
+	/**
+	 * @param list<MiddlewareAnnotationInterface> $attributes
+	 */
 	private function addAttributes(QueryFieldDescriptor $descriptor, array $attributes): QueryFieldDescriptor
 	{
 		if (!$attributes) {

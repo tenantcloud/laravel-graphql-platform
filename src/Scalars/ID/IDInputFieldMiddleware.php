@@ -14,7 +14,7 @@ use TheCodingMachine\GraphQLite\InputFieldDescriptor;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Parameters\InputTypeParameter;
-use TheCodingMachine\GraphQLite\Parameters\InputTypeParameterInterface;
+use TheCodingMachine\GraphQLite\Parameters\ParameterInterface;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 use TheCodingMachine\GraphQLite\Types\ID;
 use Webmozart\Assert\Assert;
@@ -27,7 +27,6 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 
 	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
-		/** @var ID|null $idAnnotation */
 		$idAnnotation = $inputFieldDescriptor->getMiddlewareAnnotations()->getAnnotationByType(IDAnnotation::class);
 
 		if (!$idAnnotation) {
@@ -39,7 +38,7 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 		$inputFieldDescriptor = $inputFieldDescriptor
 			->withType($type)
 			->withParameters(
-				array_map(function (InputTypeParameterInterface $parameter) {
+				array_map(function (ParameterInterface $parameter) {
 					if ($parameter instanceof InputTypeParameter) {
 						$parameter = new InputTypeParameter(
 							name: $parameter->getName(),
@@ -59,7 +58,7 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 					array_map(fn (ID $id) => $id->val(), $id) :
 					$id?->val();
 
-				if ($type instanceof IntType || ($type instanceof ListOfType && $type->getWrappedType()->getWrappedType() instanceof IntType)) {
+				if ($type instanceof IntType || ($type instanceof ListOfType && $type->getInnermostType() instanceof IntType)) {
 					$id = is_array($id) ?
 						array_map(fn (string|int $id) => (int) $id, $id) :
 						($id === null ? $id : (int) $id);
@@ -91,6 +90,7 @@ class IDInputFieldMiddleware implements InputFieldMiddlewareInterface
 		) {
 			$type = Type::listOf(Type::nonNull(Type::id()));
 		} else {
+			/* @phpstan-ignore-next-line */
 			Assert::true(false, "Expected type int|string|int[]|string[], got {$originalType}");
 		}
 

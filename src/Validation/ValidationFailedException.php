@@ -10,6 +10,9 @@ use TheCodingMachine\GraphQLite\Exceptions\GraphQLExceptionInterface;
 
 class ValidationFailedException extends InvalidArgumentException implements GraphQLExceptionInterface
 {
+	/**
+	 * @param list<string> $path
+	 */
 	public function __construct(
 		public readonly ConstraintViolationListInterface $violations,
 		public readonly array $path,

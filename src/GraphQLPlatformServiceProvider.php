@@ -86,7 +86,6 @@ use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\AuthorizationServiceInterface;
 use TheCodingMachine\GraphQLite\Security\SecurityExpressionLanguageProvider;
 use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
-use Webmozart\Assert\Assert;
 
 class GraphQLPlatformServiceProvider extends ServiceProvider
 {
@@ -300,21 +299,9 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 	private function registerConnections(): void
 	{
-		Builder::macro('toGraphQLConnectable', function () {
-			Assert::isInstanceOf($this, Builder::class);
-
-			return new QueryBuilderConnectable($this);
-		});
-		EloquentBuilder::macro('toGraphQLConnectable', function () {
-			Assert::isInstanceOf($this, EloquentBuilder::class);
-
-			return new QueryBuilderConnectable($this);
-		});
-		Relation::macro('toGraphQLConnectable', function () {
-			Assert::isInstanceOf($this, Relation::class);
-
-			return new QueryBuilderConnectable($this);
-		});
+		Builder::macro('toGraphQLConnectable', fn () => new QueryBuilderConnectable($this));
+		EloquentBuilder::macro('toGraphQLConnectable', fn () => new QueryBuilderConnectable($this));
+		Relation::macro('toGraphQLConnectable', fn () => new QueryBuilderConnectable($this));
 	}
 
 	private function registerAuthentication(): void

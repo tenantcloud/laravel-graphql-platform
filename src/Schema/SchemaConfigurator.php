@@ -52,6 +52,10 @@ final class SchemaConfigurator
 		return $this->with(classFinder: $classFinder);
 	}
 
+	/**
+	 * @param list<string>                $namespaces
+	 * @param callable(string): bool|null $pathFilter
+	 */
 	public function usingComposerClassFinder(array $namespaces, callable $pathFilter = null): self
 	{
 		return $this->usingClassFinder(
