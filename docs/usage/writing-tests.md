@@ -7,7 +7,7 @@ but you shouldn't.
 
 You shouldn't because GraphQL is [protocol agnostic](https://graphql.org/faq/general/#does-graphql-use-http).
 It is usually served over HTTP, but it's not a hard requirement and it doesn't
-actually use most common features of the HTTP protocol - verbs/methods, 
+actually use most common features of the HTTP protocol - verbs/methods,
 paths (endpoints), content types, status codes. Which is why tests shouldn't
 be tied to the HTTP part either - in case there's ever a better alternative
 that we can switch to, without rewriting the tests too.
@@ -57,12 +57,12 @@ class UpdateTest extends TestCase
 	{
 		return $this->graphQL(
 			<<<'GRAPHQL'
-				mutation ($data: UpdateListingWebsiteInput!) { 
-					updateListingWebsite(data: $data) { 
+				mutation ($data: UpdateListingWebsiteInput!) {
+					updateListingWebsite(data: $data) {
 						id
 						layout
 						title
-					} 
+					}
 				}
 				GRAPHQL,
 			['data' => $data]
@@ -70,4 +70,3 @@ class UpdateTest extends TestCase
 	}
 }
 ```
-

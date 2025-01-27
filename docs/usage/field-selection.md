@@ -48,7 +48,7 @@ class DataController {
 and receive the selection above for this query:
 
 ```graphql
-query { 
+query {
 	data(id: 123) {
 		id
 		nested {

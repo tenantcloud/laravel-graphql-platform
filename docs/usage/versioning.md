@@ -33,7 +33,7 @@ readonly class Data {
 		#[Field]
 		#[ForVersions('>=2')]
 		public string $field,
-		
+
 		#[Field(name: 'field')]
 		#[ForVersions('<=1')]
 		public int $fieldV1,
@@ -44,7 +44,7 @@ class DataController {
 	#[Query]
 	#[ForVersions('>=2')]
 	public function onlyForV2(): void {}
-	
+
 	#[Query]
 	#[ForVersions('<=1')]
 	public function onlyForV1(): void {}
@@ -56,6 +56,7 @@ with identical names in GraphQL schema, but different implementations in code. T
 above would look like for different versions:
 
 `latest` or `v2`:
+
 ```graphql
 type Data {
 	field: String!
@@ -69,6 +70,7 @@ type Query {
 ```
 
 `v1`:
+
 ```graphql
 type Data {
 	field: Int!

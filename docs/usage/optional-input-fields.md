@@ -1,6 +1,6 @@
 # Optional input fields
 
-Sometimes you want to know if a field was passed as an input, even if it matches the default value or is nullable. 
+Sometimes you want to know if a field was passed as an input, even if it matches the default value or is nullable.
 For example, given this schema and mutation:
 
 ```graphql
@@ -16,16 +16,12 @@ type Mutation {
 }
 
 mutation {
-	updateSomething(data: {
-		id: 123,
-		name: "Asd",
-		description: null,
-	})
+	updateSomething(data: { id: 123, name: "Asd", description: null })
 }
 ```
 
-You'd wanna know that the client sent only the `id`, `name` and `description` fields, but not the `url` field. 
-Basically, this adds a way to check if the input data "has" the field. To do this in PHP, there's a special 
+You'd wanna know that the client sent only the `id`, `name` and `description` fields, but not the `url` field.
+Basically, this adds a way to check if the input data "has" the field. To do this in PHP, there's a special
 case value `MissingValue`. This is how you'd use it:
 
 ```php

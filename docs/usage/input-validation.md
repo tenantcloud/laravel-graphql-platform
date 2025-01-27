@@ -8,11 +8,12 @@ for example.
 
 However, this kind of process is error-prone and requires a lot of boilerplate.
 To make it easier, GraphQLite automatically maps input data into DTOs:
-- first, GraphQL validates the input data against the schema, making sure
-all of the required fields were passed and that their types match
-- second, GraphQLite constructs a DTO from that data
-- last, Symfony Validator is triggered, which goes through all class properties
-and validates each one separately using custom rules specified with attributes
+
+-   first, GraphQL validates the input data against the schema, making sure
+    all of the required fields were passed and that their types match
+-   second, GraphQLite constructs a DTO from that data
+-   last, Symfony Validator is triggered, which goes through all class properties
+    and validates each one separately using custom rules specified with attributes
 
 All you have to do is add [Symfony Validator constraints](https://symfony.com/doc/current/validation.html#supported-constraints)
 in a form of attributes and you're good:
@@ -29,15 +30,15 @@ class UpdateDTO
 			constraints: [new EqualTo(Layout::BASIC)]
 		)]
 		public Layout|MissingValue $layout = MissingValue::INSTANCE,
-		
+
 		#[Field]
 		#[Length(min: 1, max: 500)]
 		public string|MissingValue|null $title = MissingValue::INSTANCE,
-		
+
 		#[Field]
 		#[Length(min: 1, max: 10000, normalizer: [HtmlNormalizer::class, 'withoutTags'])]
 		public string|MissingValue|null $description = MissingValue::INSTANCE,
-		
+
 		#[Field]
 		#[Count(max: 50)]
 		#[Unique]
