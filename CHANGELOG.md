@@ -1,3 +1,10 @@
+# [1.0.0-alpha.2](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.1...v1.0.0-alpha.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* Connections should use the same logic and respect default values ([#10](https://github.com/tenantcloud/laravel-graphql-platform/issues/10)) ([c402415](https://github.com/tenantcloud/laravel-graphql-platform/commit/c402415f1b6b413c2795d701e916a6c1afb9cdd2))
+
 # 1.0.0-alpha.1 (2025-01-27)
 
 
