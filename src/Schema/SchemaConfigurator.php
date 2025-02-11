@@ -40,12 +40,8 @@ final class SchemaConfigurator
 		public readonly array $fieldMiddlewares = [],
 		public readonly array $inputFieldMiddlewares = [],
 		public readonly string|Version|null $forVersion = null,
+		public readonly int $defaultConnectionsLimit = 100,
 	) {}
-
-	public function forVersion(string|Version $version): self
-	{
-		return $this->with(forVersion: $version);
-	}
 
 	public function usingClassFinder(ClassFinder $classFinder): self
 	{
@@ -152,5 +148,15 @@ final class SchemaConfigurator
 			...$this->inputFieldMiddlewares,
 			...(!$prepend ? [$inputFieldMiddleware] : []),
 		]);
+	}
+
+	public function forVersion(string|Version $version): self
+	{
+		return $this->with(forVersion: $version);
+	}
+
+	public function defaultConnectionsLimit(int $limit): self
+	{
+		return $this->with(defaultConnectionsLimit: $limit);
 	}
 }

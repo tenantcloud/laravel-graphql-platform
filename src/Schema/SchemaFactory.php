@@ -130,6 +130,7 @@ class SchemaFactory
 			$rootTypeMapper,
 			$topRootTypeMapper,
 			$this->container->get(AnnotationReader::class),
+			$configurator->defaultConnectionsLimit,
 		);
 		$rootTypeMapper = new LaravelPaginationTypeMapper($rootTypeMapper);
 

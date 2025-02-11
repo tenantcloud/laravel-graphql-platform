@@ -1,2 +1,3 @@
 providers:
+    - TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider
     - Tests\TestBenchServiceProvider
