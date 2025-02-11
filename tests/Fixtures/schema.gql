@@ -50,15 +50,22 @@ type Query {
 	fullSelection: SelectionResponse!
 	nestedSelection: SelectionResponse!
 	offsetConnectable(
-		offset: Int = null
-		limit: Int = null
-	): UserOffsetConnection
+		"Maximum: 100"
+		limit: Int! = 100
+
+		offset: Int! = 0
+	): UserOffsetConnection!
 	cursorConnectable(
+		"Maximum: 100"
 		first: Int = null
+
 		after: String = null
+
+		"Maximum: 100"
 		last: Int = null
+
 		before: String = null
-	): UserConnection
+	): UserConnection!
 	connectable: UserFriendsConnectable!
 }
 
@@ -94,12 +101,22 @@ type PageInfo {
 
 type UserFriendsConnectable {
 	cursor(
-		first: Int
-		after: String
-		last: Int
-		before: String
+		"Maximum: 100"
+		first: Int = null
+
+		after: String = null
+
+		"Maximum: 100"
+		last: Int = null
+
+		before: String = null
 	): UserFriendsConnection!
-	offset(limit: Int, offset: Int): UserFriendsOffsetConnection!
+	offset(
+		"Maximum: 100"
+		limit: Int! = 100
+
+		offset: Int! = 0
+	): UserFriendsOffsetConnection!
 }
 
 type UserFriendsConnection {

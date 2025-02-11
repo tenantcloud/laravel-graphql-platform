@@ -2,8 +2,9 @@
 
 namespace TenantCloud\GraphQLPlatform\Connection;
 
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\FieldDefinition;
-use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Arr;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
@@ -13,12 +14,9 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectable;
-use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnection;
 use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionEdge;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectable;
-use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnection;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
-use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TheCodingMachine\GraphQLite\InvalidDocBlockRuntimeException;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
@@ -95,64 +93,45 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 		ReflectionMethod|ReflectionProperty $reflector,
 		DocBlock $docBlockObj
 	): QueryFieldDescriptor {
-		$generics = PhpDocTypes::genericToTypes($type);
+		$field = $this->connectionTypeMapper->cursorConnectionField(
+			$type,
+			$reflector,
+			$docBlockObj,
+		);
 
 		return $queryFieldDescriptor
-			->withType(
-				$this->connectionTypeMapper->toGraphQLOutputType(
-					PhpDocTypes::generic(CursorConnection::class, $generics),
-					null,
-					$reflector,
-					$docBlockObj
-				)
-			)
+			->withType($field->getType())
 			->withParameters([
+				...Arr::mapWithKeys($field->args, fn (Argument $arg) => [
+					$arg->name => new InputTypeParameter(
+						name: $arg->name,
+						type: $arg->getType(),
+						description: $arg->description,
+						hasDefaultValue: $arg->defaultValueExists(),
+						defaultValue: $arg->defaultValue,
+						argumentResolver: $this->argumentResolver,
+					),
+				]),
 				...$queryFieldDescriptor->getParameters(),
-				'first' => new InputTypeParameter(
-					name: 'first',
-					type: Type::int(),
-					description: null,
-					hasDefaultValue: true,
-					defaultValue: null,
-					argumentResolver: $this->argumentResolver,
-				),
-				'after' => new InputTypeParameter(
-					name: 'after',
-					type: Type::string(),
-					description: null,
-					hasDefaultValue: true,
-					defaultValue: null,
-					argumentResolver: $this->argumentResolver,
-				),
-				'last' => new InputTypeParameter(
-					name: 'last',
-					type: Type::int(),
-					description: null,
-					hasDefaultValue: true,
-					defaultValue: null,
-					argumentResolver: $this->argumentResolver,
-				),
-				'before' => new InputTypeParameter(
-					name: 'before',
-					type: Type::string(),
-					description: null,
-					hasDefaultValue: true,
-					defaultValue: null,
-					argumentResolver: $this->argumentResolver,
-				),
 			])
-			->withResolver(function (...$args) use ($queryFieldDescriptor) {
-				$before = array_pop($args);
-				$last = array_pop($args);
-				$after = array_pop($args);
-				$first = array_pop($args);
+			->withResolver(function (mixed $source, ...$args) use ($field, $queryFieldDescriptor) {
+				$first = array_shift($args);
+				$after = array_shift($args);
+				$last = array_shift($args);
+				$before = array_shift($args);
 
-				$result = $queryFieldDescriptor->getResolver()(...$args);
+				$result = $queryFieldDescriptor->getResolver()($source, ...$args);
 
 				Assert::isInstanceOf($result, CursorConnectable::class);
 
 				/** @var CursorConnectable<mixed, CursorConnectionEdge<mixed>> $result */
-				return $result->cursor($first, $after, $last, $before);
+				/* @phpstan-ignore-next-line */
+				return ($field->resolveFn)($result, [
+					'first'  => $first,
+					'after'  => $after,
+					'last'   => $last,
+					'before' => $before,
+				]);
 			});
 	}
 
@@ -162,46 +141,41 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 		ReflectionMethod|ReflectionProperty $reflector,
 		DocBlock $docBlockObj
 	): QueryFieldDescriptor {
-		$generics = PhpDocTypes::genericToTypes($type);
+		$field = $this->connectionTypeMapper->offsetConnectionField(
+			$type,
+			$reflector,
+			$docBlockObj,
+		);
 
 		return $queryFieldDescriptor
-			->withType(
-				$this->connectionTypeMapper->toGraphQLOutputType(
-					PhpDocTypes::generic(OffsetConnection::class, $generics),
-					null,
-					$reflector,
-					$docBlockObj
-				)
-			)
+			->withType($field->getType())
 			->withParameters([
+				...Arr::mapWithKeys($field->args, fn (Argument $arg) => [
+					$arg->name => new InputTypeParameter(
+						name: $arg->name,
+						type: $arg->getType(),
+						description: $arg->description,
+						hasDefaultValue: $arg->defaultValueExists(),
+						defaultValue: $arg->defaultValue,
+						argumentResolver: $this->argumentResolver,
+					),
+				]),
 				...$queryFieldDescriptor->getParameters(),
-				'offset' => new InputTypeParameter(
-					name: 'offset',
-					type: Type::int(),
-					description: null,
-					hasDefaultValue: true,
-					defaultValue: null,
-					argumentResolver: $this->argumentResolver,
-				),
-				'limit' => new InputTypeParameter(
-					name: 'limit',
-					type: Type::int(),
-					description: null,
-					hasDefaultValue: true,
-					defaultValue: null,
-					argumentResolver: $this->argumentResolver,
-				),
 			])
-			->withResolver(function (...$args) use ($queryFieldDescriptor) {
-				$limit = array_pop($args);
-				$offset = array_pop($args);
+			->withResolver(function (mixed $source, ...$args) use ($field, $queryFieldDescriptor) {
+				$limit = array_shift($args);
+				$offset = array_shift($args);
 
-				$result = $queryFieldDescriptor->getResolver()(...$args);
+				$result = $queryFieldDescriptor->getResolver()($source, ...$args);
 
 				Assert::isInstanceOf($result, OffsetConnectable::class);
 
 				/** @var OffsetConnectable<mixed, OffsetConnectionEdge<mixed>> $result */
-				return $result->offset($limit, $offset);
+				/* @phpstan-ignore-next-line */
+				return ($field->resolveFn)($result, [
+					'limit'  => $limit,
+					'offset' => $offset,
+				]);
 			});
 	}
 

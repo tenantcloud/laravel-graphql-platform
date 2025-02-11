@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Connection;
 
+use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\NonNull;
@@ -9,7 +10,6 @@ use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\OutputType;
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\Type as GraphQLType;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\Type as PhpDocType;
 use phpDocumentor\Reflection\Types\Collection;
@@ -46,6 +46,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		private readonly RootTypeMapperInterface $next,
 		private readonly RootTypeMapperInterface $topRootTypeMapper,
 		private readonly AnnotationReader $annotationReader,
+		private readonly int $defaultConnectionsLimit,
 	) {}
 
 	public function toGraphQLOutputType(PhpDocType $type, ?OutputType $subType, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): OutputType&Type
@@ -73,7 +74,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		return $this->next->toGraphQLInputType($type, $subType, $argumentName, $reflector, $docBlockObj);
 	}
 
-	public function mapNameToType(string $typeName): NamedType&GraphQLType
+	public function mapNameToType(string $typeName): NamedType&Type
 	{
 		return match (true) {
 			$typeName === 'PageInfo'       => $this->cursorConnectionPageInfo(),
@@ -97,6 +98,75 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		return in_array($type, $this->offsetConnectionCache, true);
 	}
 
+	public function cursorConnectionField(
+		Collection|Object_ $type,
+		ReflectionProperty|ReflectionMethod $reflector,
+		DocBlock $docBlock,
+	): FieldDefinition {
+		$useConnections = $this->useConnectionsAnnotation($reflector);
+		$maxLimit = $useConnections->maxLimit ?? $this->defaultConnectionsLimit;
+
+		return new FieldDefinition([
+			'name' => 'cursor',
+			'type' => Type::nonNull($this->cursorConnection($type, $reflector, $docBlock)),
+			'args' => [
+				'first' => [
+					'type'         => Type::int(),
+					'description'  => "Maximum: {$maxLimit}",
+					'defaultValue' => null,
+				],
+				'after' => [
+					'type'         => Type::string(),
+					'defaultValue' => null,
+				],
+				'last' => [
+					'type'         => Type::int(),
+					'description'  => "Maximum: {$maxLimit}",
+					'defaultValue' => null,
+				],
+				'before' => [
+					'type'         => Type::string(),
+					'defaultValue' => null,
+				],
+			],
+			'resolve' => static fn (CursorConnectable $root, array $args) => $root->cursor(
+				tap($args['first'] ?? null, fn (?int $limit) => $limit ? min($limit, $maxLimit) : $limit),
+				$args['after'] ?? null,
+				tap($args['last'] ?? null, fn (?int $limit) => $limit ? min($limit, $maxLimit) : $limit),
+				$args['before'] ?? null,
+			),
+		]);
+	}
+
+	public function offsetConnectionField(
+		Collection|Object_ $type,
+		ReflectionProperty|ReflectionMethod $reflector,
+		DocBlock $docBlock,
+	): FieldDefinition {
+		$useConnections = $this->useConnectionsAnnotation($reflector);
+		$maxLimit = $useConnections->maxLimit ?? $this->defaultConnectionsLimit;
+
+		return new FieldDefinition([
+			'name' => 'offset',
+			'type' => Type::nonNull($this->offsetConnection($type, $reflector, $docBlock)),
+			'args' => [
+				'limit' => [
+					'type'         => Type::nonNull(Type::int()),
+					'description'  => "Maximum: {$maxLimit}",
+					'defaultValue' => $maxLimit,
+				],
+				'offset' => [
+					'type'         => Type::nonNull(Type::int()),
+					'defaultValue' => 0,
+				],
+			],
+			'resolve' => static fn (OffsetConnectable $root, array $args) => $root->offset(
+				min($args['limit'], $maxLimit),
+				max($args['offset'], 0),
+			),
+		]);
+	}
+
 	/**
 	 * @return array{ OutputType&Type&NamedType, string }
 	 */
@@ -117,8 +187,11 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		return [$type, $typeName];
 	}
 
-	private function cursorConnection(Object_|Collection $type, ReflectionProperty|ReflectionMethod $reflector, DocBlock $docBlockObj): ObjectType
-	{
+	private function cursorConnection(
+		Object_|Collection $type,
+		ReflectionProperty|ReflectionMethod $reflector,
+		DocBlock $docBlockObj
+	): ObjectType {
 		$useConnections = $this->useConnectionsAnnotation($reflector);
 
 		[$docNodeType, $docEdgeType] = PhpDocTypes::genericToTypes($type) + [1 => null];
@@ -180,8 +253,11 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		]);
 	}
 
-	private function offsetConnection(Object_|Collection $type, ReflectionProperty|ReflectionMethod $reflector, DocBlock $docBlockObj): ObjectType
-	{
+	private function offsetConnection(
+		Object_|Collection $type,
+		ReflectionProperty|ReflectionMethod $reflector,
+		DocBlock $docBlockObj
+	): ObjectType {
 		$useConnections = $this->useConnectionsAnnotation($reflector);
 
 		[$docNodeType, $docEdgeType] = PhpDocTypes::genericToTypes($type) + [1 => null];
@@ -290,69 +366,26 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 	{
 		$useConnections = $this->useConnectionsAnnotation($reflector);
 
-		Assert::true(
-			$useConnections?->cursor || $useConnections?->offset,
-			'To use the connectable, #[UseConnections] must be present and at least one of `cursor` or `offset` must be set to true.'
-		);
-
 		[$docNodeType, $docEdgeType] = PhpDocTypes::genericToTypes($type) + [1 => null];
 		[$nodeType, $nodeName] = $this->guessType($docNodeType, $useConnections->nodeType, $reflector, $docBlockObj);
 
 		$prefix = $this->guessConnectionPrefix($useConnections, $nodeName);
-
-		$fields = [];
-
-		if ($useConnections->cursor) {
-			$fields['cursor'] = [
-				'type' => Type::nonNull($this->cursorConnection(
-					PhpDocTypes::generic(CursorConnection::class, array_filter([
-						$docNodeType,
-						$docEdgeType,
-					])),
-					$reflector,
-					$docBlockObj,
-				)),
-				'args' => [
-					'first'  => Type::int(),
-					'after'  => Type::string(),
-					'last'   => Type::int(),
-					'before' => Type::string(),
-				],
-				'resolve' => static fn (CursorConnectable $root, array $args) => $root->cursor(
-					$args['first'] ?? null,
-					$args['after'] ?? null,
-					$args['last'] ?? null,
-					$args['before'] ?? null,
-				),
-			];
-		}
-
-		if ($useConnections->offset) {
-			$fields['offset'] = [
-				'type' => Type::nonNull($this->offsetConnection(
-					PhpDocTypes::generic(OffsetConnection::class, array_filter([
-						$docNodeType,
-						$docEdgeType,
-					])),
-					$reflector,
-					$docBlockObj,
-				)),
-				'args' => [
-					'limit'  => Type::int(),
-					'offset' => Type::int(),
-				],
-				'resolve' => static fn (OffsetConnectable $root, array $args) => $root->offset(
-					$args['limit'] ?? 10,
-					$args['offset'] ?? 0,
-				),
-			];
-		}
-
 		$typeName = "{$prefix}Connectable";
 
 		return $this->cache[$typeName] ??= $this->connectableCache[$typeName] ??= new ObjectType([
 			'name'   => $typeName,
-			'fields' => static fn () => $fields,
+			'fields' => fn () => [
+				...($useConnections->cursor ? [$this->cursorConnectionField(
+					PhpDocTypes::generic(CursorConnection::class, array_filter([$docNodeType, $docEdgeType])),
+					$reflector,
+					$docBlockObj
+				)] : []),
+				...($useConnections->offset ? [$this->offsetConnectionField(
+					PhpDocTypes::generic(OffsetConnection::class, array_filter([$docNodeType, $docEdgeType])),
+					$reflector,
+					$docBlockObj,
+				)] : []),
+			],
 		]);
 	}
 }

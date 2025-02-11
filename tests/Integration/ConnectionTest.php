@@ -53,6 +53,29 @@ class ConnectionTest extends IntegrationTestCase
 	}
 
 	#[Test]
+	public function returnsOffsetConnectionUsingDefaultLimitAndOffset(): void
+	{
+		$this
+			->graphQL(
+				<<<'GRAPHQL'
+					query {
+						offsetConnectable {
+							nodes {
+								name
+							}
+						}
+					}
+					GRAPHQL,
+			)
+			->assertSuccessful()
+			->assertData([
+				'nodes' => [
+					['name' => 'Alex'],
+				],
+			]);
+	}
+
+	#[Test]
 	public function returnsCursorConnectionUsingCursorConnectable(): void
 	{
 		$this
