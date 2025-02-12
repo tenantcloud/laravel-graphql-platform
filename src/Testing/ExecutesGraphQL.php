@@ -7,8 +7,14 @@ use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Testing\TestResponse;
+use TenantCloud\GraphQLPlatform\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
+use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
 use TheCodingMachine\GraphQLite\Context\Context;
 
 /**
@@ -44,8 +50,79 @@ trait ExecutesGraphQL
 			'variables' => $variables,
 		]);
 
+		$this->app->make(Request::class)->setUserResolver(fn () => $this->app->make(Guard::class)->user());
+
 		return TestExecutionResult::fromExecutionResult(
 			$serverHelper->executeOperation($config, $params)
+		);
+	}
+
+	/**
+	 * Execute a GraphQL operation as if it was sent as an HTTP request to the server.
+	 *
+	 * Not recommended unless required to test the HTTP part specifically.
+	 *
+	 * @param string               $query     The GraphQL operation to send
+	 * @param array<string, mixed> $variables The variables to include in the query
+	 * @param array<string, mixed> $headers   HTTP headers to pass to the POST request
+	 */
+	protected function httpGraphQL(
+		string $query,
+		array $variables = [],
+		array $headers = [],
+	): TestResponse {
+		$data = ['query' => $query];
+
+		if ($variables) {
+			$data += ['variables' => $variables];
+		}
+
+		return $this->postJson(
+			uri: route(GraphQLPlatform::namespaced('graphql')),
+			data: $data,
+			headers: [
+				'Accept' => GraphQLController::GRAPHQL_RESPONSE_CONTENT_TYPE . ', ' . GraphQLController::JSON_CONTENT_TYPE,
+				...$headers,
+			],
+			options: JSON_THROW_ON_ERROR,
+		);
+	}
+
+	/**
+	 * Send a multipart form request to the GraphQL endpoint.
+	 *
+	 * Not recommended unless required to test the HTTP part specifically.
+	 *
+	 * This is used for file uploads conforming to the specification:
+	 * https://github.com/jaydenseric/graphql-multipart-request-spec
+	 *
+	 * @param array<string, mixed>|array<int, array<string, mixed>> $operations
+	 * @param array<array<int, string>>                             $map
+	 * @param array<UploadedFile>|array<array<mixed>>               $files
+	 * @param array<string, mixed>                                  $headers
+	 */
+	protected function httpMultipartGraphQL(
+		array $operations,
+		array $map,
+		array $files,
+		array $headers = [],
+	): TestResponse {
+		$parameters = [
+			'operations' => json_encode($operations, JSON_THROW_ON_ERROR),
+			'map'        => json_encode($map, JSON_THROW_ON_ERROR),
+		];
+
+		return $this->call(
+			method: 'POST',
+			uri: route(GraphQLPlatform::namespaced('graphql')),
+			parameters: $parameters,
+			files: $files,
+			server: $this->transformHeadersToServerVars(array_merge(
+				[
+					'Content-Type' => 'multipart/form-data',
+				],
+				$headers,
+			)),
 		);
 	}
 }

@@ -7,11 +7,12 @@ use Symfony\Component\Cache\Psr16Cache;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
+use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
 use Tests\TestCase;
 
 abstract class HttpIntegrationTestCase extends TestCase
 {
-	use MakesHttpGraphQLRequests;
+	use ExecutesGraphQL;
 
 	protected string $endpoint;
 
