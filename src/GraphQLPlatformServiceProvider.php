@@ -283,16 +283,24 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 	{
 		$this->app->singleton(
 			ValidatorInterface::class,
-			fn (Application $app) => (new ValidatorBuilder())
-				->enableAttributeMapping()
-				->setMappingCache($app->make('graphqlite.psr6_cache'))
-				->setTranslator(new LaravelCompositeTranslatorAdapter($app->make(Translator::class)))
-				->setConstraintValidatorFactory(
-					new SkipMissingValueConstraintValidatorFactory(
-						new ContainerConstraintValidatorFactory($app->make(self::CONTAINER_HANDLE))
-					)
-				)
-				->getValidator()
+			function (Application $app) {
+				$builder = (new ValidatorBuilder())
+					->enableAttributeMapping()
+					->setTranslator(new LaravelCompositeTranslatorAdapter($app->make(Translator::class)))
+					->setConstraintValidatorFactory(
+						new SkipMissingValueConstraintValidatorFactory(
+							new ContainerConstraintValidatorFactory($app->make(self::CONTAINER_HANDLE))
+						)
+					);
+
+				// Cache does not invalidate itself on file changes, so it's only enabled in prod,
+				// where file modification times are not checked either way.
+				if (!$app->make(GraphQLConfigurator::class)->devMode) {
+					$builder = $builder->setMappingCache($app->make('graphqlite.psr6_cache'));
+				}
+
+				return $builder->getValidator();
+			}
 		);
 		$this->app->bind(MetadataFactoryInterface::class, ValidatorInterface::class);
 	}
