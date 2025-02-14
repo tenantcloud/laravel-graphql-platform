@@ -140,7 +140,7 @@ type UserFriendsOffsetEdge {
 }
 
 type Mutation {
-	createUser(data: CreateUserDataInput!): Void
+	createUser(data: CreateUserDataInput!): User!
 	updateUser(data: UpdateUserDataInput!): User!
 	uploadFile(file: Upload!): String!
 }
@@ -150,9 +150,6 @@ input CreateUserDataInput {
 	createdAt: DateTime!
 	somethingAfter: Duration!
 }
-
-"The `Void` scalar type represents no value being returned."
-scalar Void
 
 input UpdateUserDataInput {
 	id: ID!

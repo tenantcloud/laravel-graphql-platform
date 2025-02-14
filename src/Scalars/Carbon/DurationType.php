@@ -4,15 +4,19 @@ namespace TenantCloud\GraphQLPlatform\Scalars\Carbon;
 
 use Carbon\CarbonInterval;
 use DateInterval;
-use Exception;
+use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 use TheCodingMachine\GraphQLite\GraphQLRuntimeException;
 
 class DurationType extends ScalarType
 {
+	/** @see https://github.com/Urigo/graphql-scalars/blob/master/src/scalars/iso-date/Duration.ts#L12 */
+	private const DURATION_REGEX = '/^(-|\+)?P(?!$)((-|\+)?\d+(?:(\.|,)\d+)?Y)?((-|\+)?\d+(?:(\.|,)\d+)?M)?((-|\+)?\d+(?:(\.|,)\d+)?W)?((-|\+)?\d+(?:(\.|,)\d+)?D)?(T(?=(-|\+)?\d)((-|\+)?\d+(?:(\.|,)\d+)?H)?((-|\+)?\d+(?:(\.|,)\d+)?M)?((-|\+)?\d+(?:(\.|,)\d+)?S)?)?$/';
+
 	public string $name = 'Duration';
 
 	public ?string $description = 'The `Duration` scalar type represents a time duration conforming to the `ISO8601` standard, such as `P1W1DT13H23M34S`.';
@@ -47,19 +51,21 @@ class DurationType extends ScalarType
 			throw new GraphQLRuntimeException();
 		}
 
-		try {
-			return new CarbonInterval($value);
-		} catch (Exception $e) {
-			throw new GraphQLRuntimeException(previous: $e);
+		if (!preg_match(self::DURATION_REGEX, $value)) {
+			throw new Error('Value is not a valid ISO formatted duration.');
 		}
+
+		return new CarbonInterval($value);
 	}
 
-	public function parseLiteral($valueNode, array|null $variables = null): string
+	public function parseLiteral($valueNode, array $variables = null): string
 	{
 		if ($valueNode instanceof StringValueNode) {
 			return $valueNode->value;
 		}
 
-		throw new GraphQLRuntimeException();
+		$notString = Printer::doPrint($valueNode);
+
+		throw new Error("Duration cannot represent a non string value: {$notString}", $valueNode);
 	}
 }
