@@ -27,7 +27,7 @@ class ValidatingParameter implements InputTypeParameterInterface
 		$violations = $this->validator->validate($value);
 
 		if ($violations->count() > 0) {
-			throw new ValidationFailedException($violations, [$this->delegate->getName()], $this->propertyPathMapper);
+			throw new ValidationFailedException($violations, $this->delegate->getName(), $this->propertyPathMapper);
 		}
 
 		return $value;

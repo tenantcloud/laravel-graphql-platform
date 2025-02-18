@@ -83,19 +83,22 @@ class ValidationTest extends IntegrationTestCase
 					'extensions' => [
 						'errors' => [
 							[
-								'path'    => ['data', 'name'],
-								'code'    => '9ff3fdc4-b214-49db-8718-39c315e33d45',
-								'message' => 'This value is too short. It should have 1 character or more.',
+								'parameter' => 'data',
+								'path'      => ['name'],
+								'code'      => '9ff3fdc4-b214-49db-8718-39c315e33d45',
+								'message'   => 'This value is too short. It should have 1 character or more.',
 							],
 							[
-								'path'    => ['data', 'fileIds'],
-								'code'    => 'f27e6d6c-261a-4056-b391-6673a623531c',
-								'message' => 'This value should satisfy at least one of the following constraints: [1] This collection should contain only unique elements. [2] This value should be equal to array.',
+								'parameter' => 'data',
+								'path'      => ['fileIds'],
+								'code'      => 'f27e6d6c-261a-4056-b391-6673a623531c',
+								'message'   => 'This value should satisfy at least one of the following constraints: [1] This collection should contain only unique elements. [2] This value should be equal to array.',
 							],
 							[
-								'path'    => ['data', 'nested', '1', 'name'],
-								'code'    => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
-								'message' => 'This value is too long. It should have 4 characters or less.',
+								'parameter' => 'data',
+								'path'      => ['nested', '1', 'name'],
+								'code'      => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
+								'message'   => 'This value is too long. It should have 4 characters or less.',
 							],
 						],
 					],
@@ -129,9 +132,10 @@ class ValidationTest extends IntegrationTestCase
 					'extensions' => [
 						'errors' => [
 							[
-								'path'    => ['nest', '0', 'name'],
-								'code'    => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
-								'message' => 'This value is too long. It should have 4 characters or less.',
+								'parameter' => 'nest',
+								'path'      => ['0', 'name'],
+								'code'      => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
+								'message'   => 'This value is too long. It should have 4 characters or less.',
 							],
 						],
 					],
