@@ -37,6 +37,7 @@ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
+use TenantCloud\GraphQLPlatform\Internal\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddleware;
@@ -242,6 +243,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(MetadataFactoryInterface::class),
 					new ReflectionConstraintDescriptionProvider(),
 				))
+				->addInputFieldMiddleware(new FixNonNullTypeDefaultValuesInputFieldMiddleware())
 				->addParameterMiddleware(new InjectUserParameterHandler($app->make(AuthenticationServiceInterface::class)))
 				->addParameterMiddleware(new InjectSelectionParameterMiddleware())
 				->addParameterMiddleware(new ModelIDParameterMiddleware())
