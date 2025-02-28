@@ -20,18 +20,18 @@ class BatchTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				[
-					'query' => <<<'GRAPHQL'
+					'query' => <<<'EOD'
 						query {
 							firstUser { name }
 						}
-						GRAPHQL,
+						EOD,
 				],
 				[
-					'query' => <<<'GRAPHQL'
+					'query' => <<<'EOD'
 						query {
 							firstUser { somethingAfter }
 						}
-						GRAPHQL,
+						EOD,
 				],
 			])
 			->dump();
@@ -43,18 +43,18 @@ class BatchTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				[
-					'query' => <<<'GRAPHQL'
+					'query' => <<<'EOD'
 						query {
 							firstUser { name }
 						}
-						GRAPHQL,
+						EOD,
 				],
 				[
-					'query' => <<<'GRAPHQL'
+					'query' => <<<'EOD'
 						query {
 							firstUser { somethingAfter }
 						}
-						GRAPHQL,
+						EOD,
 				],
 			])
 			->assertBadRequest()
@@ -88,18 +88,18 @@ class BatchTest extends HttpIntegrationTestCase
 				uri: $this->endpoint,
 				data: [
 					[
-						'query' => <<<'GRAPHQL'
+						'query' => <<<'EOD'
 							query {
 								firstUser { name }
 							}
-							GRAPHQL,
+							EOD,
 					],
 					[
-						'query' => <<<'GRAPHQL'
+						'query' => <<<'EOD'
 							query {
 								firstUser { somethingAfter }
 							}
-							GRAPHQL,
+							EOD,
 					],
 				],
 				options: JSON_THROW_ON_ERROR,

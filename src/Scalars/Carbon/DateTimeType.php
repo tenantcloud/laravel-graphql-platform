@@ -31,7 +31,7 @@ class DateTimeType extends GraphQLiteDateTimeType
 		return CarbonImmutable::instance($value)->toISOString();
 	}
 
-	public function parseValue(mixed $value): CarbonImmutable|null
+	public function parseValue(mixed $value): ?CarbonImmutable
 	{
 		if ($value === null) {
 			return null;
@@ -55,7 +55,7 @@ class DateTimeType extends GraphQLiteDateTimeType
 		return new CarbonImmutable($value);
 	}
 
-	public function parseLiteral($valueNode, array $variables = null): string
+	public function parseLiteral($valueNode, ?array $variables = null): string
 	{
 		if ($valueNode instanceof StringValueNode) {
 			return $valueNode->value;

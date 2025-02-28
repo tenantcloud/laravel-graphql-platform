@@ -116,7 +116,7 @@ class PrintCommandTest extends TestCase
 					],
 				]),
 			]),
-			<<<GRAPHQL
+			<<<EOD
 				schema {
 				  query: Type
 				}
@@ -125,7 +125,7 @@ class PrintCommandTest extends TestCase
 				  {$identifier}: Int
 				}
 
-				GRAPHQL
+				EOD
 		];
 	}
 }

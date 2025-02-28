@@ -20,7 +20,7 @@ class ValidatingParameter implements InputTypeParameterInterface
 	/**
 	 * @param array<string, mixed> $args
 	 */
-	public function resolve(object|null $source, array $args, mixed $context, ResolveInfo $info): mixed
+	public function resolve(?object $source, array $args, mixed $context, ResolveInfo $info): mixed
 	{
 		$value = $this->delegate->resolve($source, $args, $context, $info);
 

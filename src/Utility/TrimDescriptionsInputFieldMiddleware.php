@@ -9,7 +9,7 @@ use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
 
 class TrimDescriptionsInputFieldMiddleware implements InputFieldMiddlewareInterface
 {
-	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): InputField|null
+	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
 		$trimmed = trim($inputFieldDescriptor->getComment() ?? '') ?: null;
 

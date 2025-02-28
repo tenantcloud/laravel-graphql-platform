@@ -16,7 +16,7 @@ class IDTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation {
 						updateUser(
 							data: {
@@ -29,7 +29,7 @@ class IDTest extends IntegrationTestCase
 							fileIds
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([

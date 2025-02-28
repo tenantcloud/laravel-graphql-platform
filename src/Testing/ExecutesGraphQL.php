@@ -31,7 +31,7 @@ trait ExecutesGraphQL
 	protected function graphQL(
 		string $query,
 		array $variables = [],
-		string|Schema $schema = null,
+		string|Schema|null $schema = null,
 	): TestExecutionResult {
 		if (!$schema instanceof Schema) {
 			$schema = $schema ?
@@ -97,8 +97,8 @@ trait ExecutesGraphQL
 	 * https://github.com/jaydenseric/graphql-multipart-request-spec
 	 *
 	 * @param array<string, mixed>|array<int, array<string, mixed>> $operations
-	 * @param array<array<int, string>>                             $map
-	 * @param array<UploadedFile>|array<array<mixed>>               $files
+	 * @param list<array<int, string>>                              $map
+	 * @param list<UploadedFile>|list<list<mixed>>                  $files
 	 * @param array<string, mixed>                                  $headers
 	 */
 	protected function httpMultipartGraphQL(

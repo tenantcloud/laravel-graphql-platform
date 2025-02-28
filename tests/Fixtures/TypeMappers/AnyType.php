@@ -20,7 +20,7 @@ class AnyType extends ScalarType
 		throw new GraphQLRuntimeException();
 	}
 
-	public function parseLiteral(Node $valueNode, array|null $variables = null): never
+	public function parseLiteral(Node $valueNode, ?array $variables = null): never
 	{
 		throw new GraphQLRuntimeException();
 	}

@@ -19,7 +19,7 @@ class QueryComplexityTest extends IntegrationTestCase
 		// All have a combined cost of 15, that is then multiplied by perPage (3), which gives us 45.
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						listUsers(perPage: 3) {
 							nodes {
@@ -28,7 +28,7 @@ class QueryComplexityTest extends IntegrationTestCase
 							}
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertErrors([
 				['message' => 'Max query complexity should be 1 but got 45.'],

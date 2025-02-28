@@ -17,11 +17,11 @@ class UploadTest extends HttpIntegrationTestCase
 		$this
 			->httpMultipartGraphQL(
 				[
-					'query' => <<<'GRAPHQL'
+					'query' => <<<'EOD'
 						mutation ($file: Upload!) {
 							uploadFile(file: $file)
 						}
-						GRAPHQL,
+						EOD,
 					'variables' => [
 						'file' => null,
 					],

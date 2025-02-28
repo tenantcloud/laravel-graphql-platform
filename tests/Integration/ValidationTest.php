@@ -57,7 +57,7 @@ class ValidationTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation {
 						updateUser(
 							data: {
@@ -74,7 +74,7 @@ class ValidationTest extends IntegrationTestCase
 							somethingAfter
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertErrors([
 				[
@@ -111,7 +111,7 @@ class ValidationTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation {
 						updateUser(
 							data: {
@@ -123,7 +123,7 @@ class ValidationTest extends IntegrationTestCase
 							avatar(nest: [{ name: "invalid2" }], size: 123)
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertErrors([
 				[

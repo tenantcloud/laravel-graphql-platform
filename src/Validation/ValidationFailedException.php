@@ -26,14 +26,12 @@ class ValidationFailedException extends InvalidArgumentException implements Grap
 	public function getExtensions(): array
 	{
 		$violations = collect($this->violations)
-			->map(function (ConstraintViolationInterface $violation) {
-				return [
-					'parameter' => $this->parameter,
-					'path'      => $this->propertyPathMapper->map($violation->getPropertyPath(), $violation->getRoot()),
-					'code'      => $violation->getCode(),
-					'message'   => (string) $violation->getMessage(),
-				];
-			})
+			->map(fn (ConstraintViolationInterface $violation) => [
+				'parameter' => $this->parameter,
+				'path'      => $this->propertyPathMapper->map($violation->getPropertyPath(), $violation->getRoot()),
+				'code'      => $violation->getCode(),
+				'message'   => (string) $violation->getMessage(),
+			])
 			->all();
 
 		return [

@@ -16,7 +16,7 @@ use TheCodingMachine\GraphQLite\Middlewares\InputFieldMiddlewareInterface;
  */
 class FixNonNullTypeDefaultValuesInputFieldMiddleware implements InputFieldMiddlewareInterface
 {
-	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): InputField|null
+	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
 		if (
 			$inputFieldDescriptor->hasDefaultValue() &&

@@ -15,7 +15,7 @@ class PropertyMappingInputFieldMiddleware implements InputFieldMiddlewareInterfa
 		private readonly PropertyMapping $inputPropertyMapping,
 	) {}
 
-	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): InputField|null
+	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
 		$field = $inputFieldHandler->handle($inputFieldDescriptor);
 

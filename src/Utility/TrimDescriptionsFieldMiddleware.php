@@ -9,7 +9,7 @@ use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
 
 class TrimDescriptionsFieldMiddleware implements FieldMiddlewareInterface
 {
-	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
+	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): ?FieldDefinition
 	{
 		$trimmed = trim($queryFieldDescriptor->getComment() ?? '') ?: null;
 

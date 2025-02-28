@@ -3,6 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection;
 
 use ReflectionClass;
+use Throwable;
 
 class NativeReflectionFactory implements ReflectionFactory
 {
@@ -11,7 +12,7 @@ class NativeReflectionFactory implements ReflectionFactory
 		try {
 			return new ReflectionClass($class);
 			/* @phpstan-ignore-next-line */
-		} catch (\Throwable) {
+		} catch (Throwable) {
 			return null;
 		}
 	}

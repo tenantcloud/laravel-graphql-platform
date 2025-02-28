@@ -18,7 +18,7 @@ class MissingValueTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation {
 						updateUser(
 							data: {
@@ -29,7 +29,7 @@ class MissingValueTest extends IntegrationTestCase
 							somethingAfter
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -43,7 +43,7 @@ class MissingValueTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation {
 						updateUser(
 							data: {
@@ -56,7 +56,7 @@ class MissingValueTest extends IntegrationTestCase
 							somethingAfter
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([

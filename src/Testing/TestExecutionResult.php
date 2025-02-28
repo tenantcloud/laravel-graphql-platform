@@ -11,7 +11,7 @@ use ReflectionProperty;
 
 class TestExecutionResult extends ExecutionResult
 {
-	public function __construct(array $data = null, array $errors = [], array $extensions = [])
+	public function __construct(?array $data = null, array $errors = [], array $extensions = [])
 	{
 		parent::__construct($data, $errors, $extensions);
 	}
@@ -100,7 +100,7 @@ class TestExecutionResult extends ExecutionResult
 	/**
 	 * @return array<mixed, mixed>|int|float|string|bool|null
 	 */
-	public function data(string $field = null): array|int|float|string|bool|null
+	public function data(?string $field = null): array|int|float|string|bool|null
 	{
 		if ($field === null) {
 			$fieldNames = [

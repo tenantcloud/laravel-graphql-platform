@@ -18,12 +18,12 @@ class User
 		#[Field] public readonly string $name,
 		#[Field] public readonly CarbonImmutable $createdAt,
 		#[Field] #[Cost(3)] public readonly ?CarbonInterval $somethingAfter = null,
-		/** @var array<int> $fileIds */
+		/** @var list<int> $fileIds */
 		#[Field] public readonly array $fileIds = [],
 	) {}
 
 	/**
-	 * @param array<Nested> $nest
+	 * @param list<Nested> $nest
 	 */
 	#[Field]
 	public function avatar(array $nest, int $size): string

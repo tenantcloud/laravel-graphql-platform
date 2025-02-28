@@ -33,7 +33,7 @@ class GraphQLController
 	) {}
 
 	/**
-	 * @param OperationParams|OperationParams[] $parsedBody
+	 * @param OperationParams|list<OperationParams> $parsedBody
 	 */
 	private function handlePsr7Request(Schema $schema, ServerConfig $config, array|OperationParams $parsedBody): JsonResponse
 	{

@@ -37,7 +37,7 @@ class DurationType extends ScalarType
 		return CarbonInterval::instance($value)->spec(true);
 	}
 
-	public function parseValue(mixed $value): CarbonInterval|null
+	public function parseValue(mixed $value): ?CarbonInterval
 	{
 		if ($value === null) {
 			return null;
@@ -58,7 +58,7 @@ class DurationType extends ScalarType
 		return new CarbonInterval($value);
 	}
 
-	public function parseLiteral($valueNode, array $variables = null): string
+	public function parseLiteral($valueNode, ?array $variables = null): string
 	{
 		if ($valueNode instanceof StringValueNode) {
 			return $valueNode->value;

@@ -19,17 +19,17 @@ class UpdateUserData
 {
 	#[Field]
 	#[ID]
-	public string           $id;
+	public string $id;
 
 	#[Field]
 	#[Length(min: 1, max: 255)]
 	#[PersonName]
-	public string|MissingValue           $name = MissingValue::INSTANCE;
+	public string|MissingValue $name = MissingValue::INSTANCE;
 
 	#[Field]
-	public CarbonInterval|MissingValue|null  $somethingAfter = MissingValue::INSTANCE;
+	public CarbonInterval|MissingValue|null $somethingAfter = MissingValue::INSTANCE;
 
-	/** @var array<string> */
+	/** @var list<string> */
 	#[Field]
 	#[ID]
 	#[AtLeastOneOf([
@@ -38,7 +38,7 @@ class UpdateUserData
 	])]
 	public array $fileIds = [];
 
-	/** @var array<Nested>|MissingValue */
+	/** @var list<Nested>|MissingValue */
 	#[Field(name: 'nested')]
 	#[Valid]
 	public mixed $nest = MissingValue::INSTANCE;

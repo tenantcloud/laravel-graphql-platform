@@ -18,7 +18,7 @@ class PhpDocTypes
 	}
 
 	/**
-	 * @param Type[] $types
+	 * @param list<Type> $types
 	 */
 	public static function generic(string $className, array $types): Object_|Collection
 	{
@@ -33,7 +33,7 @@ class PhpDocTypes
 	}
 
 	/**
-	 * @return Type[]
+	 * @return list<Type>
 	 */
 	public static function genericToTypes(Object_|Collection $type): array
 	{

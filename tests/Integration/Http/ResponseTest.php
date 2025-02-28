@@ -15,11 +15,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query Test ($q: Int!) {
 						clientSafeError
 					}
-					GRAPHQL,
+					EOD,
 				/* @phpstan-ignore-next-line */
 				[7]
 			)
@@ -42,11 +42,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					queryasd {
 						clientSafeError
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertBadRequest()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -67,11 +67,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						unknownField
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertBadRequest()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -92,13 +92,13 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query ($perPage: Int!) {
 						listUsers(perPage: $perPage) {
 							__typename
 						}
 					}
-					GRAPHQL,
+					EOD,
 				['perPage' => 'String']
 			)
 			->assertBadRequest()
@@ -122,11 +122,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						clientSafeError
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertStatus(Response::HTTP_MULTI_STATUS)
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -154,11 +154,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						clientSafeError
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertStatus(Response::HTTP_MULTI_STATUS)
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -182,11 +182,11 @@ class ResponseTest extends HttpIntegrationTestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						firstUser { name }
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertOk()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -210,11 +210,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						clientUnsafeError
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
 			->assertHeader('Content-Type', 'application/json')
@@ -237,11 +237,11 @@ class ResponseTest extends HttpIntegrationTestCase
 
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						clientUnsafeError
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
 			->assertHeader('Content-Type', 'application/json')

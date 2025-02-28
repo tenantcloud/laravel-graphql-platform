@@ -20,14 +20,14 @@ class CarbonTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						firstUser {
 							somethingAfter
 							createdAt
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -42,7 +42,7 @@ class CarbonTest extends IntegrationTestCase
 	{
 		$response = $this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation ($createdAt: DateTime!) {
 						createUser(
 							data: {
@@ -54,7 +54,7 @@ class CarbonTest extends IntegrationTestCase
 							createdAt
 						}
 					}
-					GRAPHQL,
+					EOD,
 				['createdAt' => $createdAt]
 			);
 
@@ -110,7 +110,7 @@ class CarbonTest extends IntegrationTestCase
 	{
 		$response = $this
 			->graphQL(
-				<<<GRAPHQL
+				<<<EOD
 					mutation {
 						createUser(
 							data: {
@@ -122,7 +122,7 @@ class CarbonTest extends IntegrationTestCase
 							createdAt
 						}
 					}
-					GRAPHQL,
+					EOD,
 			);
 
 		if (!$error) {
@@ -143,7 +143,7 @@ class CarbonTest extends IntegrationTestCase
 	{
 		$response = $this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation ($somethingAfter: Duration!) {
 						createUser(
 							data: {
@@ -155,7 +155,7 @@ class CarbonTest extends IntegrationTestCase
 							somethingAfter
 						}
 					}
-					GRAPHQL,
+					EOD,
 				['somethingAfter' => $somethingAfter]
 			);
 
@@ -194,7 +194,7 @@ class CarbonTest extends IntegrationTestCase
 	{
 		$response = $this
 			->graphQL(
-				<<<GRAPHQL
+				<<<EOD
 					mutation {
 						createUser(
 							data: {
@@ -206,7 +206,7 @@ class CarbonTest extends IntegrationTestCase
 							somethingAfter
 						}
 					}
-					GRAPHQL,
+					EOD,
 			);
 
 		if (!$error) {
