@@ -37,8 +37,13 @@ class UserController
 	}
 
 	#[Mutation]
-	public function createUser(CreateUserData $data): void
+	public function createUser(CreateUserData $data): User
 	{
+		return new User(
+			name: $data->name,
+			createdAt: $data->createdAt,
+			somethingAfter: $data->somethingAfter,
+		);
 	}
 
 	#[Mutation]

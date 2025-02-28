@@ -14,7 +14,7 @@ class ResponseTest extends HttpIntegrationTestCase
 	public function invalidParameters(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query Test ($q: Int!) {
 						clientSafeError
@@ -41,7 +41,7 @@ class ResponseTest extends HttpIntegrationTestCase
 	public function documentParsingFailure(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					queryasd {
 						clientSafeError
@@ -66,7 +66,7 @@ class ResponseTest extends HttpIntegrationTestCase
 	public function invalidField(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						unknownField
@@ -91,7 +91,7 @@ class ResponseTest extends HttpIntegrationTestCase
 	public function variableCoercionFailure(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query ($perPage: Int!) {
 						listUsers(perPage: $perPage) {
@@ -121,7 +121,7 @@ class ResponseTest extends HttpIntegrationTestCase
 		config()->set('app.debug', true);
 
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						clientSafeError
@@ -153,7 +153,7 @@ class ResponseTest extends HttpIntegrationTestCase
 		config()->set('app.debug', false);
 
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						clientSafeError
@@ -181,7 +181,7 @@ class ResponseTest extends HttpIntegrationTestCase
 	public function fieldSuccess(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						firstUser { name }
@@ -209,7 +209,7 @@ class ResponseTest extends HttpIntegrationTestCase
 		config()->set('app.debug', true);
 
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						clientUnsafeError
@@ -236,7 +236,7 @@ class ResponseTest extends HttpIntegrationTestCase
 		config()->set('app.debug', false);
 
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						clientUnsafeError

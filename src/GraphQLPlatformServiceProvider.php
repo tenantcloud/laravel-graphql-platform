@@ -37,6 +37,7 @@ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
+use TenantCloud\GraphQLPlatform\Internal\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddleware;
@@ -242,6 +243,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(MetadataFactoryInterface::class),
 					new ReflectionConstraintDescriptionProvider(),
 				))
+				->addInputFieldMiddleware(new FixNonNullTypeDefaultValuesInputFieldMiddleware())
 				->addParameterMiddleware(new InjectUserParameterHandler($app->make(AuthenticationServiceInterface::class)))
 				->addParameterMiddleware(new InjectSelectionParameterMiddleware())
 				->addParameterMiddleware(new ModelIDParameterMiddleware())
@@ -283,16 +285,24 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 	{
 		$this->app->singleton(
 			ValidatorInterface::class,
-			fn (Application $app) => (new ValidatorBuilder())
-				->enableAttributeMapping()
-				->setMappingCache($app->make('graphqlite.psr6_cache'))
-				->setTranslator(new LaravelCompositeTranslatorAdapter($app->make(Translator::class)))
-				->setConstraintValidatorFactory(
-					new SkipMissingValueConstraintValidatorFactory(
-						new ContainerConstraintValidatorFactory($app->make(self::CONTAINER_HANDLE))
-					)
-				)
-				->getValidator()
+			function (Application $app) {
+				$builder = (new ValidatorBuilder())
+					->enableAttributeMapping()
+					->setTranslator(new LaravelCompositeTranslatorAdapter($app->make(Translator::class)))
+					->setConstraintValidatorFactory(
+						new SkipMissingValueConstraintValidatorFactory(
+							new ContainerConstraintValidatorFactory($app->make(self::CONTAINER_HANDLE))
+						)
+					);
+
+				// Cache does not invalidate itself on file changes, so it's only enabled in prod,
+				// where file modification times are not checked either way.
+				if (!$app->make(GraphQLConfigurator::class)->devMode) {
+					$builder = $builder->setMappingCache($app->make('graphqlite.psr6_cache'));
+				}
+
+				return $builder->getValidator();
+			}
 		);
 		$this->app->bind(MetadataFactoryInterface::class, ValidatorInterface::class);
 	}

@@ -24,10 +24,16 @@ class ValidatingParameter implements InputTypeParameterInterface
 	{
 		$value = $this->delegate->resolve($source, $args, $context, $info);
 
+		// Symfony Validator can't validate just `null` without any constraints,
+		// and it wouldn't know the type of the variable, so we have to skip it beforehand.
+		if ($value === null) {
+			return null;
+		}
+
 		$violations = $this->validator->validate($value);
 
 		if ($violations->count() > 0) {
-			throw new ValidationFailedException($violations, [$this->delegate->getName()], $this->propertyPathMapper);
+			throw new ValidationFailedException($violations, $this->delegate->getName(), $this->propertyPathMapper);
 		}
 
 		return $value;

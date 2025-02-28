@@ -5,18 +5,19 @@ namespace Tests\Integration\Http;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
+use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
 use TenantCloud\GraphQLPlatform\Versioning\VersionedRequestSchemaProvider;
 use Tests\TestCase;
 
 class VersionsTest extends TestCase
 {
-	use MakesHttpGraphQLRequests;
+	use ExecutesGraphQL;
 
 	#[Test]
 	public function v1(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						versionedField(data: {
@@ -38,7 +39,7 @@ class VersionsTest extends TestCase
 	public function v2(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						versionedField(data: {
@@ -60,7 +61,7 @@ class VersionsTest extends TestCase
 	public function latest(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						versionedField(data: {
@@ -82,7 +83,7 @@ class VersionsTest extends TestCase
 	public function default(): void
 	{
 		$this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
 						versionedField(data: {

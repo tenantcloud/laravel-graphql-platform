@@ -66,6 +66,7 @@ class TestExecutionResult extends ExecutionResult
 				$assert->interacted();
 			}
 		} elseif (is_array($expected)) {
+			Assert::assertNotNull($data);
 			Assert::assertArraySubset($expected, $data, true);
 		} else {
 			Assert::assertSame($expected, $data);

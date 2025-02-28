@@ -5,8 +5,10 @@ namespace TenantCloud\GraphQLPlatform\Scalars\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Exception;
+use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Language\Printer;
 use GraphQL\Utils\Utils;
 use TheCodingMachine\GraphQLite\GraphQLRuntimeException;
 use TheCodingMachine\GraphQLite\Types\DateTimeType as GraphQLiteDateTimeType;
@@ -43,10 +45,24 @@ class DateTimeType extends GraphQLiteDateTimeType
 			throw new GraphQLRuntimeException();
 		}
 
-		try {
-			return new CarbonImmutable($value);
-		} catch (Exception $e) {
-			throw new GraphQLRuntimeException(previous: $e);
+		if (!(
+			CarbonImmutable::hasFormat($value, 'Y-m-d\TH:i:sp') ||
+			CarbonImmutable::hasFormat($value, 'Y-m-d\TH:i:s.up')
+		)) {
+			throw new Error('Value is not a valid ISO formatted date time.');
 		}
+
+		return new CarbonImmutable($value);
+	}
+
+	public function parseLiteral($valueNode, array $variables = null): string
+	{
+		if ($valueNode instanceof StringValueNode) {
+			return $valueNode->value;
+		}
+
+		$notString = Printer::doPrint($valueNode);
+
+		throw new Error("DateTime cannot represent a non string value: {$notString}", $valueNode);
 	}
 }

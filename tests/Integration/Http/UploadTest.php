@@ -15,7 +15,7 @@ class UploadTest extends HttpIntegrationTestCase
 		//  -F map='{ "0": ["variables.file"] }' \
 		//  -F 0=@file.txt
 		$this
-			->multipartGraphQL(
+			->httpMultipartGraphQL(
 				[
 					'query' => <<<'GRAPHQL'
 						mutation ($file: Upload!) {
