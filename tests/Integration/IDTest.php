@@ -4,11 +4,9 @@ namespace Tests\Integration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use TenantCloud\GraphQLPlatform\Scalars\ID\ID;
-use TenantCloud\GraphQLPlatform\Scalars\ID\IDInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Scalars\Hints\ID;
 
 #[CoversClass(ID::class)]
-#[CoversClass(IDInputFieldMiddleware::class)]
 class IDTest extends IntegrationTestCase
 {
 	#[Test]

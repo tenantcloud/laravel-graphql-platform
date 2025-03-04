@@ -4,6 +4,7 @@ namespace Tests\Fixtures\Models;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;
+use TenantCloud\GraphQLPlatform\Scalars\Hints\Date;
 use TheCodingMachine\GraphQLite\Annotations\Cost;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -20,6 +21,7 @@ class User
 		#[Field] #[Cost(3)] public readonly ?CarbonInterval $somethingAfter = null,
 		/** @var array<int> $fileIds */
 		#[Field] public readonly array $fileIds = [],
+		#[Field] #[Date] public readonly ?CarbonImmutable $date = null,
 	) {}
 
 	/**
@@ -37,6 +39,7 @@ class User
 			name: 'Alex',
 			createdAt: CarbonImmutable::create(2020, 1, 3),
 			somethingAfter: CarbonInterval::hour(),
+			date: CarbonImmutable::create(2022, 3, 5),
 		);
 	}
 }

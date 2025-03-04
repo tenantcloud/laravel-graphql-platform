@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\Valid;
 use TenantCloud\GraphQLPlatform\MissingValue;
-use TenantCloud\GraphQLPlatform\Scalars\ID\ID;
+use TenantCloud\GraphQLPlatform\Scalars\Hints\ID;
 use Tests\Fixtures\Validation\PersonName;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Input;
