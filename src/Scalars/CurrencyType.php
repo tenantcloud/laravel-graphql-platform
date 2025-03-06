@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ScalarType;
 use Sokil\IsoCodes\Database\Currencies;
 use Sokil\IsoCodes\IsoCodesFactory;
+use Sokil\IsoCodes\TranslationDriver\DummyDriver;
 use TenantCloud\GraphQLPlatform\Scalars\Concerns\ParsesAsString;
 use TenantCloud\GraphQLPlatform\Scalars\Concerns\SerializesAsParses;
 
@@ -29,7 +30,7 @@ class CurrencyType extends ScalarType
 
 	public static function instance(): self
 	{
-		return self::$INSTANCE ??= new self(currencies: (new IsoCodesFactory())->getCurrencies());
+		return self::$INSTANCE ??= new self(currencies: (new IsoCodesFactory(translationDriver: new DummyDriver()))->getCurrencies());
 	}
 
 	public function parseValue(mixed $value): string

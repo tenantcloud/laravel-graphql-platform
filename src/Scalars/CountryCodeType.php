@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ScalarType;
 use Sokil\IsoCodes\Database\Countries;
 use Sokil\IsoCodes\IsoCodesFactory;
+use Sokil\IsoCodes\TranslationDriver\DummyDriver;
 use TenantCloud\GraphQLPlatform\Scalars\Concerns\ParsesAsString;
 use TenantCloud\GraphQLPlatform\Scalars\Concerns\SerializesAsParses;
 
@@ -29,7 +30,7 @@ class CountryCodeType extends ScalarType
 
 	public static function instance(): self
 	{
-		return self::$INSTANCE ??= new self(countries: (new IsoCodesFactory())->getCountries());
+		return self::$INSTANCE ??= new self(countries: (new IsoCodesFactory(translationDriver: new DummyDriver()))->getCountries());
 	}
 
 	public function parseValue(mixed $value): string
