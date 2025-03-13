@@ -4,6 +4,8 @@ namespace TenantCloud\GraphQLPlatform\Resolve;
 
 readonly class ResolveKey
 {
+	private string $hash;
+
 	/**
 	 * @param array<string, mixed> $args
 	 */
@@ -12,4 +14,9 @@ readonly class ResolveKey
 		public string $fieldName,
 		public array $args,
 	) {}
+
+	public function hash(): string
+	{
+		return $this->hash ??= md5(serialize($this));
+	}
 }

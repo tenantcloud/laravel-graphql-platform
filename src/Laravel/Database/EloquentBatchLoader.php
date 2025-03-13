@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use RuntimeException;
+use TenantCloud\GraphQLPlatform\Resolve\ResolveKey;
 
 class EloquentBatchLoader
 {
@@ -36,7 +37,8 @@ class EloquentBatchLoader
 
 		// Not developer friendly, but at least it's secure - in a sense that we don't have to escape any
 		// of the key parts, join arrays, serialize objects separately etc.
-		$key = md5(serialize($key));
+		$key = $key instanceof ResolveKey ? $key->hash() : md5(serialize($key));
+
 		$modelClass = $model::class;
 		$modelKey = $model->getKey();
 
