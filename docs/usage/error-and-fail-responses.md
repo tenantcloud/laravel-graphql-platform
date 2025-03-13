@@ -26,7 +26,7 @@ type LoginEmailTwoFactorRequired {
 }
 
 union LoginResult =
-	| LoginAuthenticated
+	  LoginAuthenticated
 	| LoginEmailNotConfirmedResult
 	| LoginCodeTwoFactorRequired
 	| LoginEmailTwoFactorRequired
