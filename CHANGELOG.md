@@ -1,3 +1,10 @@
+# [1.0.0-alpha.4](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2025-03-13)
+
+
+### Features
+
+* New scalar types and some general improvements ([#12](https://github.com/tenantcloud/laravel-graphql-platform/issues/12)) ([b9c1bb3](https://github.com/tenantcloud/laravel-graphql-platform/commit/b9c1bb340296365feddcd8f2e0297065cf41b13a))
+
 # [1.0.0-alpha.3](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.2...v1.0.0-alpha.3) (2025-02-28)
 
 
