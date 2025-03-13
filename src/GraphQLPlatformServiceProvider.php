@@ -4,6 +4,7 @@ namespace TenantCloud\GraphQLPlatform;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Server\ServerConfig;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema as WebonyxSchema;
 use GraphQL\Validator\DocumentValidator;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -48,7 +49,7 @@ use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Octane\GiveNewApplicationInstanceToContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Scalars\ID\IDInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Scalars\IdType;
 use TenantCloud\GraphQLPlatform\Schema\PrintCommand;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
@@ -94,6 +95,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 	public function register(): void
 	{
+		$this->overwriteGraphQLTypes();
 		$this->registerContainer();
 		$this->registerCache();
 		$this->registerUtils();
@@ -136,6 +138,13 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				$route($router, $urlGenerator);
 			}
 		}
+	}
+
+	private function overwriteGraphQLTypes(): void
+	{
+		Type::overrideStandardTypes([
+			Type::ID => new IdType(),
+		]);
 	}
 
 	private function registerUtils(): void
@@ -226,9 +235,6 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				))
 				->addFieldMiddleware(new CostFieldMiddleware())
 				->addInputFieldMiddleware(new MissingValueInputFieldMiddleware())
-				->addInputFieldMiddleware(new IDInputFieldMiddleware(
-					$app->make(ArgumentResolver::class),
-				))
 				->addInputFieldMiddleware(new ModelIDInputFieldMiddleware())
 				->addInputFieldMiddleware(new SecurityInputFieldMiddleware(
 					$app->make('graphqlite.expression_language'),

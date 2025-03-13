@@ -43,18 +43,13 @@ class TestExecutionResult extends ExecutionResult
 	}
 
 	/**
-	 * @param array<mixed, mixed>|int|float|string|bool|callable(AssertableJson): void|null $field
 	 * @param array<mixed, mixed>|int|float|string|bool|callable(AssertableJson): void|null $expected
+	 * @param string|null                                                                   $field    Optionally specify the field name if there is more than 1
 	 *
 	 * @return $this
 	 */
-	public function assertData(callable|array|int|float|string|bool|null $field, callable|array|int|float|string|bool|null $expected = null): self
+	public function assertData(callable|array|int|float|string|bool|null $expected, string $field = null): self
 	{
-		if (func_num_args() === 1) {
-			$expected = $field;
-			$field = null;
-		}
-
 		$data = $this->data($field);
 
 		if (is_callable($expected)) {

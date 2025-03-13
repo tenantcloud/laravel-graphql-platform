@@ -18,7 +18,11 @@
 		"symfony/psr-http-message-bridge": "^2.0",
 		"laminas/laminas-diactoros": "^3.0",
 		"tenantcloud/php-standard": "^2.1.1",
-		"tenantcloud/laravel-api-versioning": "^1.0"
+		"tenantcloud/laravel-api-versioning": "^1.0",
+		"sokil/php-isocodes": "^4.2",
+		"sokil/php-isocodes-db-only": "^4.0",
+		"giggsey/libphonenumber-for-php": "^8.13",
+		"league/uri": "^7.5"
 	},
 	"require-dev": {
 		"pestphp/pest": "^2.8",
@@ -31,7 +35,8 @@
 		"orchestra/testbench": "^8.5",
 		"ecodev/graphql-upload": "^7.0",
 		"nunomaduro/larastan": "^2.6",
-		"laravel/octane": "^2.6"
+		"laravel/octane": "^2.6",
+		"phpbench/phpbench": "^1.4"
 	},
 	"suggest": {
 		"ecodev/graphql-upload": "^7.0"
@@ -52,7 +57,11 @@
 		"coverage": "XDEBUG_MODE=coverage vendor/bin/pest --coverage-html coverage",
 		"cs-fix": "vendor/bin/php-cs-fixer fix -v --show-progress=dots",
 		"phpstan": "vendor/bin/phpstan analyse --memory-limit=2G",
-		"testbench": "vendor/bin/testbench"
+		"testbench": "vendor/bin/testbench",
+		"benchmark": [
+			"Composer\\Config::disableProcessTimeout",
+			"vendor/bin/phpbench run tests/Benchmark"
+		]
 	},
 	"minimum-stability": "dev",
 	"prefer-stable": true,

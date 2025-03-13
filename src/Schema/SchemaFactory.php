@@ -15,7 +15,7 @@ use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
-use TenantCloud\GraphQLPlatform\Scalars\Carbon\CarbonRootTypeMapper;
+use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
@@ -97,7 +97,7 @@ class SchemaFactory
 			$this->container->get(ClassFinderComputedCache::class),
 		);
 		$rootTypeMapper = new ModelIDTypeMapper($rootTypeMapper);
-		$rootTypeMapper = new CarbonRootTypeMapper($rootTypeMapper);
+		$rootTypeMapper = new ScalarsRootTypeMapper($rootTypeMapper);
 
 		if ($configurator->rootTypeMapperFactories) {
 			$rootSchemaFactoryContext = new RootTypeMapperFactoryContext(
