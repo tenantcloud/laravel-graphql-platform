@@ -70,6 +70,15 @@ class TestExecutionResult extends ExecutionResult
 		return $this;
 	}
 
+	public function assertCount(int $count, string $key, string $field = null): self
+	{
+		$data = $this->data($field);
+
+		Assert::assertCount($count, data_get($data, $key));
+
+		return $this;
+	}
+
 	/**
 	 * @param callable|array<mixed, mixed> $expected
 	 */
