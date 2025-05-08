@@ -4,6 +4,7 @@ namespace TenantCloud\GraphQLPlatform\Laravel\Database;
 
 use GraphQL\Deferred;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use RuntimeException;
@@ -23,14 +24,14 @@ class EloquentBatchLoader
 	 * @param callable(Builder): Builder $apply
 	 * @param callable(TModel): TReturn  $map
 	 *
-	 * @return Deferred<TReturn>
+	 * @return callable(): TReturn
 	 */
 	public function defer(
 		mixed $key,
 		Model $model,
 		callable $apply,
 		callable $map,
-	): Deferred {
+	): callable {
 		if (isset($this->loaded)) {
 			throw new RuntimeException('Data for this loader has already been loaded');
 		}
@@ -49,17 +50,17 @@ class EloquentBatchLoader
 		];
 		$this->defers[$modelClass][$key]['ids']->push($modelKey);
 
-		return new Deferred(function () use ($modelClass, $key, $modelKey, $map) {
+		return function () use ($modelClass, $key, $modelKey, $map) {
 			$entity = $this->loaded($key, $modelClass, $modelKey);
 
 			return $map($entity);
-		});
+		};
 	}
 
 	/**
-	 * @return Deferred<int>
+	 * @return callable(): int
 	 */
-	public function deferCount(Model $model, string $relation, callable $callback = null): Deferred
+	public function deferCount(Model $model, string $relation, callable $callback = null): callable
 	{
 		return $this->defer(
 			null,
@@ -74,9 +75,9 @@ class EloquentBatchLoader
 	}
 
 	/**
-	 * @return Deferred<int>
+	 * @return callable(): EloquentCollection
 	 */
-	public function deferWith(Model $model, string $relation, callable $callback = null): Deferred
+	public function deferWith(Model $model, string $relation, callable $callback = null): callable
 	{
 		return $this->defer(
 			null,
