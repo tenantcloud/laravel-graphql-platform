@@ -7,6 +7,7 @@ use Carbon\CarbonInterval;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\OutputType;
@@ -59,6 +60,7 @@ class ScalarsRootTypeMapper implements RootTypeMapperInterface
 			DateType::instance()->name         => DateType::instance(),
 			DurationType::instance()->name     => DurationType::instance(),
 			EmailAddressType::instance()->name => EmailAddressType::instance(),
+			GraphQLDocumentType::instance()->name => GraphQLDocumentType::instance(),
 			HexColorType::instance()->name     => HexColorType::instance(),
 			GraphQLType::id()->name            => GraphQLType::id(),
 			MarkdownType::instance()->name     => MarkdownType::instance(),
@@ -116,6 +118,7 @@ class ScalarsRootTypeMapper implements RootTypeMapperInterface
 					DateTimeType::instance();
 			})(),
 			DateInterval::class, CarbonInterval::class => DurationType::instance(),
+			DocumentNode::class => GraphQLDocumentType::instance(),
 			UriInterface::class, Uri::class => UrlType::instance(),
 
 			default => null,
