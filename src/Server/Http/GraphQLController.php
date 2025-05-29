@@ -38,7 +38,6 @@ class GraphQLController
 	private function handlePsr7Request(Schema $schema, ServerConfig $config, array|OperationParams $parsedBody): JsonResponse
 	{
 		$config->setSchema($schema);
-		$config->setContext(new Context());
 
 		$result = match (true) {
 			is_array($parsedBody) => $this->serverHelper->executeBatch($config, $parsedBody),

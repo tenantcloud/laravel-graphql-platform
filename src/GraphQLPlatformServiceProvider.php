@@ -38,6 +38,7 @@ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
+use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\Internal\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
@@ -64,6 +65,7 @@ use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
 use TheCodingMachine\GraphQLite\Cache\FilesSnapshot;
 use TheCodingMachine\GraphQLite\Cache\SnapshotClassBoundCache;
+use TheCodingMachine\GraphQLite\Context\ContextInterface;
 use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\SnapshotClassFinderComputedCache;
@@ -209,6 +211,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 	private function registerSchema(): void
 	{
+		$this->app->bind(ContextInterface::class, Context::class);
 		$this->app->singleton(
 			GraphQLConfigurator::class,
 			fn (Application $app) => new GraphQLConfigurator(devMode: $app->isLocal() || $app->runningUnitTests())
@@ -268,6 +271,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(HttpCodeDeciderInterface::class, GraphQLResponseHttpCodeDecider::class);
 		$this->app->singleton(ServerConfig::class, static function (Application $app) {
 			$serverConfig = new ServerConfig();
+			$serverConfig->setContext($app->factory(ContextInterface::class));
 			$serverConfig->setErrorFormatter([WebonyxErrorHandler::class, 'errorFormatter']);
 			$serverConfig->setErrorsHandler([WebonyxErrorHandler::class, 'errorHandler']);
 			$serverConfig->setDebugFlag(

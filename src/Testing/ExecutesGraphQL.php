@@ -23,7 +23,10 @@ use TheCodingMachine\GraphQLite\Context\Context;
 trait ExecutesGraphQL
 {
 	/**
-	 * Execute a GraphQL operation as if it was sent as a request to the server.
+	 * Execute a GraphQL operation:
+	 *   - doesn't execute HTTP middleware
+	 *   - doesn't allow HTTP headers
+	 *   - doesn't generate HTTP response (status, body etc)
 	 *
 	 * @param string               $query     The GraphQL operation to send
 	 * @param array<string, mixed> $variables The variables to include in the query
@@ -43,7 +46,6 @@ trait ExecutesGraphQL
 
 		$config = $this->app->make(ServerConfig::class);
 		$config->setSchema($schema);
-		$config->setContext(new Context());
 
 		$params = OperationParams::create([
 			'query'     => $query,
@@ -58,9 +60,12 @@ trait ExecutesGraphQL
 	}
 
 	/**
-	 * Execute a GraphQL operation as if it was sent as an HTTP request to the server.
+	 * Execute a GraphQL operation as an HTTP request:
+	 *   - executes HTTP middleware
+	 *   - allows HTTP headers and cookies
+	 *   - allows testing HTTP response
 	 *
-	 * Not recommended unless required to test the HTTP part specifically.
+	 * Generally not recommended, unless you specifically need one of the above.
 	 *
 	 * @param string               $query     The GraphQL operation to send
 	 * @param array<string, mixed> $variables The variables to include in the query
@@ -89,11 +94,11 @@ trait ExecutesGraphQL
 	}
 
 	/**
-	 * Send a multipart form request to the GraphQL endpoint.
+	 * Execute a GraphQL operation as a multipart HTTP request:
+	 *   - in addition to `httpGraphQL`, allows file uploads
 	 *
-	 * Not recommended unless required to test the HTTP part specifically.
+	 * Again, unless you need file uploads specifically, you shouldn't use this.
 	 *
-	 * This is used for file uploads conforming to the specification:
 	 * https://github.com/jaydenseric/graphql-multipart-request-spec
 	 *
 	 * @param array<string, mixed>|array<int, array<string, mixed>> $operations
