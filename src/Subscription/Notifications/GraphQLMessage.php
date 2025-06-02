@@ -9,9 +9,7 @@ class GraphQLMessage
 	public function __construct(
 		public readonly mixed $root,
 		public array $channels = [],
-	)
-	{
-	}
+	) {}
 
 	public function on(array|string $channels): self
 	{

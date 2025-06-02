@@ -15,7 +15,6 @@ use Illuminate\Support\Arr;
 use RuntimeException;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use TheCodingMachine\GraphQLite\Context\Context;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 
 use function array_map;

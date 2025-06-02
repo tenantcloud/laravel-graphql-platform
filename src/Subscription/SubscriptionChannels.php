@@ -8,6 +8,6 @@ class SubscriptionChannels
 {
 	public static function private(Authenticatable $auth, string $channel): string
 	{
-		return "auth:{$auth->getAuthIdentifier()}:$channel";
+		return "auth:{$auth->getAuthIdentifier()}:{$channel}";
 	}
 }

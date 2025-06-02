@@ -2,7 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Subscription;
 
-use TenantCloud\GraphQLPlatform\Subscription\Notifications\GraphQLChannel;
 use TenantCloud\GraphQLPlatform\Subscription\Notifications\GraphQLMessage;
 
 /**
@@ -13,17 +12,15 @@ use TenantCloud\GraphQLPlatform\Subscription\Notifications\GraphQLMessage;
 readonly class ChannelSubscription
 {
 	/**
-	 * @param string $channel Channel name that should match one of the channels specified in a notification using {@see GraphQLMessage}
+	 * @param string                            $channel Channel name that should match one of the channels specified in a notification using {@see GraphQLMessage}
 	 * @param (callable(TOutput): TOutput)|null $resolve A method that will be called every time a new item is dispatched
-	 * @param (callable(TOutput): bool)|null $filter A method that will be called every time a new item is dispatched, allowing to skip that particular item
+	 * @param (callable(TOutput): bool)|null    $filter  A method that will be called every time a new item is dispatched, allowing to skip that particular item
 	 */
 	public function __construct(
 		public string $channel,
-		public mixed  $resolve = null,
-		public mixed  $filter = null,
-	)
-	{
-	}
+		public mixed $resolve = null,
+		public mixed $filter = null,
+	) {}
 
 	public function withChannel(string $channel): self
 	{

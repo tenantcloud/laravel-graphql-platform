@@ -7,7 +7,6 @@ use TheCodingMachine\GraphQLite\Context\ContextInterface;
 use TheCodingMachine\GraphQLite\Context\ResetableContextInterface;
 use TheCodingMachine\GraphQLite\Parameters\ParameterInterface;
 use TheCodingMachine\GraphQLite\PrefetchBuffer;
-use WeakMap;
 
 final class Context implements ContextInterface, ResetableContextInterface
 {
@@ -48,7 +47,7 @@ final class Context implements ContextInterface, ResetableContextInterface
 	 * @template T
 	 *
 	 * @param ContextToken<T> $token
-	 * @param T $value
+	 * @param T               $value
 	 */
 	public function set(ContextToken $token, mixed $value): mixed
 	{

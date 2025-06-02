@@ -5,7 +5,6 @@ namespace TenantCloud\GraphQLPlatform\Subscription\Transport;
 use Carbon\CarbonImmutable;
 use GraphQL\Error\Error;
 use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
-use TenantCloud\GraphQLPlatform\Subscription\Notifications\GraphQLMessage;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 
 /**

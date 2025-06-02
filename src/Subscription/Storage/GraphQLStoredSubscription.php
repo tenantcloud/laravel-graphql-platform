@@ -6,26 +6,24 @@ use Carbon\CarbonImmutable;
 use Closure;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Utils\AST;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\SerializableClosure\SerializableClosure;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 
 /**
- * @property string $id
- * @property string $channel
+ * @property string                $id
+ * @property string                $channel
  * @property SubscriptionTransport $transport
- * @property string $schema_name
- * @property DocumentNode $document
- * @property array $variables
- * @property Closure|null $resolve
- * @property Closure|null $filter
- * @property CarbonImmutable|null $expires_at
+ * @property string                $schema_name
+ * @property DocumentNode          $document
+ * @property array                 $variables
+ * @property Closure|null          $resolve
+ * @property Closure|null          $filter
+ * @property CarbonImmutable|null  $expires_at
  */
 class GraphQLStoredSubscription extends Model implements Subscription
 {
@@ -34,7 +32,7 @@ class GraphQLStoredSubscription extends Model implements Subscription
 	protected $table = 'graphql_subscriptions';
 
 	protected $casts = [
-		'variables' => 'array',
+		'variables'  => 'array',
 		'expires_at' => 'immutable_datetime',
 	];
 

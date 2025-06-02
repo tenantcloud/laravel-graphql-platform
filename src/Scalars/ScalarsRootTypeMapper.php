@@ -54,19 +54,19 @@ class ScalarsRootTypeMapper implements RootTypeMapperInterface
 	public function mapNameToType(string $typeName): NamedType&GraphQLType
 	{
 		return match ($typeName) {
-			CountryCodeType::instance()->name  => CountryCodeType::instance(),
-			CurrencyType::instance()->name     => CurrencyType::instance(),
-			DateTimeType::instance()->name     => DateTimeType::instance(),
-			DateType::instance()->name         => DateType::instance(),
-			DurationType::instance()->name     => DurationType::instance(),
-			EmailAddressType::instance()->name => EmailAddressType::instance(),
+			CountryCodeType::instance()->name     => CountryCodeType::instance(),
+			CurrencyType::instance()->name        => CurrencyType::instance(),
+			DateTimeType::instance()->name        => DateTimeType::instance(),
+			DateType::instance()->name            => DateType::instance(),
+			DurationType::instance()->name        => DurationType::instance(),
+			EmailAddressType::instance()->name    => EmailAddressType::instance(),
 			GraphQLDocumentType::instance()->name => GraphQLDocumentType::instance(),
-			HexColorType::instance()->name     => HexColorType::instance(),
-			GraphQLType::id()->name            => GraphQLType::id(),
-			MarkdownType::instance()->name     => MarkdownType::instance(),
-			PhoneNumberType::instance()->name  => PhoneNumberType::instance(),
-			UrlType::instance()->name          => UrlType::instance(),
-			default                            => $this->next->mapNameToType($typeName),
+			HexColorType::instance()->name        => HexColorType::instance(),
+			GraphQLType::id()->name               => GraphQLType::id(),
+			MarkdownType::instance()->name        => MarkdownType::instance(),
+			PhoneNumberType::instance()->name     => PhoneNumberType::instance(),
+			UrlType::instance()->name             => UrlType::instance(),
+			default                               => $this->next->mapNameToType($typeName),
 		};
 	}
 

@@ -10,22 +10,19 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ResolveInfo;
 use ReflectionMethod;
 use ReflectionNamedType;
+use RuntimeException;
 use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\Context\ContextToken;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
-use TheCodingMachine\GraphQLite\Annotations\Mutation;
-use TheCodingMachine\GraphQLite\Annotations\Query;
 use TheCodingMachine\GraphQLite\Annotations\Subscription;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
 use TheCodingMachine\GraphQLite\Middlewares\ServiceResolver;
 use TheCodingMachine\GraphQLite\Middlewares\SourceMethodResolver;
-use TheCodingMachine\GraphQLite\Middlewares\SourcePropertyResolver;
 use TheCodingMachine\GraphQLite\QueryFieldDescriptor;
 use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
-use TheCodingMachine\GraphQLite\Security\AuthorizationServiceInterface;
 use Webmozart\Assert\Assert;
 
 class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
@@ -38,9 +35,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 		private readonly SubscriptionStorage $subscriptionStorage,
 		private readonly ContextToken $subscriptionTransportContextToken,
 		private readonly AuthenticationServiceInterface $authenticationService,
-	)
-	{
-	}
+	) {}
 
 	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
 	{
@@ -109,15 +104,14 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 		$originalResolver = $descriptor->getOriginalResolver();
 
 		$reflection = match (true) {
-			$originalResolver instanceof SourceMethodResolver   => $originalResolver->methodReflection(),
-			$originalResolver instanceof ServiceResolver        => new ReflectionMethod(...$originalResolver->callable()),
-			default                                             => null,
+			$originalResolver instanceof SourceMethodResolver => $originalResolver->methodReflection(),
+			$originalResolver instanceof ServiceResolver      => new ReflectionMethod(...$originalResolver->callable()),
+			default                                           => null,
 		};
 
 		return $reflection?->getAttributes(Subscription::class) &&
 			$reflection->getReturnType() instanceof ReflectionNamedType &&
 			$reflection->getReturnType()->getName() === ChannelSubscription::class;
-
 	}
 
 	private function replaceType(QueryFieldDescriptor $queryFieldDescriptor): QueryFieldDescriptor
@@ -125,7 +119,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 		$type = $queryFieldDescriptor->getType();
 
 		if (!$type instanceof NonNull || !$type->getWrappedType() instanceof ListOfType) {
-			throw new \RuntimeException("Subscription field {$queryFieldDescriptor->getName()} must define a return type annotation like so: @return ChannelSubscription<User>");
+			throw new RuntimeException("Subscription field {$queryFieldDescriptor->getName()} must define a return type annotation like so: @return ChannelSubscription<User>");
 		}
 
 		return $queryFieldDescriptor->withType(

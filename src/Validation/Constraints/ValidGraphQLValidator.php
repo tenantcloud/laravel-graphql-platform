@@ -17,9 +17,7 @@ class ValidGraphQLValidator extends ConstraintValidator
 	public function __construct(
 		private readonly SchemaRegistry $schemaRegistry,
 		private readonly array $validationRules,
-	)
-	{
-	}
+	) {}
 
 	public function validate(mixed $value, Constraint $constraint): void
 	{

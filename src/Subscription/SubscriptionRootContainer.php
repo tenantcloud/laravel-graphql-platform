@@ -10,13 +10,11 @@ namespace TenantCloud\GraphQLPlatform\Subscription;
 readonly class SubscriptionRootContainer
 {
 	/**
-	 * @param TRoot $root
+	 * @param TRoot                         $root
 	 * @param (callable(TRoot): TRoot)|null $resolve
 	 */
 	public function __construct(
 		public mixed $root,
 		public mixed $resolve,
-	)
-	{
-	}
+	) {}
 }

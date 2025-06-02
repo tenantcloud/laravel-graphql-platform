@@ -32,7 +32,7 @@ class SchemaRegistry
 	public function nameFor(Schema $schema): string
 	{
 		return collect($this->schemas)
-			->filter(fn (Lazy $lazySchema) => $lazySchema->isInitialized() && $lazySchema->value() === $schema)
+			->filter(fn (Lazy $lazySchema) => $lazySchema->isInitialized() && $schema === $lazySchema->value())
 			->keys()
 			->first();
 	}

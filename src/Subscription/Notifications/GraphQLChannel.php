@@ -2,14 +2,9 @@
 
 namespace TenantCloud\GraphQLPlatform\Subscription\Notifications;
 
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Notifications\Events\BroadcastNotificationCreated;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use RuntimeException;
-use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
-use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionChannels;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionDataSender;
 
@@ -21,11 +16,9 @@ use TenantCloud\GraphQLPlatform\Subscription\SubscriptionDataSender;
 class GraphQLChannel
 {
 	public function __construct(
-		private readonly SubscriptionStorage    $subscriptionStorage,
+		private readonly SubscriptionStorage $subscriptionStorage,
 		private readonly SubscriptionDataSender $subscriptionDataSender,
-	)
-	{
-	}
+	) {}
 
 	public function send($notifiable, Notification $notification): GraphQLMessage
 	{
@@ -53,4 +46,3 @@ class GraphQLChannel
 		return array_map(fn (string $channel) => SubscriptionChannels::private($notifiable, $channel), $channels);
 	}
 }
-

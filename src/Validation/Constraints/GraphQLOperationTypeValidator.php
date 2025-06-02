@@ -2,20 +2,12 @@
 
 namespace TenantCloud\GraphQLPlatform\Validation\Constraints;
 
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Server\Exception\FailedToDetermineOperationType;
-use GraphQL\Server\Exception\GetMethodSupportsOnlyQueryOperation;
-use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
-use GraphQL\Validator\DocumentValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
-use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
-use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;use TenantCloud\GraphQLPlatform\Validation\Constraints\GraphQLOperationType;
 
 class GraphQLOperationTypeValidator extends ConstraintValidator
 {

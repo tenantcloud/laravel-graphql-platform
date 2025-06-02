@@ -64,7 +64,9 @@ class UserController
 		return $user->with(fileIds: $data->fileIds);
 	}
 
-	/** @return ChannelSubscription<User> */
+	/**
+	 * @return ChannelSubscription<User>
+	 */
 	#[Subscription]
 	public function newUser(): ChannelSubscription
 	{

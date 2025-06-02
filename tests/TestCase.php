@@ -14,12 +14,13 @@ use Tests\Fixtures\TypeMappers\AnyRootTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryContext;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
+
 use function Orchestra\Testbench\package_path;
 
 abstract class TestCase extends BaseTestCase
 {
-	use WithFaker;
 	use LazilyRefreshDatabase;
+	use WithFaker;
 
 	protected function setUp(): void
 	{

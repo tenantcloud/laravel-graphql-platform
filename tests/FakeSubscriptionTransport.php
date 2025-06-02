@@ -4,8 +4,6 @@ namespace Tests;
 
 use Carbon\CarbonImmutable;
 use GraphQL\Error\Error;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
 use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;

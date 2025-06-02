@@ -10,18 +10,19 @@ class SubscriptionTransportChangedException extends Error
 
 	public function __construct(
 		public readonly Subscription $subscription,
-	)
-	{
+	) {
 		parent::__construct('Subscriptions require a different transport. See error extensions for details on how to continue with the subscription.');
 
 		$this->code = self::CODE;
 	}
 
-	/** @return array<string, mixed> */
+	/**
+	 * @return array<string, mixed>
+	 */
 	public function getExtensions(): array
 	{
 		return [
-			'code' => $this->code,
+			'code'         => $this->code,
 			'subscription' => [
 				'transport' => [
 					'type' => $this->subscription->transport->type(),

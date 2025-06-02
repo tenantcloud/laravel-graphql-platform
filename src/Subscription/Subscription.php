@@ -3,7 +3,6 @@
 namespace TenantCloud\GraphQLPlatform\Subscription;
 
 use GraphQL\Language\AST\DocumentNode;
-use Illuminate\Contracts\Auth\Authenticatable;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 
 /**

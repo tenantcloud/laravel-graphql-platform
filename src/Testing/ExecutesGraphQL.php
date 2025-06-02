@@ -15,7 +15,6 @@ use Illuminate\Testing\TestResponse;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
-use TheCodingMachine\GraphQLite\Context\Context;
 
 /**
  * @mixin TestCase

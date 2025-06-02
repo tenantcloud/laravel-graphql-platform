@@ -14,7 +14,5 @@ final class ContextToken
 	 */
 	public function __construct(
 		public readonly Closure $default,
-	)
-	{
-	}
+	) {}
 }

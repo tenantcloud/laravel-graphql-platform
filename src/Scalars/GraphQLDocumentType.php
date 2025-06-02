@@ -2,7 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Scalars;
 
-use Carbon\CarbonInterval;
 use GraphQL\Error\Error;
 use GraphQL\Error\SerializationError;
 use GraphQL\Error\SyntaxError;

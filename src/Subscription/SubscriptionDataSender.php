@@ -3,26 +3,15 @@
 namespace TenantCloud\GraphQLPlatform\Subscription;
 
 use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
-use GraphQL\Error\InvariantViolation;
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\GraphQL;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\Parser;
-use GraphQL\Server\Exception\BatchedQueriesAreNotSupported;
-use GraphQL\Server\Exception\FailedToDetermineOperationType;
-use GraphQL\Server\Exception\GetMethodSupportsOnlyQueryOperation;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
-use GraphQL\Server\RequestError;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
-use GraphQL\Utils\AST;
 use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
-use TheCodingMachine\GraphQLite\Context\Context;
 use Webmozart\Assert\Assert;
 
 class SubscriptionDataSender
@@ -32,9 +21,7 @@ class SubscriptionDataSender
 		private readonly SchemaRegistry $schemaRegistry,
 		private readonly ServerConfig $config,
 		private readonly Helper $serverHelper,
-	)
-	{
-	}
+	) {}
 
 	public function send(Subscription $subscription, mixed $root): void
 	{

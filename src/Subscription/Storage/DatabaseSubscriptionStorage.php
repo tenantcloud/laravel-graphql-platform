@@ -4,12 +4,9 @@ namespace TenantCloud\GraphQLPlatform\Subscription\Storage;
 
 use Carbon\CarbonImmutable;
 use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Utils\AST;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
+use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 
 class DatabaseSubscriptionStorage implements SubscriptionStorage
@@ -20,7 +17,7 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 		string $schemaName,
 		DocumentNode $document,
 		array $variables,
-		?CarbonImmutable $expiresAt = null
+		CarbonImmutable $expiresAt = null
 	): Subscription {
 		$subscription = new GraphQLStoredSubscription();
 		$subscription->channel = $channelSubscription->channel;

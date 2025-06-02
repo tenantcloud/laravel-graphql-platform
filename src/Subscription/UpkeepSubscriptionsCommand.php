@@ -27,7 +27,7 @@ class UpkeepSubscriptionsCommand extends Command
 			$subscriptionStorage->updateExpiration($subscription, $newExpiration);
 		}
 
-		$this->info("Cleaned");
+		$this->info('Cleaned');
 
 		return self::SUCCESS;
 	}

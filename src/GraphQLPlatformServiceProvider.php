@@ -7,8 +7,6 @@ use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema as WebonyxSchema;
 use GraphQL\Validator\DocumentValidator;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -63,7 +61,6 @@ use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\DatabaseSubscriptionStorage;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
@@ -135,7 +132,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			]);
 
 			$this->publishes([
-				__DIR__.'/../resources/database/migrations' => database_path('migrations'),
+				__DIR__ . '/../resources/database/migrations' => database_path('migrations'),
 			], 'graphql-platform-migrations');
 		}
 

@@ -2,13 +2,9 @@
 
 namespace TenantCloud\GraphQLPlatform\Server\Http;
 
-use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\Server\RequestError;
-use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
-use TheCodingMachine\GraphQLite\Exceptions\GraphQLExceptionInterface;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 use Webmozart\Assert\Assert;
 
