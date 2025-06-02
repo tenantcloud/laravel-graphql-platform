@@ -18,6 +18,7 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Server\Http\DefaultRequestSchemaProvider;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
 use TenantCloud\GraphQLPlatform\Server\Http\RequestSchemaProvider;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\CachePersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\NotSupportedPersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Utils\Cloneable;
@@ -41,6 +42,7 @@ final class GraphQLConfigurator
 		public readonly array $schemas = [],
 		public readonly array $validationRules = [],
 		public readonly bool $devMode = false,
+		public readonly ?SubscriptionTransport $subscriptionTransport = null,
 	) {}
 
 	public function useAutomaticPersistedQueries(CacheInterface $cache, DateInterval $ttl = new CarbonInterval('P1D')): self
@@ -130,6 +132,13 @@ final class GraphQLConfigurator
 				...$this->schemas,
 				$name => $configurator,
 			],
+		);
+	}
+
+	public function useSubscriptionTransport(?SubscriptionTransport $transport): self
+	{
+		return $this->with(
+			subscriptionTransport: $transport,
 		);
 	}
 

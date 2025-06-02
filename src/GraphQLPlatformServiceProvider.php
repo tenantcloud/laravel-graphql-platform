@@ -7,6 +7,8 @@ use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema as WebonyxSchema;
 use GraphQL\Validator\DocumentValidator;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -39,6 +41,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use TenantCloud\GraphQLPlatform\Context\Context;
+use TenantCloud\GraphQLPlatform\Context\ContextToken;
 use TenantCloud\GraphQLPlatform\Internal\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
@@ -57,8 +60,14 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
+use TenantCloud\GraphQLPlatform\Subscription\Storage\DatabaseSubscriptionStorage;
+use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
+use TenantCloud\GraphQLPlatform\Validation\Constraints\ValidGraphQLValidator;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TheCodingMachine\GraphQLite\AnnotationReader;
@@ -94,6 +103,8 @@ use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 class GraphQLPlatformServiceProvider extends ServiceProvider
 {
 	public const CONTAINER_HANDLE = 'graphql-platform.container_handle';
+	public const VALIDATION_RULES = 'graphql-platform.validation_rules';
+	public const SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN = 'graphql-platform.subscriptions.transport_context_token';
 
 	public function register(): void
 	{
@@ -101,6 +112,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->registerContainer();
 		$this->registerCache();
 		$this->registerUtils();
+		$this->registerSubscriptions();
 		$this->registerSchema();
 		$this->registerHttp();
 		$this->registerConnections();
@@ -121,6 +133,10 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				DebugCommand::class,
 				PrintCommand::class,
 			]);
+
+			$this->publishes([
+				__DIR__.'/../resources/database/migrations' => database_path('migrations'),
+			], 'graphql-platform-migrations');
 		}
 
 		if (class_exists(\Laravel\Octane\Octane::class)) {
@@ -209,6 +225,18 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		);
 	}
 
+	private function registerSubscriptions(): void
+	{
+		$this->app->singleton(SubscriptionStorage::class, DatabaseSubscriptionStorage::class);
+		$this->app->singleton(SubscriptionTransportManager::class);
+		$this->app->singleton(
+			self::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN,
+			fn (Application $app) => new ContextToken(
+				fn () => $app->make(GraphQLConfigurator::class)->subscriptionTransport
+			)
+		);
+	}
+
 	private function registerSchema(): void
 	{
 		$this->app->bind(ContextInterface::class, Context::class);
@@ -225,6 +253,12 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			SchemaConfigurator::class,
 			fn (Application $app) => (new SchemaConfigurator())
+				->addFieldMiddleware(new SubscriptionFieldMiddleware(
+					$app->make(SchemaRegistry::class),
+					$app->make(SubscriptionStorage::class),
+					$app->make(self::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN),
+					$app->make(AuthenticationServiceInterface::class),
+				))
 				->addFieldMiddleware(new TransactionalFieldMiddleware())
 				->addFieldMiddleware(new PreventLazyLoadingFieldMiddleware())
 				->addFieldMiddleware(new SecurityFieldMiddleware(
@@ -259,6 +293,10 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->addParameterMiddleware(new ResolveInfoParameterHandler())
 				->addParameterMiddleware(new ContainerParameterHandler($app->make(self::CONTAINER_HANDLE)))
 		);
+		$this->app->bind(self::VALIDATION_RULES, fn (Application $app) => [
+			...DocumentValidator::allRules(),
+			...$app->make(GraphQLConfigurator::class)->validationRules,
+		]);
 	}
 
 	private function registerHttp(): void
@@ -279,10 +317,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					DebugFlag::RETHROW_UNSAFE_EXCEPTIONS | DebugFlag::INCLUDE_TRACE :
 					DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
 			);
-			$serverConfig->setValidationRules([
-				...DocumentValidator::allRules(),
-				...$app->make(GraphQLConfigurator::class)->validationRules,
-			]);
+			$serverConfig->setValidationRules($app->make(self::VALIDATION_RULES));
 			$serverConfig->setPersistedQueryLoader(
 				$app->make(GraphQLConfigurator::class)->persistedQueryLoader
 			);
@@ -315,6 +350,14 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			}
 		);
 		$this->app->bind(MetadataFactoryInterface::class, ValidatorInterface::class);
+
+		$this->app->bind(
+			ValidGraphQLValidator::class,
+			fn (Application $app) => new ValidGraphQLValidator(
+				$app->make(SchemaRegistry::class),
+				$app->make(self::VALIDATION_RULES),
+			)
+		);
 	}
 
 	private function registerConnections(): void

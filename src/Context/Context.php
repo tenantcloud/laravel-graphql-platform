@@ -14,6 +14,11 @@ final class Context implements ContextInterface, ResetableContextInterface
 	/** @var SplObjectStorage<object, mixed> */
 	private SplObjectStorage $data;
 
+	public function __construct()
+	{
+		$this->data = new SplObjectStorage();
+	}
+
 	public function has(ContextToken $token): bool
 	{
 		return isset($this->data[$token]);

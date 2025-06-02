@@ -2,19 +2,24 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use TenantCloud\APIVersioning\APIVersioningServiceProvider;
+use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use Tests\Fixtures\TypeMappers\AnyRootTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryContext;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
+use function Orchestra\Testbench\package_path;
 
 abstract class TestCase extends BaseTestCase
 {
 	use WithFaker;
+	use LazilyRefreshDatabase;
 
 	protected function setUp(): void
 	{
@@ -32,6 +37,17 @@ abstract class TestCase extends BaseTestCase
 						}
 					})
 			);
+
+			$this->app->extend(
+				GraphQLConfigurator::class,
+				fn (GraphQLConfigurator $configurator) => $configurator
+					->useSubscriptionTransport(new FakeSubscriptionTransport())
+			);
+
+			$this->app->booting(function () {
+				$subscriptionTransportManager = $this->app->make(SubscriptionTransportManager::class);
+				$subscriptionTransportManager->extend(FakeSubscriptionTransport::TYPE, fn () => new FakeSubscriptionTransport());
+			});
 		});
 	}
 
@@ -48,5 +64,12 @@ abstract class TestCase extends BaseTestCase
 		parent::resolveApplicationConfiguration($app);
 
 		$app['config']->set('app.debug', true);
+	}
+
+	protected function defineDatabaseMigrations(): void
+	{
+		$this->loadMigrationsFrom(
+			package_path('resources/database/migrations')
+		);
 	}
 }

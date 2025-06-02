@@ -6,12 +6,14 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 use TenantCloud\GraphQLPlatform\Connection\UseConnections;
 use TenantCloud\GraphQLPlatform\MissingValue;
+use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
 use Tests\Fixtures\Models\CreateUserData;
 use Tests\Fixtures\Models\UpdateUserData;
 use Tests\Fixtures\Models\User;
 use TheCodingMachine\GraphQLite\Annotations\Cost;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
+use TheCodingMachine\GraphQLite\Annotations\Subscription;
 
 class UserController
 {
@@ -60,5 +62,14 @@ class UserController
 		}
 
 		return $user->with(fileIds: $data->fileIds);
+	}
+
+	/** @return ChannelSubscription<User> */
+	#[Subscription]
+	public function newUser(): ChannelSubscription
+	{
+		return new ChannelSubscription(
+			'users.new',
+		);
 	}
 }
