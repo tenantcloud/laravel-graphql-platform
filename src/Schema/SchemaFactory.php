@@ -18,6 +18,8 @@ use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptions;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptionsParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
@@ -141,6 +143,7 @@ class SchemaFactory
 			$propertyMapping,
 			PropertyAccess::createPropertyAccessor(),
 		);
+		$validationExceptions = new ValidationExceptions($propertyPathMapper);
 
 		$fieldMiddlewarePipe = new FieldMiddlewarePipe();
 		$inputFieldMiddlewarePipe = new InputFieldMiddlewarePipe();
@@ -179,10 +182,13 @@ class SchemaFactory
 
 		$parameterMiddlewarePipe->pipe(new ValidationParameterMiddleware(
 			$this->container->get(ValidatorInterface::class),
-			$propertyPathMapper,
+			$validationExceptions,
 		));
 		$parameterMiddlewarePipe->pipe(new PrefetchParameterMiddleware(
 			new ParameterizedCallableResolver($fieldsBuilder, $this->container)
+		));
+		$parameterMiddlewarePipe->pipe(new ValidationExceptionsParameterMiddleware(
+			$validationExceptions,
 		));
 
 		foreach ($configurator->fieldMiddlewares as $fieldMiddleware) {

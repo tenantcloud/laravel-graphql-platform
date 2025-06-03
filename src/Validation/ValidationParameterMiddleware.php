@@ -10,7 +10,7 @@ use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\Type;
 use ReflectionParameter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptions;
 use TheCodingMachine\GraphQLite\Annotations\ParameterAnnotations;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterHandlerInterface;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewareInterface;
@@ -21,7 +21,7 @@ class ValidationParameterMiddleware implements ParameterMiddlewareInterface
 {
 	public function __construct(
 		private readonly ValidatorInterface $validator,
-		private readonly PropertyPathMapper $propertyPathMapper,
+		private readonly ValidationExceptions $validationExceptions,
 	) {}
 
 	public function mapParameter(ReflectionParameter $parameter, DocBlock $docBlock, ?Type $paramTagType, ParameterAnnotations $parameterAnnotations, ParameterHandlerInterface $next): ParameterInterface
@@ -42,7 +42,7 @@ class ValidationParameterMiddleware implements ParameterMiddlewareInterface
 		return new ValidatingParameter(
 			$mappedParameter,
 			$this->validator,
-			$this->propertyPathMapper,
+			$this->validationExceptions,
 		);
 	}
 }

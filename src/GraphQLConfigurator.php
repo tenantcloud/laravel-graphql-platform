@@ -18,7 +18,6 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Server\Http\DefaultRequestSchemaProvider;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
 use TenantCloud\GraphQLPlatform\Server\Http\RequestSchemaProvider;
-use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\CachePersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\NotSupportedPersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Utils\Cloneable;

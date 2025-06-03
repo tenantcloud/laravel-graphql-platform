@@ -4,18 +4,12 @@ namespace TenantCloud\GraphQLPlatform\Subscription;
 
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\GraphQL;
-use GraphQL\Server\Helper;
-use GraphQL\Server\OperationParams;
-use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
-use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
-use Webmozart\Assert\Assert;
 
 class SubscriptionDataSender
 {

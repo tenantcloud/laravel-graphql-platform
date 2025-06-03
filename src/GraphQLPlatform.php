@@ -8,7 +8,6 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
 use TenantCloud\GraphQLPlatform\Context\Context;
-use TenantCloud\GraphQLPlatform\Subscription\SubscriptionTransportChangedException;
 
 final class GraphQLPlatform
 {
@@ -16,24 +15,25 @@ final class GraphQLPlatform
 
 	public function __construct(
 		private readonly ServerConfig $serverConfig,
-	)
-	{
-	}
+	) {}
 
 	public static function namespaced(string $item): string
 	{
 		return self::NAMESPACE . '::' . $item;
 	}
 
+	/**
+	 * @param (callable(Context): Context)|null $applyContext
+	 */
 	public function executeQuery(
 		Schema $schema,
 		string|DocumentNode $source,
 		mixed $rootValue = null,
 		callable $applyContext = null,
-		?array $variableValues = null,
-		?string $operationName = null,
-		?callable $fieldResolver = null,
-		?array $validationRules = null
+		array $variableValues = null,
+		string $operationName = null,
+		callable $fieldResolver = null,
+		array $validationRules = null
 	): ExecutionResult {
 		$context = new Context();
 		$context = with($context, $applyContext);

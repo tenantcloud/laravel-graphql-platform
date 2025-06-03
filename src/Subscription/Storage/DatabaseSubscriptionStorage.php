@@ -4,7 +4,6 @@ namespace TenantCloud\GraphQLPlatform\Subscription\Storage;
 
 use Carbon\CarbonImmutable;
 use GraphQL\Language\AST\DocumentNode;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
