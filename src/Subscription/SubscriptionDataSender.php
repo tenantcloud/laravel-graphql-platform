@@ -4,10 +4,13 @@ namespace TenantCloud\GraphQLPlatform\Subscription;
 
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
+use GraphQL\GraphQL;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
+use TenantCloud\GraphQLPlatform\Context\Context;
+use TenantCloud\GraphQLPlatform\GraphQLPlatform;
 use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
@@ -19,8 +22,7 @@ class SubscriptionDataSender
 	public function __construct(
 		private readonly SubscriptionStorage $subscriptionStorage,
 		private readonly SchemaRegistry $schemaRegistry,
-		private readonly ServerConfig $config,
-		private readonly Helper $serverHelper,
+		private readonly GraphQLPlatform $graphQLPlatform,
 	) {}
 
 	public function send(Subscription $subscription, mixed $root): void
@@ -60,16 +62,11 @@ class SubscriptionDataSender
 
 	private function executeForRoot(Schema $schema, Subscription $subscription, mixed $root): ExecutionResult
 	{
-		$config = clone $this->config;
-		$config->setSchema($schema);
-		$config->setRootValue(new SubscriptionRootContainer($root, $subscription->resolve));
-
-		// Just in case, make sure we didn't accidentally mutate the original config. This would be very very very bad.
-		Assert::null($this->config->getRootValue());
-
-		return $this->serverHelper->executeOperation($config, OperationParams::create([
-			'operation' => $subscription->document,
-			'variables' => $subscription->variables,
-		]));
+		return $this->graphQLPlatform->executeQuery(
+			schema: $schema,
+			source: $subscription->document,
+			rootValue: new SubscriptionRootContainer($root, $subscription->resolve),
+			variableValues: $subscription->variables,
+		);
 	}
 }

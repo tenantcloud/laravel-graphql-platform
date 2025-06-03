@@ -35,5 +35,6 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 
 	public function unsubscribed(Subscription $subscription, SchemaNotFoundException|Error $exception): void
 	{
+		throw $exception;
 	}
 }
