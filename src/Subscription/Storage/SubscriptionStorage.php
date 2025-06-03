@@ -24,7 +24,7 @@ interface SubscriptionStorage
 	/**
 	 * @return iterable<Subscription>
 	 */
-	public function subscriptionsByOwnerChannels(array $channels): iterable;
+	public function subscriptionsByChannels(array $channels): iterable;
 
 	public function unsubscribe(string $id): void;
 

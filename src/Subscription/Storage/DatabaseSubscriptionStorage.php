@@ -38,7 +38,7 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 		return GraphQLStoredSubscription::find($id);
 	}
 
-	public function subscriptionsByOwnerChannels(array $channels): iterable
+	public function subscriptionsByChannels(array $channels): iterable
 	{
 		return GraphQLStoredSubscription::query()
 			->whereIn('channel', $channels)

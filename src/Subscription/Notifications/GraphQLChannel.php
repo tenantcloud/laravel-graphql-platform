@@ -23,7 +23,7 @@ class GraphQLChannel
 	public function send($notifiable, Notification $notification): GraphQLMessage
 	{
 		$message = $this->data($notifiable, $notification);
-		$subscriptions = $this->subscriptionStorage->subscriptionsByOwnerChannels($this->notifiableChannels($notifiable, $message->channels));
+		$subscriptions = $this->subscriptionStorage->subscriptionsByChannels($this->notifiableChannels($notifiable, $message->channels));
 
 		foreach ($subscriptions as $subscription) {
 			$this->subscriptionDataSender->send($subscription, $message->root);
