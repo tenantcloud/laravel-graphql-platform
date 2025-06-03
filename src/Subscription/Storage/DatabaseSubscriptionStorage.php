@@ -53,7 +53,8 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 	public function expired(): iterable
 	{
 		return GraphQLStoredSubscription::query()
-			->where(fn (Builder $query) => $query->whereNull('expires_at')->orWhere('expires_at', '<=', now()))
+			->whereNotNull('expires_at')
+			->where('expires_at', '<=', now())
 			->lazy();
 	}
 
