@@ -229,7 +229,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			self::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN,
 			fn (Application $app) => new ContextToken(
-				fn () => $app->make(GraphQLConfigurator::class)->subscriptionTransport
+				fn () => $app->make(GraphQLConfigurator::class)->subscriptionTransportName,
 			)
 		);
 	}
@@ -255,6 +255,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(SubscriptionStorage::class),
 					$app->make(self::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN),
 					$app->make(AuthenticationServiceInterface::class),
+					$app->make(SubscriptionTransportManager::class),
 				))
 				->addFieldMiddleware(new TransactionalFieldMiddleware())
 				->addFieldMiddleware(new PreventLazyLoadingFieldMiddleware())

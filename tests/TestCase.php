@@ -42,12 +42,13 @@ abstract class TestCase extends BaseTestCase
 			$this->app->extend(
 				GraphQLConfigurator::class,
 				fn (GraphQLConfigurator $configurator) => $configurator
-					->useSubscriptionTransport(new FakeSubscriptionTransport())
+					->useSubscriptionTransport(FakeSubscriptionTransport::TYPE)
 			);
 
-			$this->app->booting(function () {
-				$subscriptionTransportManager = $this->app->make(SubscriptionTransportManager::class);
+			$this->app->extend(SubscriptionTransportManager::class, function (SubscriptionTransportManager $subscriptionTransportManager) {
 				$subscriptionTransportManager->extend(FakeSubscriptionTransport::TYPE, fn () => new FakeSubscriptionTransport());
+
+				return $subscriptionTransportManager;
 			});
 		});
 	}

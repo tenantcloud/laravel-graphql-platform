@@ -42,7 +42,7 @@ final class GraphQLConfigurator
 		public readonly array $schemas = [],
 		public readonly array $validationRules = [],
 		public readonly bool $devMode = false,
-		public readonly ?SubscriptionTransport $subscriptionTransport = null,
+		public readonly ?string $subscriptionTransportName = null,
 	) {}
 
 	public function useAutomaticPersistedQueries(CacheInterface $cache, DateInterval $ttl = new CarbonInterval('P1D')): self
@@ -135,10 +135,10 @@ final class GraphQLConfigurator
 		);
 	}
 
-	public function useSubscriptionTransport(?SubscriptionTransport $transport): self
+	public function useSubscriptionTransport(?string $transportName): self
 	{
 		return $this->with(
-			subscriptionTransport: $transport,
+			subscriptionTransportName: $transportName,
 		);
 	}
 

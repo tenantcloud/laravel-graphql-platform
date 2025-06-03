@@ -16,6 +16,7 @@ use TenantCloud\GraphQLPlatform\Context\ContextToken;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TheCodingMachine\GraphQLite\Annotations\Subscription;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
@@ -28,13 +29,14 @@ use Webmozart\Assert\Assert;
 class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 {
 	/**
-	 * @param ContextToken<SubscriptionTransport> $subscriptionTransportContextToken
+	 * @param ContextToken<string> $subscriptionTransportContextToken
 	 */
 	public function __construct(
 		private readonly SchemaRegistry $schemaRegistry,
 		private readonly SubscriptionStorage $subscriptionStorage,
 		private readonly ContextToken $subscriptionTransportContextToken,
 		private readonly AuthenticationServiceInterface $authenticationService,
+		private readonly SubscriptionTransportManager $subscriptionTransportManager,
 	) {}
 
 	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
@@ -131,6 +133,8 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 	{
 		Assert::isInstanceOf($context, Context::class);
 
-		return $context->get($this->subscriptionTransportContextToken);
+		$transportName = $context->get($this->subscriptionTransportContextToken);
+
+		return $this->subscriptionTransportManager->driver($transportName);
 	}
 }
