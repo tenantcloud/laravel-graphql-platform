@@ -18,16 +18,16 @@ class ThreadController {
 		#[ModelID] Thread $thread
 	): ChannelSubscription {
 		$this->authorizeForUser($auth, 'view', $thread);
-	
+
 		return new ChannelSubscription("threads.{$thread->id}.messages");
 	}
 }
 ```
 
-As you can see, all we did is some checks - ones you would usually do when defining a 
+As you can see, all we did is some checks - ones you would usually do when defining a
 [Laravel broadcast channel](https://laravel.com/docs/11.x/broadcasting#example-application-authorizing-channels).
 Then the method returns a `ChannelSubscription` with a channel name. That channel name
-is what we would then use to publish events for that subscription through 
+is what we would then use to publish events for that subscription through
 [Laravel notifications](https://laravel.com/docs/11.x/notifications#custom-channels):
 
 ```php
@@ -36,15 +36,15 @@ readonly class NewThreadMessageNotification
 	public function __construct(
 		public Message $message,
 	) {}
-	
-	public function via(): array 
+
+	public function via(): array
 	{
 		return [
 			GraphQLChannel::class,
-			// MailChannel::class, 
+			// MailChannel::class,
 		];
 	}
-	
+
 	public function toGraphQL(): GraphQLMessage
 	{
 		return (new GraphQLMessage($this->message))
@@ -71,37 +71,6 @@ When you execute a `subscription` operation on the backend, instead of switching
 or keeping the connection open, like GraphQL servers usually do, it closes the connection
 with a specific error code: `SUBSCRIPTION_REDIRECTED`. The error also includes
 a channel name that the client should use to subscribe to that channel on the
-broadcasting side, as well as an authorization signature so save a request to 
-`/broadcasting/auth`. The subscription will expire within 5 minutes if client 
+broadcasting side, as well as an authorization signature so save a request to
+`/broadcasting/auth`. The subscription will expire within 5 minutes if client
 doesn't subscribe.
-
-### Internal implementation
-
-The way it works is `#[Subscription]` annotated method defines the structure
-of the GraphQL field (input parameters, output type), checks for authorization
-and returns a channel name. GraphQL platform then calculates a new channel name 
-using `hash('sha256', $channel . '|' . $query)`, which is returned to the client
-so that it can subscribe to it on the WebSocket side using Pusher or other implementation.
-GraphQL platform also writes information about that subscription into storage:
-
-```json5
-// key: threads.15.messages
-[
-	{
-		"query": "subscription { newThreadMessage { id } }",
-		// sha256('threads.15.messages|subscription { newThreadMessage { id } }')
-		"channel": "9a632280a4e5b665638c22fa7de067126e7d22a2cd745fbf53a765814662ad18"
-	},
-	{
-		"query": "subscription { newThreadMessage { id, body, sender { id } } }",
-		// sha256('threads.15.messages|subscription { newThreadMessage { id, body, sender { id } } }')
-		"channel": "252d5c44a15cea25975fcb714e8383ee73ab578326cde07b935cf6493e3fc5a1"
-	}
-]
-```
-
-Then, when you send an event to channel name `threads.15.messages`, GraphQL platform will
-get all of the "actual" channels from Redis, prepare the result (convert the event
-to JSON according to the selection from query) and broadcast it for each of the channels. 
-If multiple clients are subscribed to the same query, with the same parameters and the
-same selection, the work of converting the event to JSON will only be done once.

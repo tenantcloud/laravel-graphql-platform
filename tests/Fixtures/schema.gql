@@ -8,13 +8,13 @@ type UserOffsetConnection {
 	edges: [UserOffsetEdge]!
 }
 
-"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
+"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
 scalar DateTime
 
-"The `Duration` scalar type represents a time duration conforming to the [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Durations) standard, such as `P1W1DT13H23M34S`."
+"The `Duration` scalar type represents a time duration conforming to the [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Durations) standard, such as `P1W1DT13H23M34S`."
 scalar Duration
 
-"The `Date` scalar type represents a date, conforming to [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Dates) standard, such as `2025-02-25`."
+"The `Date` scalar type represents a date, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Dates) standard, such as `2025-02-25`."
 scalar Date
 
 input NestedInput {
