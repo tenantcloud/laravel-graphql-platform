@@ -11,8 +11,8 @@ use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 interface SubscriptionStorage
 {
 	/**
-	 * @param ChannelSubscription<*> $channelSubscription
 	 * @param array<string, mixed> $variables
+	 * @param ChannelSubscription<*> $channelSubscription
 	 */
 	public function subscribe(
 		ChannelSubscription $channelSubscription,
@@ -20,7 +20,7 @@ interface SubscriptionStorage
 		string $schemaName,
 		DocumentNode $document,
 		array $variables,
-		CarbonImmutable $expiresAt = null
+		?CarbonImmutable $expiresAt = null
 	): Subscription;
 
 	public function subscriptionById(string $id): ?Subscription;

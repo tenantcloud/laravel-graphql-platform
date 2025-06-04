@@ -40,7 +40,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 		private readonly SubscriptionTransportManager $subscriptionTransportManager,
 	) {}
 
-	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
+	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): ?FieldDefinition
 	{
 		if (!$this->isChannelSubscription($queryFieldDescriptor)) {
 			return $fieldHandler->handle($queryFieldDescriptor);
@@ -56,7 +56,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 		// type and try to convert it using that, but the implementation to do so is protected in Webonyx.
 		$originalResolve = $field->resolveFn;
 
-		$field->resolveFn = function (object|null $source, array $args, $context, ResolveInfo $info) use ($originalResolve) {
+		$field->resolveFn = function (?object $source, array $args, $context, ResolveInfo $info) use ($originalResolve) {
 			// When a source (root) is passed, it means the subscription is already active
 			// and this is just one of the items that should be resolved.
 			if ($source instanceof SubscriptionRootContainer) {

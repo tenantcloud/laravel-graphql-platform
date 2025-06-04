@@ -15,7 +15,7 @@ class GraphQLOperationType extends Constraint
 	public function __construct(
 		public readonly array $allowedTypes,
 		mixed $options = null,
-		array $groups = null,
+		?array $groups = null,
 		mixed $payload = null
 	) {
 		parent::__construct($options, $groups, $payload);

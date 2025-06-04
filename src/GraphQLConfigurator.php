@@ -31,9 +31,9 @@ final class GraphQLConfigurator
 
 	/**
 	 * @param PersistedQueryLoader|null                                                          $persistedQueryLoader
-	 * @param array<callable(Router, UrlGenerator): Route>                                       $routes
+	 * @param list<callable(Router, UrlGenerator): Route>                                        $routes
 	 * @param array<string, SchemaConfigurator|callable(SchemaConfigurator): SchemaConfigurator> $schemas
-	 * @param ValidationRule[]                                                                   $validationRules
+	 * @param list<ValidationRule>                                                               $validationRules
 	 */
 	public function __construct(
 		public readonly mixed $persistedQueryLoader = new NotSupportedPersistedQueryLoader(),
@@ -81,8 +81,8 @@ final class GraphQLConfigurator
 
 	public function addExploreRoute(
 		string $endpoint = '/graphql/explore',
-		string $graphQLEndpoint = null,
-		callable $callback = null,
+		?string $graphQLEndpoint = null,
+		?callable $callback = null,
 	): self {
 		$graphQLEndpoint ??= GraphQLPlatform::namespaced('graphql');
 
@@ -106,8 +106,8 @@ final class GraphQLConfigurator
 	 */
 	public function addGraphQLRoute(
 		string $endpoint = '/graphql',
-		string $name = null,
-		callable $callback = null,
+		?string $name = null,
+		?callable $callback = null,
 		string $schemaProvider = DefaultRequestSchemaProvider::class,
 	): self {
 		$name ??= GraphQLPlatform::namespaced('graphql');
@@ -124,7 +124,7 @@ final class GraphQLConfigurator
 		));
 	}
 
-	public function addSchema(string $name, callable|SchemaConfigurator $configurator = null): self
+	public function addSchema(string $name, callable|SchemaConfigurator|null $configurator = null): self
 	{
 		return $this->with(
 			schemas: [

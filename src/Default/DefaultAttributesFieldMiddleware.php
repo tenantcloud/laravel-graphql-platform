@@ -56,7 +56,7 @@ class DefaultAttributesFieldMiddleware implements FieldMiddlewareInterface
 		});
 	}
 
-	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): FieldDefinition|null
+	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): ?FieldDefinition
 	{
 		if (!($this->filter)($queryFieldDescriptor)) {
 			return $fieldHandler->handle($queryFieldDescriptor);

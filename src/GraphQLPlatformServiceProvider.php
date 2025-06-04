@@ -22,6 +22,10 @@ use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
+use Laravel\Octane\Events\RequestReceived;
+use Laravel\Octane\Events\TaskReceived;
+use Laravel\Octane\Events\TickReceived;
+use Laravel\Octane\Octane;
 use PackageVersions\Versions;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -136,10 +140,10 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			], 'graphql-platform-migrations');
 		}
 
-		if (class_exists(\Laravel\Octane\Octane::class)) {
-			$events->listen(\Laravel\Octane\Events\RequestReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
-			$events->listen(\Laravel\Octane\Events\TaskReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
-			$events->listen(\Laravel\Octane\Events\TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+		if (class_exists(Octane::class)) {
+			$events->listen(RequestReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+			$events->listen(TaskReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+			$events->listen(TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
 		}
 
 		$viewFactory->addNamespace(GraphQLPlatform::NAMESPACE, __DIR__ . '/../resources/views');

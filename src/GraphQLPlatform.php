@@ -33,11 +33,11 @@ final class GraphQLPlatform
 		Schema $schema,
 		string|DocumentNode $source,
 		mixed $rootValue = null,
-		callable $applyContext = null,
-		array $variableValues = null,
-		string $operationName = null,
-		callable $fieldResolver = null,
-		array $validationRules = null
+		?callable $applyContext = null,
+		?array $variableValues = null,
+		?string $operationName = null,
+		?callable $fieldResolver = null,
+		?array $validationRules = null
 	): ExecutionResult {
 		$context = new Context();
 		$context = with($context, $applyContext);

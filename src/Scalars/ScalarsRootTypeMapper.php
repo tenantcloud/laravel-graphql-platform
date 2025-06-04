@@ -112,11 +112,9 @@ class ScalarsRootTypeMapper implements RootTypeMapperInterface
 		}
 
 		return match (PhpDocTypes::className($type)) {
-			DateTimeInterface::class, DateTimeImmutable::class, CarbonImmutable::class => (function () use ($reflector) {
-				return $reflector->getAttributes(Date::class) ?
+			DateTimeInterface::class, DateTimeImmutable::class, CarbonImmutable::class => (fn () => $reflector->getAttributes(Date::class) ?
 					DateType::instance() :
-					DateTimeType::instance();
-			})(),
+					DateTimeType::instance())(),
 			DateInterval::class, CarbonInterval::class => DurationType::instance(),
 			DocumentNode::class => GraphQLDocumentType::instance(),
 			UriInterface::class, Uri::class => UrlType::instance(),

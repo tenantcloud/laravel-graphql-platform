@@ -29,9 +29,7 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 		return now()->toImmutable()->addHour();
 	}
 
-	public function send(Subscription $subscription, array $data): void
-	{
-	}
+	public function send(Subscription $subscription, array $data): void {}
 
 	public function unsubscribed(Subscription $subscription, SchemaNotFoundException|Error $exception): void
 	{

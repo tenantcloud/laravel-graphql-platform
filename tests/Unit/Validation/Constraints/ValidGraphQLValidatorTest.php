@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use TenantCloud\GraphQLPlatform\Schema\OperationType;
@@ -21,9 +22,7 @@ use TenantCloud\GraphQLPlatform\Validation\Constraints\ValidGraphQLValidator;
  */
 class ValidGraphQLValidatorTest extends ConstraintValidatorTestCase
 {
-	/**
-	 * @dataProvider passesValidationProvider
-	 */
+	#[DataProvider('passesValidationProvider')]
 	public function testPassesValidation(string $operation): void
 	{
 		$this->validator->validate(
@@ -34,9 +33,7 @@ class ValidGraphQLValidatorTest extends ConstraintValidatorTestCase
 		$this->assertNoViolation();
 	}
 
-	/**
-	 * @dataProvider failsValidationProvider
-	 */
+	#[DataProvider('failsValidationProvider')]
 	public function testFailsValidation(string $violationMessage, string $operation): void
 	{
 		$this->validator->validate(

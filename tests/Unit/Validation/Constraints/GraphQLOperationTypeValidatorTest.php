@@ -5,6 +5,7 @@ namespace Tests\Unit\Validation\Constraints;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
 use GraphQL\Language\Source;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use TenantCloud\GraphQLPlatform\Schema\OperationType;
@@ -16,9 +17,7 @@ use TenantCloud\GraphQLPlatform\Validation\Constraints\GraphQLOperationTypeValid
  */
 class GraphQLOperationTypeValidatorTest extends ConstraintValidatorTestCase
 {
-	/**
-	 * @dataProvider passesValidationProvider
-	 */
+	#[DataProvider('passesValidationProvider')]
 	public function testPassesValidation(string $operation, array $allowedTypes): void
 	{
 		$this->validator->validate(
@@ -29,9 +28,7 @@ class GraphQLOperationTypeValidatorTest extends ConstraintValidatorTestCase
 		$this->assertNoViolation();
 	}
 
-	/**
-	 * @dataProvider failsValidationProvider
-	 */
+	#[DataProvider('failsValidationProvider')]
 	public function testFailsValidation(string $violationMessage, string $operation, array $allowedTypes): void
 	{
 		$this->validator->validate(

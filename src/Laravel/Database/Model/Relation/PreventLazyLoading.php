@@ -6,6 +6,4 @@ use Attribute;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotationInterface;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD)]
-class PreventLazyLoading implements MiddlewareAnnotationInterface
-{
-}
+class PreventLazyLoading implements MiddlewareAnnotationInterface {}

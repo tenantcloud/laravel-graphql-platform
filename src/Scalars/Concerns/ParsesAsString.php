@@ -11,7 +11,7 @@ use GraphQL\Language\Printer;
  */
 trait ParsesAsString
 {
-	public function parseLiteral($valueNode, array $variables = null): string
+	public function parseLiteral($valueNode, ?array $variables = null): string
 	{
 		if ($valueNode instanceof StringValueNode) {
 			return $valueNode->value;

@@ -16,6 +16,4 @@ use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
  * @property-read Closure|null $resolve
  * @property-read Closure|null $filter
  */
-interface Subscription
-{
-}
+interface Subscription {}

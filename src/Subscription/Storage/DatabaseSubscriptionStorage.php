@@ -16,7 +16,7 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 		string $schemaName,
 		DocumentNode $document,
 		array $variables,
-		CarbonImmutable $expiresAt = null
+		?CarbonImmutable $expiresAt = null
 	): Subscription {
 		$subscription = new GraphQLStoredSubscription();
 		$subscription->channel = $channelSubscription->channel;

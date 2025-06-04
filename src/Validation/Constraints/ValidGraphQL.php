@@ -17,7 +17,7 @@ class ValidGraphQL extends Constraint
 		public readonly mixed $schema,
 		public readonly array $variables,
 		mixed $options = null,
-		array $groups = null,
+		?array $groups = null,
 		mixed $payload = null
 	) {
 		parent::__construct($options, $groups, $payload);

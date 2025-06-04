@@ -17,7 +17,7 @@ class ValidationExceptionsParameterMiddleware implements ParameterMiddlewareInte
 		private readonly ValidationExceptions $validationExceptions,
 	) {}
 
-	public function mapParameter(ReflectionParameter $parameter, DocBlock $docBlock, Type|null $paramTagType, ParameterAnnotations $parameterAnnotations, ParameterHandlerInterface $parameterMapper): ParameterInterface
+	public function mapParameter(ReflectionParameter $parameter, DocBlock $docBlock, ?Type $paramTagType, ParameterAnnotations $parameterAnnotations, ParameterHandlerInterface $parameterMapper): ParameterInterface
 	{
 		$type = $parameter->getType();
 
