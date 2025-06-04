@@ -3,8 +3,13 @@
 namespace Tests\Integration\Http;
 
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
+use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
 
+#[CoversClass(GraphQLController::class)]
+#[CoversClass(ExecutesGraphQL::class)]
 class UploadTest extends HttpIntegrationTestCase
 {
 	#[Test]

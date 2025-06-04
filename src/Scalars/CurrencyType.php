@@ -21,6 +21,9 @@ class CurrencyType extends ScalarType
 
 	private static self $INSTANCE;
 
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function __construct(
 		private readonly Currencies $currencies,
 		array $config = [],

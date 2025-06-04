@@ -37,7 +37,7 @@ class SchemaRegistry
 			->first();
 	}
 
-	public function first(): ?Schema
+	public function first(): Schema
 	{
 		return $this->getOrFail(Arr::first($this->names()));
 	}

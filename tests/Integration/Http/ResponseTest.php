@@ -3,8 +3,19 @@
 namespace Tests\Integration\Http;
 
 use Illuminate\Http\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
+use TenantCloud\GraphQLPlatform\Server\Http\DefaultRequestSchemaProvider;
+use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
+use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
+use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
 
+#[CoversClass(DefaultRequestSchemaProvider::class)]
+#[CoversClass(GraphQLController::class)]
+#[CoversClass(GraphQLResponseHttpCodeDecider::class)]
+#[CoversClass(ErrorHelper::class)]
+#[CoversClass(ExecutesGraphQL::class)]
 class ResponseTest extends HttpIntegrationTestCase
 {
 	/**

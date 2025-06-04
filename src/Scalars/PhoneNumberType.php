@@ -23,6 +23,9 @@ class PhoneNumberType extends ScalarType
 
 	private static self $INSTANCE;
 
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function __construct(
 		private readonly PhoneNumberUtil $phoneNumberUtil,
 		array $config = []

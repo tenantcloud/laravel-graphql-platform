@@ -53,6 +53,8 @@ class GraphQLController
 			);
 		}
 
+		// Ignored coverage as this functionality is currently hard disabled.
+		// @codeCoverageIgnoreStart
 		if (is_array($result)) {
 			$statusCodes = array_map($this->httpCodeDecider->decideHttpStatusCode(...), $result);
 			$anySucceeded = (bool) Arr::first($statusCodes, fn (int $code) => $code < 300);
@@ -65,6 +67,7 @@ class GraphQLController
 				]
 			);
 		}
+		// @codeCoverageIgnoreEnd
 
 		throw new RuntimeException('Unexpected response from StandardServer::executePsrRequest');
 	}

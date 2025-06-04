@@ -2,9 +2,9 @@
 
 namespace TenantCloud\GraphQLPlatform\Versioning;
 
-use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use TenantCloud\APIVersioning\Version\LatestVersion;
 use TenantCloud\APIVersioning\Version\RequestVersionParser;
 use TenantCloud\APIVersioning\Version\VersionParser;
@@ -32,7 +32,7 @@ class VersionedRequestSchemaProvider implements RequestSchemaProvider
 		$schema = $this->schemaRegistry->get("v{$version}");
 
 		if (!$schema) {
-			throw new RequestError("Version '{$version}' is not supported.");
+			throw new BadRequestHttpException("Version '{$version}' is not supported.");
 		}
 
 		return $schema;

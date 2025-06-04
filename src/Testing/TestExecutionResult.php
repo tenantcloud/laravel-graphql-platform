@@ -33,6 +33,11 @@ class TestExecutionResult extends ExecutionResult
 			);
 	}
 
+	/**
+	 * Assert all fields executed without errors.
+	 *
+	 * To assert the opposite (failure), just assert for specific errors using {@see self::assertErrors()}
+	 */
 	public function assertSuccessful(): self
 	{
 		$this->assertErrors(
@@ -43,6 +48,8 @@ class TestExecutionResult extends ExecutionResult
 	}
 
 	/**
+	 * Assert the data of the field when it executed successfully. Use $field when there 2 or more fields.
+	 *
 	 * @param array<mixed, mixed>|int|float|string|bool|callable(AssertableJson): void|null $expected
 	 * @param string|null                                                                   $field    Optionally specify the field name if there is more than 1
 	 *
@@ -71,6 +78,8 @@ class TestExecutionResult extends ExecutionResult
 	}
 
 	/**
+	 * Assert the errors of the field when it executed unsuccessfully. Use $field when there 2 or more fields.
+	 *
 	 * @param callable|array<mixed, mixed> $expected
 	 */
 	public function assertErrors(callable|array $expected): self
@@ -93,30 +102,51 @@ class TestExecutionResult extends ExecutionResult
 	}
 
 	/**
+	 * Get the result of a successfully executed field. Use $field when there 2 or more fields.
+	 *
 	 * @return array<mixed, mixed>|int|float|string|bool|null
 	 */
 	public function data(?string $field = null): array|int|float|string|bool|null
 	{
 		if ($field === null) {
-			$fieldNames = [
-				...array_keys($this->data ?? []),
-				...array_filter(
-					array_map(fn (Error $error) => $error->path[0] ?? null, $this->errors),
-				),
-			];
+			$fieldNames = array_keys($this->data ?? []);
 
 			Assert::assertCount(1, $fieldNames, 'When more than one field result is returned, field name must be specified.');
 
 			$field = $fieldNames[0];
 		}
 
-		Assert::assertArrayHasKey($field, $this->data);
+		Assert::assertArrayHasKey($field, $this->data ?? []);
 
 		return $this->data[$field];
 	}
 
 	/**
+	 * Get the result of an unsuccessfully executed field. Use $field when there 2 or more fields.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public function errors(?string $field = null): array
+	{
+		if ($field === null) {
+			$fieldNames = array_filter(
+				array_map(fn (Error $error) => $error->path[0] ?? null, $this->errors),
+			);
+
+			Assert::assertCount(1, $fieldNames, 'When more than one field result is returned, field name must be specified.');
+
+			$field = $fieldNames[0];
+		}
+
+		$errors = $this->toArray()['errors'] ?? [];
+
+		return array_filter($errors, fn (array $error) => $error['path'][0] ?? $field === null);
+	}
+
+	/**
 	 * Dump the content from the response and end the script.
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function dd(): never
 	{
@@ -127,6 +157,8 @@ class TestExecutionResult extends ExecutionResult
 
 	/**
 	 * Dump the content from the response.
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function dump(): self
 	{

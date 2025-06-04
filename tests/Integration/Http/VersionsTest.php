@@ -2,13 +2,21 @@
 
 namespace Tests\Integration\Http;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
+use TenantCloud\GraphQLPlatform\Versioning\ForVersions;
+use TenantCloud\GraphQLPlatform\Versioning\ForVersionsFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Versioning\ForVersionsInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Versioning\VersionedRequestSchemaProvider;
 use Tests\TestCase;
 
+#[CoversClass(ForVersions::class)]
+#[CoversClass(ForVersionsFieldMiddleware::class)]
+#[CoversClass(ForVersionsInputFieldMiddleware::class)]
+#[CoversClass(VersionedRequestSchemaProvider::class)]
 class VersionsTest extends TestCase
 {
 	use ExecutesGraphQL;
@@ -97,6 +105,26 @@ class VersionsTest extends TestCase
 				'data' => [
 					'versionedField' => 'v2',
 				],
+			]);
+	}
+
+	#[Test]
+	public function unsupported(): void
+	{
+		$this
+			->httpGraphQL(
+				<<<'GRAPHQL'
+					query {
+						versionedField(data: {
+							id: "String"
+						})
+					}
+					GRAPHQL,
+				headers: ['Version' => '3'],
+			)
+			->assertBadRequest()
+			->assertJson([
+				'message' => "Version '3' is not supported.",
 			]);
 	}
 

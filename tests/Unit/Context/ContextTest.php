@@ -10,6 +10,7 @@ use Tests\TestCase;
 use TheCodingMachine\GraphQLite\Parameters\ParameterInterface;
 
 #[CoversClass(Context::class)]
+#[CoversClass(ContextToken::class)]
 class ContextTest extends TestCase
 {
 	#[Test]
