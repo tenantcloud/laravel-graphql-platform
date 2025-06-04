@@ -10,6 +10,9 @@ use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ConstraintDescription;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptions;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptionsParameter;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptionsParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputFieldMiddleware;
@@ -32,6 +35,9 @@ use TenantCloud\GraphQLPlatform\Validation\ValidationParameterMiddleware;
 #[CoversClass(ValidatingParameter::class)]
 #[CoversClass(ValidationParameterMiddleware::class)]
 #[CoversClass(ValidationFailedException::class)]
+#[CoversClass(ValidationExceptions::class)]
+#[CoversClass(ValidationExceptionsParameter::class)]
+#[CoversClass(ValidationExceptionsParameterMiddleware::class)]
 class ValidationTest extends IntegrationTestCase
 {
 	#[Test]
@@ -66,7 +72,7 @@ class ValidationTest extends IntegrationTestCase
 								fileIds: ["123", "123"],
 								nested: [
 									{ name: "val" },
-									{ name: "invalid" }
+									{ name: "something2" }
 								]
 							}
 						) {
@@ -120,7 +126,7 @@ class ValidationTest extends IntegrationTestCase
 						) {
 							name
 							somethingAfter
-							avatar(nest: [{ name: "invalid2" }], size: 123)
+							avatar(nest: [{ name: "something2" }], size: 123)
 						}
 					}
 					GRAPHQL,
@@ -136,6 +142,44 @@ class ValidationTest extends IntegrationTestCase
 								'path'      => ['0', 'name'],
 								'code'      => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
 								'message'   => 'This value is too long. It should have 4 characters or less.',
+							],
+						],
+					],
+				],
+			]);
+	}
+
+	#[Test]
+	public function allowsThrowingValidationErrorsFromController(): void
+	{
+		$this
+			->graphQL(
+				<<<'GRAPHQL'
+					mutation {
+						updateUser(
+							data: {
+								id: 123,
+								nested: [
+									{ name: "bobo" },
+								]
+							}
+						) {
+							name
+						}
+					}
+					GRAPHQL,
+			)
+			->assertErrors([
+				[
+					'path'       => ['updateUser'],
+					'message'    => 'Validation failed.',
+					'extensions' => [
+						'errors' => [
+							[
+								'parameter' => 'data',
+								'path'      => ['nested', '0', 'name'],
+								'code'      => null,
+								'message'   => 'Name is bobo - dont you see?',
 							],
 						],
 					],

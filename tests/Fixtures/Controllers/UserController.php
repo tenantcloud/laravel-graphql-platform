@@ -7,6 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 use TenantCloud\GraphQLPlatform\Connection\UseConnections;
 use TenantCloud\GraphQLPlatform\MissingValue;
 use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptions;
 use Tests\Fixtures\Models\CreateUserData;
 use Tests\Fixtures\Models\UpdateUserData;
 use Tests\Fixtures\Models\User;
@@ -49,8 +50,14 @@ class UserController
 	}
 
 	#[Mutation]
-	public function updateUser(UpdateUserData $data): User
-	{
+	public function updateUser(
+		UpdateUserData $data,
+		ValidationExceptions $validationExceptions,
+	): User {
+		if (is_array($data->nest) && $data->nest && $data->nest[0]->name === 'bobo') {
+			throw $validationExceptions->forProperty('data', $data, 'nest[0].name', ['Name is bobo - dont you see?']);
+		}
+
 		$user = User::dummy();
 
 		if ($data->name !== MissingValue::INSTANCE) {

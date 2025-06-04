@@ -3,19 +3,26 @@
 namespace TenantCloud\GraphQLPlatform\Context;
 
 use SplObjectStorage;
+use Tests\Unit\Context\ContextTest;
 use TheCodingMachine\GraphQLite\Context\ContextInterface;
 use TheCodingMachine\GraphQLite\Context\ResetableContextInterface;
 use TheCodingMachine\GraphQLite\Parameters\ParameterInterface;
 use TheCodingMachine\GraphQLite\PrefetchBuffer;
 
+/**
+ * @see ContextTest
+ */
 final class Context implements ContextInterface, ResetableContextInterface
 {
 	/** @var SplObjectStorage<object, mixed> */
 	private SplObjectStorage $data;
 
+	private SplObjectStorage $prefetchBuffers;
+
 	public function __construct()
 	{
 		$this->data = new SplObjectStorage();
+		$this->prefetchBuffers = new SplObjectStorage();
 	}
 
 	public function has(ContextToken $token): bool
@@ -56,17 +63,19 @@ final class Context implements ContextInterface, ResetableContextInterface
 
 	public function getPrefetchBuffer(ParameterInterface $field): PrefetchBuffer
 	{
-		static $token;
-
-		if (!$token) {
-			$token = new ContextToken(fn () => new PrefetchBuffer());
+		if ($this->prefetchBuffers->offsetExists($field)) {
+			$prefetchBuffer = $this->prefetchBuffers->offsetGet($field);
+		} else {
+			$prefetchBuffer = new PrefetchBuffer();
+			$this->prefetchBuffers->offsetSet($field, $prefetchBuffer);
 		}
 
-		return $this->get($token);
+		return $prefetchBuffer;
 	}
 
 	public function reset(): void
 	{
 		$this->data = new SplObjectStorage();
+		$this->prefetchBuffers = new SplObjectStorage();
 	}
 }
