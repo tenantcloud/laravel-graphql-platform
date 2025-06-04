@@ -5,7 +5,7 @@ namespace TenantCloud\GraphQLPlatform\Subscription;
 /**
  * A wrapper class for $root so we can check for this using `instanceof` in the subscription resolver.
  *
- * @template-covariant TRoot
+ * @template TRoot
  */
 readonly class SubscriptionRootContainer
 {

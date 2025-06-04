@@ -11,6 +11,7 @@ class ValidGraphQL extends Constraint
 {
 	/**
 	 * @param string|Schema|(callable(): string|Schema) $schema
+	 * @param array<string, mixed>                      $variables
 	 */
 	public function __construct(
 		public readonly mixed $schema,

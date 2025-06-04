@@ -18,6 +18,10 @@ parameters:
 		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
 		- '#Readonly property TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder::\$\w+ is assigned outside of the constructor\.#'
 		- '#Using nullsafe property access "\?->attributes" on left side of \?\? is unnecessary\. Use -> instead\.#'
+		- '#Access to an undefined property TenantCloud\\GraphQLPlatform\\Subscription\\Subscription::\$(id|channel|transport|schema_name|document|variables|resolve|filter)#'
+		- '#Parameter \#1 \$field of method TenantCloud\\GraphQLPlatform\\Context\\Context::getPrefetchBuffer\(\) expects TheCodingMachine\\GraphQLite\\Parameters\\ParameterInterface, Mockery\\MockInterface given#'
+		- '#Call to static method PHPUnit\\Framework\\Assert::assertSame\(\) with .* and .* will always evaluate#'
+		- '#Parameter \$schemaRegistry of class TenantCloud\\GraphQLPlatform\\Validation\\Constraints\\ValidGraphQLValidator constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given#'
 		# Vendor wrong return type
 		- '#Method TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult::fromExecutionResult\(\) should return TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult but returns GraphQL\\Executor\\ExecutionResult\.#i'
 		- '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\ExpectsHigherOrderMessage::#'

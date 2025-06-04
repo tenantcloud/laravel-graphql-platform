@@ -17,6 +17,7 @@ final class Context implements ContextInterface, ResetableContextInterface
 	/** @var SplObjectStorage<object, mixed> */
 	private SplObjectStorage $data;
 
+	/** @var SplObjectStorage<ParameterInterface, PrefetchBuffer> */
 	private SplObjectStorage $prefetchBuffers;
 
 	public function __construct()
@@ -25,6 +26,9 @@ final class Context implements ContextInterface, ResetableContextInterface
 		$this->prefetchBuffers = new SplObjectStorage();
 	}
 
+	/**
+	 * @param ContextToken<*> $token
+	 */
 	public function has(ContextToken $token): bool
 	{
 		return isset($this->data[$token]);

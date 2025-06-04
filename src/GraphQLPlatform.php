@@ -7,7 +7,9 @@ use GraphQL\GraphQL;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
+use GraphQL\Validator\Rules\ValidationRule;
 use TenantCloud\GraphQLPlatform\Context\Context;
+use Webmozart\Assert\Assert;
 
 final class GraphQLPlatform
 {
@@ -24,6 +26,8 @@ final class GraphQLPlatform
 
 	/**
 	 * @param (callable(Context): Context)|null $applyContext
+	 * @param array<string, mixed>|null         $variableValues
+	 * @param list<ValidationRule>|null         $validationRules
 	 */
 	public function executeQuery(
 		Schema $schema,
@@ -39,9 +43,11 @@ final class GraphQLPlatform
 		$context = with($context, $applyContext);
 
 		if ($validationRules === null) {
-			$validationRules = is_callable($this->serverConfig->getValidationRules()) ?
-				$this->serverConfig->getValidationRules()() :
-				$this->serverConfig->getValidationRules();
+			// We don't support callable() version of it for now, because it requires
+			// OperationsParams as well as parsed document (source), neither of which we have here
+			Assert::nullOrIsArray($this->serverConfig->getValidationRules());
+
+			$validationRules = $this->serverConfig->getValidationRules();
 		}
 
 		$result = GraphQL::executeQuery(

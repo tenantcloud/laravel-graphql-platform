@@ -20,7 +20,7 @@ use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportMana
  * @property SubscriptionTransport $transport
  * @property string                $schema_name
  * @property DocumentNode          $document
- * @property array                 $variables
+ * @property array<string, mixed>  $variables
  * @property Closure|null          $resolve
  * @property Closure|null          $filter
  * @property CarbonImmutable|null  $expires_at
@@ -36,6 +36,9 @@ class GraphQLStoredSubscription extends Model implements Subscription
 		'expires_at' => 'immutable_datetime',
 	];
 
+	/**
+	 * @return Attribute<SubscriptionTransport, SubscriptionTransport>
+	 */
 	public function transport(): Attribute
 	{
 		return new Attribute(
@@ -44,6 +47,9 @@ class GraphQLStoredSubscription extends Model implements Subscription
 		);
 	}
 
+	/**
+	 * @return Attribute<DocumentNode, DocumentNode>
+	 */
 	public function document(): Attribute
 	{
 		return new Attribute(
@@ -52,6 +58,9 @@ class GraphQLStoredSubscription extends Model implements Subscription
 		);
 	}
 
+	/**
+	 * @return Attribute<Closure|null, Closure|null>
+	 */
 	public function resolve(): Attribute
 	{
 		return new Attribute(
@@ -60,6 +69,9 @@ class GraphQLStoredSubscription extends Model implements Subscription
 		);
 	}
 
+	/**
+	 * @return Attribute<Closure|null, Closure|null>
+	 */
 	public function filter(): Attribute
 	{
 		return new Attribute(

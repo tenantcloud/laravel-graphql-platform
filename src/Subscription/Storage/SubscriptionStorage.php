@@ -10,6 +10,10 @@ use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 
 interface SubscriptionStorage
 {
+	/**
+	 * @param ChannelSubscription<*> $channelSubscription
+	 * @param array<string, mixed> $variables
+	 */
 	public function subscribe(
 		ChannelSubscription $channelSubscription,
 		SubscriptionTransport $transport,
@@ -22,6 +26,8 @@ interface SubscriptionStorage
 	public function subscriptionById(string $id): ?Subscription;
 
 	/**
+	 * @param list<string> $channels
+	 *
 	 * @return iterable<Subscription>
 	 */
 	public function subscriptionsByChannels(array $channels): iterable;

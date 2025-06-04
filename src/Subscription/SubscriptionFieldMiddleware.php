@@ -7,6 +7,7 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\OutputType;
 use GraphQL\Type\Definition\ResolveInfo;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -64,7 +65,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 
 			$owner = $this->authenticationService->getUser();
 
-			/** @var ChannelSubscription $channelSubscription */
+			/** @var ChannelSubscription<mixed> $channelSubscription */
 			$channelSubscription = $originalResolve($source, $args, $context, $info);
 
 			$transport = $this->chooseTransport($context);
@@ -120,7 +121,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 	{
 		$type = $queryFieldDescriptor->getType();
 
-		if (!$type instanceof NonNull || !$type->getWrappedType() instanceof ListOfType) {
+		if (!$type instanceof NonNull || !$type->getWrappedType() instanceof ListOfType || !$type->getWrappedType()->getWrappedType() instanceof OutputType) {
 			throw new RuntimeException("Subscription field {$queryFieldDescriptor->getName()} must define a return type annotation like so: @return ChannelSubscription<User>");
 		}
 
@@ -129,7 +130,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 		);
 	}
 
-	private function chooseTransport($context): SubscriptionTransport
+	private function chooseTransport(mixed $context): SubscriptionTransport
 	{
 		Assert::isInstanceOf($context, Context::class);
 

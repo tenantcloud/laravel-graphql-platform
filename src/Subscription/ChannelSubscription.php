@@ -7,7 +7,7 @@ use TenantCloud\GraphQLPlatform\Subscription\Notifications\GraphQLMessage;
 /**
  * A "configuration" for a subscription that should be returned from #[Subscription] annotated controller methods.
  *
- * @template-covariant TOutput
+ * @template TOutput
  */
 readonly class ChannelSubscription
 {
@@ -22,6 +22,9 @@ readonly class ChannelSubscription
 		public mixed $filter = null,
 	) {}
 
+	/**
+	 * @return self<TOutput>
+	 */
 	public function withChannel(string $channel): self
 	{
 		return new self(

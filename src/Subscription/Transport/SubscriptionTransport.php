@@ -24,6 +24,8 @@ interface SubscriptionTransport
 
 	/**
 	 * Details objects that is sent to the client after they subscribe, so they know what to do next.
+	 *
+	 * @return array<string, mixed>
 	 */
 	public function clientDetails(Subscription $subscription): array;
 
@@ -36,6 +38,8 @@ interface SubscriptionTransport
 
 	/**
 	 * Send already serialized $data to given subscription. That may be a push to a Pusher channel or a webhook for example.
+	 *
+	 * @param array<string, mixed> $data
 	 */
 	public function send(Subscription $subscription, array $data): void;
 

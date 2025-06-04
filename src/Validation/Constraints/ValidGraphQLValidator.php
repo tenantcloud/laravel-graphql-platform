@@ -6,6 +6,7 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\ValidationRule;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -14,6 +15,9 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 
 class ValidGraphQLValidator extends ConstraintValidator
 {
+	/**
+	 * @param array<string, ValidationRule> $validationRules
+	 */
 	public function __construct(
 		private readonly SchemaRegistry $schemaRegistry,
 		private readonly array $validationRules,
@@ -51,6 +55,11 @@ class ValidGraphQLValidator extends ConstraintValidator
 		return is_string($schema) ? $this->schemaRegistry->getOrFail($schema) : $schema;
 	}
 
+	/**
+	 * @param array<string, mixed> $variableValues
+	 *
+	 * @return array<string, ValidationRule>
+	 */
 	private function resolveRules(array $variableValues): array
 	{
 		foreach ($this->validationRules as $rule) {

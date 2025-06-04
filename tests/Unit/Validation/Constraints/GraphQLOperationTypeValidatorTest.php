@@ -11,12 +11,15 @@ use TenantCloud\GraphQLPlatform\Schema\OperationType;
 use TenantCloud\GraphQLPlatform\Validation\Constraints\GraphQLOperationType;
 use TenantCloud\GraphQLPlatform\Validation\Constraints\GraphQLOperationTypeValidator;
 
+/**
+ * @extends ConstraintValidatorTestCase<GraphQLOperationTypeValidator>
+ */
 class GraphQLOperationTypeValidatorTest extends ConstraintValidatorTestCase
 {
 	/**
 	 * @dataProvider passesValidationProvider
 	 */
-	public function testPassesValidation(string $operation, array $allowedTypes)
+	public function testPassesValidation(string $operation, array $allowedTypes): void
 	{
 		$this->validator->validate(
 			Parser::parse(new Source($operation, 'GraphQL')),
@@ -29,7 +32,7 @@ class GraphQLOperationTypeValidatorTest extends ConstraintValidatorTestCase
 	/**
 	 * @dataProvider failsValidationProvider
 	 */
-	public function testFailsValidation(string $violationMessage, string $operation, array $allowedTypes)
+	public function testFailsValidation(string $violationMessage, string $operation, array $allowedTypes): void
 	{
 		$this->validator->validate(
 			Parser::parse(new Source($operation, 'GraphQL')),

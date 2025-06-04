@@ -20,7 +20,7 @@ class GraphQLChannel
 		private readonly SubscriptionDataSender $subscriptionDataSender,
 	) {}
 
-	public function send($notifiable, Notification $notification): GraphQLMessage
+	public function send(mixed $notifiable, Notification $notification): GraphQLMessage
 	{
 		$message = $this->data($notifiable, $notification);
 		$subscriptions = $this->subscriptionStorage->subscriptionsByChannels($this->notifiableChannels($notifiable, $message->channels));
@@ -41,7 +41,12 @@ class GraphQLChannel
 		return $notification->toGraphQL($notifiable);
 	}
 
-	private function notifiableChannels($notifiable, array $channels): array
+	/**
+	 * @param list<string> $channels
+	 *
+	 * @return list<string>
+	 */
+	private function notifiableChannels(mixed $notifiable, array $channels): array
 	{
 		return array_map(fn (string $channel) => SubscriptionChannels::private($notifiable, $channel), $channels);
 	}

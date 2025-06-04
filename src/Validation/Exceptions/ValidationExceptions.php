@@ -33,6 +33,9 @@ class ValidationExceptions
 		);
 	}
 
+	/**
+	 * @param list<string> $errors
+	 */
 	public function forProperty(
 		string $parameter,
 		mixed $root,

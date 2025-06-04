@@ -16,12 +16,15 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Validation\Constraints\ValidGraphQL;
 use TenantCloud\GraphQLPlatform\Validation\Constraints\ValidGraphQLValidator;
 
+/**
+ * @extends ConstraintValidatorTestCase<ValidGraphQLValidator>
+ */
 class ValidGraphQLValidatorTest extends ConstraintValidatorTestCase
 {
 	/**
 	 * @dataProvider passesValidationProvider
 	 */
-	public function testPassesValidation(string $operation)
+	public function testPassesValidation(string $operation): void
 	{
 		$this->validator->validate(
 			Parser::parse(new Source($operation, 'GraphQL')),
@@ -34,7 +37,7 @@ class ValidGraphQLValidatorTest extends ConstraintValidatorTestCase
 	/**
 	 * @dataProvider failsValidationProvider
 	 */
-	public function testFailsValidation(string $violationMessage, string $operation)
+	public function testFailsValidation(string $violationMessage, string $operation): void
 	{
 		$this->validator->validate(
 			Parser::parse(new Source($operation, 'GraphQL')),
