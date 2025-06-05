@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\TypeMappers;
+namespace Tests\Fixtures\Valid\TypeMappers;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ScalarType;

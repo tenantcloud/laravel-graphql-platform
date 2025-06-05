@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Internal;
+namespace TenantCloud\GraphQLPlatform\Utility;
 
 use InvalidArgumentException;
 use phpDocumentor\Reflection\Fqsen;

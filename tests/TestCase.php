@@ -10,7 +10,7 @@ use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
-use Tests\Fixtures\TypeMappers\AnyRootTypeMapper;
+use Tests\Fixtures\Valid\TypeMappers\AnyRootTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryContext;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
 			$this->app->extend(
 				SchemaConfigurator::class,
 				fn (SchemaConfigurator $configurator) => $configurator
-					->usingComposerClassFinder(['Tests\\Fixtures'])
+					->usingComposerClassFinder(['Tests\\Fixtures\\Valid'])
 					->addRootTypeMapperFactory(new class () implements RootTypeMapperFactoryInterface {
 						public function create(RootTypeMapperInterface $next, RootTypeMapperFactoryContext $context): RootTypeMapperInterface
 						{

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Models;
+namespace Tests\Fixtures\Valid\Models;
 
 use Symfony\Component\Validator\Constraints\Length;
 use TheCodingMachine\GraphQLite\Annotations\Field;

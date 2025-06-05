@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Default;
+namespace TenantCloud\GraphQLPlatform\Utility;
 
 use GraphQL\Type\Definition\FieldDefinition;
 use ReflectionMethod;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Models;
+namespace Tests\Fixtures\Valid\Models;
 
 use Carbon\CarbonInterval;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\Valid;
 use TenantCloud\GraphQLPlatform\MissingValue;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\ID;
-use Tests\Fixtures\Validation\PersonName;
+use Tests\Fixtures\Valid\Validation\PersonName;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Input;
 

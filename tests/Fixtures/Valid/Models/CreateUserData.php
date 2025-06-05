@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Models;
+namespace Tests\Fixtures\Valid\Models;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;

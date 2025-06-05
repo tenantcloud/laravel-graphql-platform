@@ -11,7 +11,7 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
 
-class SubscriptionDataSender
+class SubscriptionManager
 {
 	public function __construct(
 		private readonly SubscriptionStorage $subscriptionStorage,
@@ -24,7 +24,7 @@ class SubscriptionDataSender
 		try {
 			$schema = $this->schemaRegistry->getOrFail($subscription->schema_name);
 		} catch (SchemaNotFoundException $exception) {
-			$this->unsubscribe($subscription, $exception);
+			$this->cancel($subscription, $exception);
 
 			return;
 		}
@@ -36,7 +36,7 @@ class SubscriptionDataSender
 		$result = $this->executeForRoot($schema, $subscription, $root);
 
 		if ($exception = ErrorHelper::malformedError($result)) {
-			$this->unsubscribe($subscription, $exception);
+			$this->cancel($subscription, $exception);
 
 			return;
 		}
@@ -46,12 +46,11 @@ class SubscriptionDataSender
 		$subscription->transport->send($subscription, $result->toArray());
 	}
 
-	private function unsubscribe(Subscription $subscription, SchemaNotFoundException|Error $exception): void
+	public function cancel(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void
 	{
-		// There's no point in continuing if the schema/query isn't available anymore.
-		$this->subscriptionStorage->unsubscribe($subscription->id);
+		$this->subscriptionStorage->delete($subscription);
 
-		$subscription->transport->unsubscribed($subscription, $exception);
+		$subscription->transport->canceled($subscription, $reason);
 	}
 
 	private function executeForRoot(Schema $schema, Subscription $subscription, mixed $root): ExecutionResult

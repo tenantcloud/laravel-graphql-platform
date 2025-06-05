@@ -1,182 +1,187 @@
 type SelectionResponse {
-	users: UserOffsetConnection!
-	selection: Any!
+  users: UserOffsetConnection!
+  selection: Any!
 }
 
 type UserOffsetConnection {
-	nodes: [User!]!
-	edges: [UserOffsetEdge]!
+  nodes: [User!]!
+  edges: [UserOffsetEdge]!
 }
 
-"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
+"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
 scalar DateTime
 
-"The `Duration` scalar type represents a time duration conforming to the [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Durations) standard, such as `P1W1DT13H23M34S`."
+"The `Duration` scalar type represents a time duration conforming to the [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Durations) standard, such as `P1W1DT13H23M34S`."
 scalar Duration
 
-"The `Date` scalar type represents a date, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Dates) standard, such as `2025-02-25`."
+"The `Date` scalar type represents a date, conforming to [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Dates) standard, such as `2025-02-25`."
 scalar Date
 
 input NestedInput {
-	"Constraints: Length(max: 4, min: 3)"
-	name: String!
+  "Constraints: Length(max: 4, min: 3)"
+  name: String!
 }
 
 type UserOffsetEdge {
-	node: User!
+  node: User!
 }
 
 scalar Any
 
 type User {
-	name: String!
-	createdAt: DateTime!
+  name: String!
+  createdAt: DateTime!
 
-	"Cost: complexity = 3, multipliers = [], defaultMultiplier = null"
-	somethingAfter: Duration
+  "Cost: complexity = 3, multipliers = [], defaultMultiplier = null"
+  somethingAfter: Duration
 
-	fileIds: [Int!]!
-	date: Date
-	avatar(nest: [NestedInput!]!, size: Int!): String!
+  fileIds: [Int!]!
+  date: Date
+  avatar(nest: [NestedInput!]!, size: Int!): String!
 }
 
 type Query {
-	"Cost: complexity = 10, multipliers = [perPage], defaultMultiplier = null"
-	listUsers(perPage: Int = 15): UserOffsetConnection!
+  "Cost: complexity = 10, multipliers = [limit], defaultMultiplier = null"
+  listUsers(
+    "Maximum: 100"
+    limit: Int! = 100
 
-	firstUser: User!
-	clientSafeError: Int!
-	clientUnsafeError: Int!
+    offset: Int! = 0
+  ): UserOffsetConnection!
 
-	"Available in versions: >=2"
-	versionedField(data: VersionedInput!): String!
+  firstUser: User!
+  clientSafeError: Int!
+  clientUnsafeError: Int!
 
-	fullSelection: SelectionResponse!
-	nestedSelection: SelectionResponse!
-	offsetConnectable(
-		"Maximum: 100"
-		limit: Int! = 100
+  "Available in versions: >=2"
+  versionedField(data: VersionedInput!): String!
 
-		offset: Int! = 0
-	): UserOffsetConnection!
-	cursorConnectable(
-		"Maximum: 100"
-		first: Int = null
+  fullSelection: SelectionResponse!
+  nestedSelection: SelectionResponse!
+  offsetConnectable(
+    "Maximum: 100"
+    limit: Int! = 100
 
-		after: String = null
+    offset: Int! = 0
+  ): UserOffsetConnection!
+  cursorConnectable(
+    "Maximum: 100"
+    first: Int = null
 
-		"Maximum: 100"
-		last: Int = null
+    after: String = null
 
-		before: String = null
-	): UserConnection!
-	connectable: UserFriendsConnectable!
+    "Maximum: 100"
+    last: Int = null
+
+    before: String = null
+  ): UserConnection!
+  connectable: UserFriendsConnectable!
 }
 
 input VersionedInput {
-	"Available in versions: >=2"
-	id: String!
+  "Available in versions: >=2"
+  id: String!
 }
 
 type UserConnection {
-	nodes: [User!]!
-	edges: [UserEdge]!
-	pageInfo: PageInfo!
+  nodes: [User!]!
+  edges: [UserEdge]!
+  pageInfo: PageInfo!
 }
 
 type UserEdge {
-	node: User!
-	cursor: String
+  node: User!
+  cursor: String
 }
 
 type PageInfo {
-	"Determine if there are more items in the data source after these."
-	hasNextPage: Boolean!
+  "Determine if there are more items in the data source after these."
+  hasNextPage: Boolean!
 
-	"Determine if there are more items in the data source before these."
-	hasPreviousPage: Boolean!
+  "Determine if there are more items in the data source before these."
+  hasPreviousPage: Boolean!
 
-	"A cursor for the first item."
-	startCursor: String
+  "A cursor for the first item."
+  startCursor: String
 
-	"A cursor for the last item."
-	endCursor: String
+  "A cursor for the last item."
+  endCursor: String
 }
 
 type UserFriendsConnectable {
-	cursor(
-		"Maximum: 100"
-		first: Int = null
+  cursor(
+    "Maximum: 100"
+    first: Int = null
 
-		after: String = null
+    after: String = null
 
-		"Maximum: 100"
-		last: Int = null
+    "Maximum: 100"
+    last: Int = null
 
-		before: String = null
-	): UserFriendsConnection!
-	offset(
-		"Maximum: 100"
-		limit: Int! = 100
+    before: String = null
+  ): UserFriendsConnection!
+  offset(
+    "Maximum: 100"
+    limit: Int! = 100
 
-		offset: Int! = 0
-	): UserFriendsOffsetConnection!
+    offset: Int! = 0
+  ): UserFriendsOffsetConnection!
 }
 
 type UserFriendsConnection {
-	nodes: [User!]!
-	edges: [UserFriendsEdge]!
-	pageInfo: PageInfo!
+  nodes: [User!]!
+  edges: [UserFriendsEdge]!
+  pageInfo: PageInfo!
 }
 
 type UserFriendsEdge {
-	node: User!
-	cursor: String
+  node: User!
+  cursor: String
 }
 
 type UserFriendsOffsetConnection {
-	nodes: [User!]!
-	edges: [UserFriendsOffsetEdge]!
+  nodes: [User!]!
+  edges: [UserFriendsOffsetEdge]!
 }
 
 type UserFriendsOffsetEdge {
-	node: User!
+  node: User!
 }
 
 type Mutation {
-	createUser(data: CreateUserDataInput!): User!
-	updateUser(data: UpdateUserDataInput!): User!
-	uploadFile(file: Upload!): String!
+  createUser(data: CreateUserDataInput!): User!
+  updateUser(data: UpdateUserDataInput!): User!
+  uploadFile(file: Upload!): String!
 }
 
 input CreateUserDataInput {
-	name: String!
-	createdAt: DateTime!
-	somethingAfter: Duration!
-	date: Date = null
+  name: String!
+  createdAt: DateTime!
+  somethingAfter: Duration!
+  date: Date = null
 }
 
 input UpdateUserDataInput {
-	id: ID!
+  id: ID!
 
-	"Constraints: Length(max: 255, min: 1), PersonName"
-	name: String
-	somethingAfter: Duration
+  "Constraints: Length(max: 255, min: 1), PersonName"
+  name: String
+  somethingAfter: Duration
 
-	"""
-	Constraints:
-	AtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])
-	"""
-	fileIds: [ID!]! = []
-	nested: [NestedInput!]
+  """
+  Constraints: 
+  AtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])
+  """
+  fileIds: [ID!]! = []
+  nested: [NestedInput!]
 }
 
 """
 The `Upload` special type represents a file to be uploaded in the same HTTP request as specified by
-[graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
+ [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
 """
 scalar Upload
 
 type Subscription {
-	newUser: User!
+  newUser: User!
 }

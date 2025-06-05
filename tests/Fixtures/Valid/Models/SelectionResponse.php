@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Fixtures\Models;
+namespace Tests\Fixtures\Valid\Models;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnection;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 
@@ -10,8 +10,8 @@ use TheCodingMachine\GraphQLite\Annotations\Type;
 class SelectionResponse
 {
 	public function __construct(
-		/** @var LengthAwarePaginator<User> */
-		#[Field] public readonly LengthAwarePaginator $users,
+		/** @var OffsetConnection<User> */
+		#[Field] public readonly OffsetConnection $users,
 		/** @var mixed */
 		#[Field] public readonly mixed $selection,
 	) {}

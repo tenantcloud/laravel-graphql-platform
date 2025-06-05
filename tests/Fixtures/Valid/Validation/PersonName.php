@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Validation;
+namespace Tests\Fixtures\Valid\Validation;
 
 use Attribute;
 use Symfony\Component\Validator\Constraints\Charset;

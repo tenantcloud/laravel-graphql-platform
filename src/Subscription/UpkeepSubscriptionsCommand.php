@@ -11,15 +11,13 @@ class UpkeepSubscriptionsCommand extends Command
 
 	protected $description = 'Deletes or extends expiration for subscriptions.';
 
-	public function handle(SubscriptionStorage $subscriptionStorage): int
+	public function handle(SubscriptionStorage $subscriptionStorage, SubscriptionManager $subscriptionManager): int
 	{
 		foreach ($subscriptionStorage->expired() as $subscription) {
 			$newExpiration = $subscription->transport->calculateExpiration($subscription);
 
 			if ($newExpiration?->isPast()) {
-				$subscriptionStorage->unsubscribe($subscription->id);
-
-				$subscription->transport->unsubscribed($subscription);
+				$subscriptionManager->cancel($subscription);
 
 				continue;
 			}
@@ -27,7 +25,7 @@ class UpkeepSubscriptionsCommand extends Command
 			$subscriptionStorage->updateExpiration($subscription, $newExpiration);
 		}
 
-		$this->info('Cleaned');
+		$this->info('Canceled or updated expirations for all expiring subscriptions.');
 
 		return self::SUCCESS;
 	}

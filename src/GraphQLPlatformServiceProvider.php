@@ -44,15 +44,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\Context\ContextToken;
-use TenantCloud\GraphQLPlatform\Internal\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
+use TenantCloud\GraphQLPlatform\Laravel\Container\GiveNewApplicationInstanceToContainerHandle;
+use TenantCloud\GraphQLPlatform\Laravel\Container\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\PreventLazyLoadingFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\TransactionalFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
-use TenantCloud\GraphQLPlatform\Laravel\Octane\GiveNewApplicationInstanceToContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Scalars\IdType;
@@ -66,6 +65,8 @@ use TenantCloud\GraphQLPlatform\Subscription\Storage\DatabaseSubscriptionStorage
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
+use TenantCloud\GraphQLPlatform\Subscription\UpkeepSubscriptionsCommand;
+use TenantCloud\GraphQLPlatform\Utility\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
 use TenantCloud\GraphQLPlatform\Validation\Constraints\ValidGraphQLValidator;
@@ -133,6 +134,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			$this->commands([
 				DebugCommand::class,
 				PrintCommand::class,
+				UpkeepSubscriptionsCommand::class,
 			]);
 
 			$this->publishes([

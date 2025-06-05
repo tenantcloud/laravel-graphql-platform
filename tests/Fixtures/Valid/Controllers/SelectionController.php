@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests\Fixtures\Controllers;
+namespace Tests\Fixtures\Valid\Controllers;
 
 use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\LengthAwarePaginatorOffsetConnectionAdapter;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelection;
-use Tests\Fixtures\Models\SelectionResponse;
+use Tests\Fixtures\Valid\Models\SelectionResponse;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 class SelectionController
@@ -13,7 +14,9 @@ class SelectionController
 	public function fullSelection(#[InjectSelection] array $selection): SelectionResponse
 	{
 		return new SelectionResponse(
-			new LengthAwarePaginatorImpl([], 10, 10),
+			new LengthAwarePaginatorOffsetConnectionAdapter(
+				new LengthAwarePaginatorImpl([], 10, 10),
+			),
 			$selection,
 		);
 	}
@@ -22,7 +25,9 @@ class SelectionController
 	public function nestedSelection(#[InjectSelection('users.nodes')] array $selection): SelectionResponse
 	{
 		return new SelectionResponse(
-			new LengthAwarePaginatorImpl([], 10, 10),
+			new LengthAwarePaginatorOffsetConnectionAdapter(
+				new LengthAwarePaginatorImpl([], 10, 10),
+			),
 			$selection,
 		);
 	}

@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Default;
+namespace TenantCloud\GraphQLPlatform\Utility;
 
 use Attribute;
 use TheCodingMachine\GraphQLite\Annotations\MiddlewareAnnotationInterface;

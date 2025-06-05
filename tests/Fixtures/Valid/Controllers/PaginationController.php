@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Controllers;
+namespace Tests\Fixtures\Valid\Controllers;
 
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -12,7 +12,7 @@ use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnection;
 use TenantCloud\GraphQLPlatform\Connection\UseConnections;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\CursorPaginatorCursorConnectionAdapter;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\LengthAwarePaginatorOffsetConnectionAdapter;
-use Tests\Fixtures\Models\User;
+use Tests\Fixtures\Valid\Models\User;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 class PaginationController

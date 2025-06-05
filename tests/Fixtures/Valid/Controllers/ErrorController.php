@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Controllers;
+namespace Tests\Fixtures\Valid\Controllers;
 
 use GraphQL\Error\UserError;
 use RuntimeException;

@@ -32,7 +32,7 @@ interface SubscriptionStorage
 	 */
 	public function subscriptionsByChannels(array $channels): iterable;
 
-	public function unsubscribe(string $id): void;
+	public function delete(Subscription $subscription): void;
 
 	/**
 	 * @return iterable<Subscription>

@@ -104,13 +104,13 @@ class ResponseTest extends HttpIntegrationTestCase
 		$this
 			->httpGraphQL(
 				<<<'GRAPHQL'
-					query ($perPage: Int!) {
-						listUsers(perPage: $perPage) {
+					query ($limit: Int!) {
+						listUsers(limit: $limit) {
 							__typename
 						}
 					}
 					GRAPHQL,
-				['perPage' => 'String']
+				['limit' => 'String']
 			)
 			->assertBadRequest()
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
@@ -118,7 +118,7 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertJsonCount(1, 'errors')
 			->assertJson([
 				'errors' => [
-					['message' => 'Variable "$perPage" got invalid value "String"; Int cannot represent non-integer value: "String"'],
+					['message' => 'Variable "$limit" got invalid value "String"; Int cannot represent non-integer value: "String"'],
 				],
 			]);
 	}

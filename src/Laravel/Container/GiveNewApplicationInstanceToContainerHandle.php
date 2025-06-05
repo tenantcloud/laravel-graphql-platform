@@ -1,12 +1,11 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel\Octane;
+namespace TenantCloud\GraphQLPlatform\Laravel\Container;
 
 use Laravel\Octane\Events\RequestReceived;
 use Laravel\Octane\Events\TaskReceived;
 use Laravel\Octane\Events\TickReceived;
 use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
-use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
 
 class GiveNewApplicationInstanceToContainerHandle
 {

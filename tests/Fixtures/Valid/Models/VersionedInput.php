@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\Models;
+namespace Tests\Fixtures\Valid\Models;
 
 use TenantCloud\GraphQLPlatform\Versioning\ForVersions;
 use TheCodingMachine\GraphQLite\Annotations\Field;

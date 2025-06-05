@@ -21,7 +21,6 @@ use phpDocumentor\Reflection\Types\String_;
 use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
-use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\CountryCode;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Currency;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Date;
@@ -30,6 +29,7 @@ use TenantCloud\GraphQLPlatform\Scalars\Hints\HexColor;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\ID;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Markdown;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\PhoneNumber;
+use TenantCloud\GraphQLPlatform\Utility\PhpDocTypes;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
 
 /**

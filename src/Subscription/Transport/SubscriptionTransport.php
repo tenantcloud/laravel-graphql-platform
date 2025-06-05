@@ -46,5 +46,5 @@ interface SubscriptionTransport
 	/**
 	 * Called when a subscription is cancelled/deleted.
 	 */
-	public function unsubscribed(Subscription $subscription, SchemaNotFoundException|Error $exception): void;
+	public function canceled(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void;
 }

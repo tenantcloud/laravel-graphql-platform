@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Fixtures\Controllers;
+namespace Tests\Fixtures\Valid\Controllers;
 
 use TenantCloud\GraphQLPlatform\Versioning\ForVersions;
-use Tests\Fixtures\Models\VersionedInput;
+use Tests\Fixtures\Valid\Models\VersionedInput;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 class VersionedController

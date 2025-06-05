@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Internal;
+namespace TenantCloud\GraphQLPlatform\Utility;
 
 use GraphQL\Type\Definition\NonNull;
 use TheCodingMachine\GraphQLite\InputField;

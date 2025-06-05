@@ -23,7 +23,7 @@ use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionPageInfo;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectable;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnection;
 use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
-use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
+use TenantCloud\GraphQLPlatform\Utility\PhpDocTypes;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
 use Webmozart\Assert\Assert;

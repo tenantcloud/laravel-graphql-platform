@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures\TypeMappers;
+namespace Tests\Fixtures\Valid\TypeMappers;
 
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\NamedType;

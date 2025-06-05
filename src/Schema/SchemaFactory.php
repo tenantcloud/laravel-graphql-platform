@@ -10,10 +10,8 @@ use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
+use TenantCloud\GraphQLPlatform\Laravel\Container\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
-use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
-use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsFieldMiddleware;
@@ -134,7 +132,6 @@ class SchemaFactory
 			$this->container->get(AnnotationReader::class),
 			$configurator->defaultConnectionsLimit,
 		);
-		$rootTypeMapper = new LaravelPaginationTypeMapper($rootTypeMapper);
 
 		$lastTopRootTypeMapper->setNext($rootTypeMapper);
 
@@ -176,7 +173,6 @@ class SchemaFactory
 			$this->container->get(DocBlockFactory::class),
 			$this->container->get(ArgumentResolver::class)
 		));
-		$fieldMiddlewarePipe->pipe(new LaravelPaginationFieldMiddleware($connectionTypeMapper));
 
 		$inputFieldMiddlewarePipe->pipe(new PropertyMappingInputFieldMiddleware($propertyMapping));
 

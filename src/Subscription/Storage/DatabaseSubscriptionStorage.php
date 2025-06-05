@@ -44,9 +44,9 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 			->lazy();
 	}
 
-	public function unsubscribe(string $id): void
+	public function delete(Subscription $subscription): void
 	{
-		GraphQLStoredSubscription::destroy($id);
+		GraphQLStoredSubscription::destroy($subscription->id);
 	}
 
 	public function expired(): iterable

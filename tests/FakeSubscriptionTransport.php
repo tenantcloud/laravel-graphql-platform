@@ -12,6 +12,9 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 {
 	public const TYPE = 'fake';
 
+	/** @var list<array{ Subscription, array<string, mixed> }> */
+	public array $sent = [];
+
 	public function type(): string
 	{
 		return self::TYPE;
@@ -29,9 +32,12 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 		return now()->toImmutable()->addHour();
 	}
 
-	public function send(Subscription $subscription, array $data): void {}
+	public function send(Subscription $subscription, array $data): void
+	{
+		$this->sent[] = [$subscription, $data];
+	}
 
-	public function unsubscribed(Subscription $subscription, SchemaNotFoundException|Error $exception): void
+	public function canceled(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void
 	{
 		throw $exception;
 	}

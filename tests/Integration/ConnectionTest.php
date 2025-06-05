@@ -5,16 +5,22 @@ namespace Tests\Integration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Connection\ConnectionMissingParameterException;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
 use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionPageInfo;
 use TenantCloud\GraphQLPlatform\Connection\UseConnections;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\CursorPaginatorCursorConnectionAdapter;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\CursorPaginatorCursorConnectionEdgeAdapter;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\LengthAwarePaginatorOffsetConnectionAdapter;
+use TenantCloud\GraphQLPlatform\Laravel\Pagination\LengthAwarePaginatorOffsetConnectionEdgeAdapter;
 
 #[CoversClass(ConnectionTypeMapper::class)]
 #[CoversClass(CursorConnectionPageInfo::class)]
 #[CoversClass(ConnectionFieldMiddleware::class)]
-#[CoversClass(ConnectionMissingParameterException::class)]
 #[CoversClass(UseConnections::class)]
+#[CoversClass(CursorPaginatorCursorConnectionAdapter::class)]
+#[CoversClass(CursorPaginatorCursorConnectionEdgeAdapter::class)]
+#[CoversClass(LengthAwarePaginatorOffsetConnectionAdapter::class)]
+#[CoversClass(LengthAwarePaginatorOffsetConnectionEdgeAdapter::class)]
 class ConnectionTest extends IntegrationTestCase
 {
 	#[Test]

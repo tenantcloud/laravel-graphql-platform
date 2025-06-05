@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel;
+namespace TenantCloud\GraphQLPlatform\Laravel\Container;
 
 use Illuminate\Contracts\Container\Container;
 use Psr\Container\ContainerInterface;
