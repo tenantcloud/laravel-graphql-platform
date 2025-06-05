@@ -11,6 +11,7 @@ use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Language\AST\ValueNode;
 use GraphQL\Type\Definition\Type;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -85,7 +86,7 @@ class IdTypeTest extends TestCase
 	}
 
 	#[DataProvider('parseLiteralProvider')]
-	public function testParseLiteral(mixed $expected, Node $value): void
+	public function testParseLiteral(mixed $expected, Node&ValueNode $value): void
 	{
 		try {
 			$result = Type::id()->parseLiteral($value);

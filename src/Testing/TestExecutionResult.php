@@ -50,8 +50,8 @@ class TestExecutionResult extends ExecutionResult
 	/**
 	 * Assert the data of the field when it executed successfully. Use $field when there 2 or more fields.
 	 *
-	 * @param array<mixed, mixed>|int|float|string|bool|callable(AssertableJson): void|null $expected
-	 * @param string|null                                                                   $field    Optionally specify the field name if there is more than 1
+	 * @param array<mixed, mixed>|int|float|string|bool|(callable(AssertableJson): mixed)|null $expected
+	 * @param string|null                                                                      $field    Optionally specify the field name if there is more than 1
 	 *
 	 * @return $this
 	 */
@@ -140,7 +140,7 @@ class TestExecutionResult extends ExecutionResult
 
 		$errors = $this->toArray()['errors'] ?? [];
 
-		return array_filter($errors, fn (array $error) => $error['path'][0] ?? $field === null);
+		return array_filter($errors, fn (array $error) => ($error['path'][0] ?? null) === $field);
 	}
 
 	/**

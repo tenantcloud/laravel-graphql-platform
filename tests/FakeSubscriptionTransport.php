@@ -37,8 +37,5 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 		$this->sent[] = [$subscription, $data];
 	}
 
-	public function canceled(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void
-	{
-		throw $exception;
-	}
+	public function canceled(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void {}
 }

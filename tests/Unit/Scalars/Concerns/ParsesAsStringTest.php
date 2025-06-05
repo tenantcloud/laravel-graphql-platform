@@ -14,7 +14,7 @@ use Tests\TestCase;
 class ParsesAsStringTest extends TestCase
 {
 	#[Test]
-	public function parsesLiteralsAsStrings()
+	public function parsesLiteralsAsStrings(): void
 	{
 		$type = new class () {
 			use ParsesAsString;

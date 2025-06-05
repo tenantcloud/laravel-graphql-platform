@@ -13,6 +13,9 @@ parameters:
 		- src
 		- tests
 
+	excludePaths:
+		- tests/Fixtures/Invalid
+
 	ignoreErrors:
 		# PHPStan is wrong here.
 		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
@@ -22,9 +25,13 @@ parameters:
 		- '#Parameter \#1 \$field of method TenantCloud\\GraphQLPlatform\\Context\\Context::getPrefetchBuffer\(\) expects TheCodingMachine\\GraphQLite\\Parameters\\ParameterInterface, Mockery\\MockInterface given#'
 		- '#Call to static method PHPUnit\\Framework\\Assert::assertSame\(\) with .* and .* will always evaluate#'
 		- '#Parameter \$schemaRegistry of class TenantCloud\\GraphQLPlatform\\Validation\\Constraints\\ValidGraphQLValidator constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given#'
+		- '#Parameter \#1 \$transport of method Tests\\Integration\\SubscriptionsTest::createSubscription\(\) expects TenantCloud\\GraphQLPlatform\\Subscription\\Transport\\SubscriptionTransport, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given.#'
+		- '#Parameter \#1 \$schemaFactory of class TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaFactory, Mockery\\MockInterface given.#'
 		# Vendor wrong return type
 		- '#Method TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult::fromExecutionResult\(\) should return TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult but returns GraphQL\\Executor\\ExecutionResult\.#i'
 		- '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\ExpectsHigherOrderMessage::#'
+		# Broken in the stupid phpDocumentor library
+		- '#Generic type TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\User> in PHPDoc type for property Tests\\Fixtures\\Valid\\Models\\SelectionResponse::\$users does not specify all template types of interface TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection: NodeType, EdgeType#'
 		# Vendor inherited without types
 		- '#Method TenantCloud\\GraphQLPlatform\\Validation\\LaravelCompositeTranslatorAdapter::trans\(\) has parameter \$parameters with no value type specified in iterable type array\.#i'
 		-

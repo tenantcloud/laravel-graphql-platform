@@ -9,7 +9,6 @@ use TenantCloud\GraphQLPlatform\Discovery\Composer\File\GlobFileFinder;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\File\MemoizedFileFinder;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\MemoizedReflectionFactory;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\NativeReflectionFactory;
-use Tests\Fixtures\Invalid\SyntaxError;
 use Tests\Fixtures\Valid\Controllers\UserController;
 use Tests\Fixtures\Valid\Models\CreateUserData;
 use Tests\Fixtures\Valid\Models\UpdateUserData;
@@ -40,7 +39,7 @@ class DiscoveryTest extends IntegrationTestCase
 		$result = iterator_to_array($classFinder);
 		$foundClassNames = array_keys($result);
 
-		self::assertNotContains(SyntaxError::class, $foundClassNames);
+		self::assertNotContains('Tests\Fixtures\Invalid\SyntaxError', $foundClassNames);
 		self::assertContains(AnyType::class, $foundClassNames);
 		self::assertContains(UpdateUserData::class, $foundClassNames);
 		self::assertContains(CreateUserData::class, $foundClassNames);

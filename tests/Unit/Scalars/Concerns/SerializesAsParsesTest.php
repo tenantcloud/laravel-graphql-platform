@@ -14,12 +14,12 @@ use Tests\TestCase;
 class SerializesAsParsesTest extends TestCase
 {
 	#[Test]
-	public function parsesLiteralsAsStrings()
+	public function parsesLiteralsAsStrings(): void
 	{
 		$type = new class () {
 			use SerializesAsParses;
 
-			public function parseValue($value)
+			public function parseValue(mixed $value): mixed
 			{
 				if ($value === 'graphql error') {
 					throw new Error('GraphQL error');
