@@ -171,7 +171,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->canceled(Mockery::any(), Mockery::type(SchemaNotFoundException::class));
+			->disabled(Mockery::any(), Mockery::type(SchemaNotFoundException::class));
 
 		$subscription = $this->createSubscription($subscriptionTransport);
 
@@ -202,7 +202,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->canceled(Mockery::any(), Mockery::type(Error::class));
+			->disabled(Mockery::any(), Mockery::type(Error::class));
 
 		$subscription = $this->createSubscription($subscriptionTransport);
 
@@ -233,7 +233,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->canceled(Mockery::any(), null);
+			->disabled(Mockery::any(), null);
 
 		$subscription = $this->createSubscription($subscriptionTransport);
 

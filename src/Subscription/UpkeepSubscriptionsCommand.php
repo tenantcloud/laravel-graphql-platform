@@ -17,7 +17,7 @@ class UpkeepSubscriptionsCommand extends Command
 			$newExpiration = $subscription->transport->calculateExpiration($subscription);
 
 			if ($newExpiration?->isPast()) {
-				$subscriptionManager->cancel($subscription);
+				$subscriptionManager->disable($subscription);
 
 				continue;
 			}

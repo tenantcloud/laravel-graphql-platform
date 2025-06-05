@@ -24,7 +24,7 @@ class SubscriptionManager
 		try {
 			$schema = $this->schemaRegistry->getOrFail($subscription->schema_name);
 		} catch (SchemaNotFoundException $exception) {
-			$this->cancel($subscription, $exception);
+			$this->disable($subscription, $exception);
 
 			return;
 		}
@@ -36,7 +36,7 @@ class SubscriptionManager
 		$result = $this->executeForRoot($schema, $subscription, $root);
 
 		if ($exception = ErrorHelper::malformedError($result)) {
-			$this->cancel($subscription, $exception);
+			$this->disable($subscription, $exception);
 
 			return;
 		}
@@ -46,11 +46,11 @@ class SubscriptionManager
 		$subscription->transport->send($subscription, $result->toArray());
 	}
 
-	public function cancel(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void
+	public function disable(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void
 	{
 		$this->subscriptionStorage->delete($subscription);
 
-		$subscription->transport->canceled($subscription, $reason);
+		$subscription->transport->disabled($subscription, $reason);
 	}
 
 	private function executeForRoot(Schema $schema, Subscription $subscription, mixed $root): ExecutionResult
