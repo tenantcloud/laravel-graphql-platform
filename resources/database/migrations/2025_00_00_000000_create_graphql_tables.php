@@ -13,7 +13,8 @@ return new class () extends Migration {
 		Schema::create('graphql_subscriptions', function (Blueprint $table) {
 			$table->uuid('id')->primary();
 
-			$table->string('channel');
+			$table->string('channel')
+				->index();
 			$table->string('transport');
 			$table->string('schema_name');
 			$table->json('document');
