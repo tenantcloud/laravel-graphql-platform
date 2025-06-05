@@ -30,9 +30,7 @@ interface SubscriptionStorage
 	 *
 	 * @return iterable<Subscription>
 	 */
-	public function subscriptionsByChannels(array $channels): iterable;
-
-	public function delete(Subscription $subscription): void;
+	public function activeSubscriptionsByChannels(array $channels): iterable;
 
 	/**
 	 * @return iterable<Subscription>
@@ -40,4 +38,8 @@ interface SubscriptionStorage
 	public function expired(): iterable;
 
 	public function updateExpiration(Subscription $subscription, ?CarbonImmutable $expiresAt): void;
+
+	public function updateActive(Subscription $subscription, bool $value): void;
+
+	public function delete(Subscription $subscription): void;
 }

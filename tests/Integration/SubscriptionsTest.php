@@ -160,7 +160,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	}
 
 	#[Test]
-	public function cancelsSubscriptionWhenSchemaNoLongerExists(): void
+	public function deactivatesSubscriptionWhenSchemaNoLongerExists(): void
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
@@ -171,7 +171,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->disabled(Mockery::any(), Mockery::type(SchemaNotFoundException::class));
+			->deactivated(Mockery::any(), Mockery::type(SchemaNotFoundException::class));
 
 		$subscription = $this->createSubscription($subscriptionTransport);
 
@@ -187,11 +187,15 @@ class SubscriptionsTest extends IntegrationTestCase
 			new UserFixture('Alex', CarbonImmutable::now())
 		);
 
-		self::assertModelMissing($subscription);
+		self::assertModelExists($subscription);
+
+		$subscription->refresh();
+
+		self::assertFalse($subscription->active);
 	}
 
 	#[Test]
-	public function cancelsSubscriptionOnMalformedRequestError(): void
+	public function deactivatesSubscriptionOnMalformedRequestError(): void
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
@@ -202,7 +206,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->disabled(Mockery::any(), Mockery::type(Error::class));
+			->deactivated(Mockery::any(), Mockery::type(Error::class));
 
 		$subscription = $this->createSubscription($subscriptionTransport);
 
@@ -218,7 +222,11 @@ class SubscriptionsTest extends IntegrationTestCase
 			new UserFixture('Alex', CarbonImmutable::now())
 		);
 
-		self::assertModelMissing($subscription);
+		self::assertModelExists($subscription);
+
+		$subscription->refresh();
+
+		self::assertFalse($subscription->active);
 	}
 
 	#[Test]
@@ -232,8 +240,6 @@ class SubscriptionsTest extends IntegrationTestCase
 				'calculateExpiration' => now()->subDay()->toImmutable(),
 				'clientDetails'       => [],
 			]);
-		$subscriptionTransport->expects()
-			->disabled(Mockery::any(), null);
 
 		$subscription = $this->createSubscription($subscriptionTransport);
 

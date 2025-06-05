@@ -2,7 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Subscription;
 
-use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
@@ -10,6 +9,7 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\ErrorHelper;
 use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
+use Throwable;
 
 class SubscriptionManager
 {
@@ -24,7 +24,7 @@ class SubscriptionManager
 		try {
 			$schema = $this->schemaRegistry->getOrFail($subscription->schema_name);
 		} catch (SchemaNotFoundException $exception) {
-			$this->disable($subscription, $exception);
+			$this->deactivate($subscription, $exception);
 
 			return;
 		}
@@ -36,7 +36,7 @@ class SubscriptionManager
 		$result = $this->executeForRoot($schema, $subscription, $root);
 
 		if ($exception = ErrorHelper::malformedError($result)) {
-			$this->disable($subscription, $exception);
+			$this->deactivate($subscription, $exception);
 
 			return;
 		}
@@ -46,11 +46,16 @@ class SubscriptionManager
 		$subscription->transport->send($subscription, $result->toArray());
 	}
 
-	public function disable(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void
+	public function deactivate(Subscription $subscription, ?Throwable $reason = null): void
+	{
+		$this->subscriptionStorage->updateActive($subscription, false);
+
+		$subscription->transport->deactivated($subscription, $reason);
+	}
+
+	public function delete(Subscription $subscription): void
 	{
 		$this->subscriptionStorage->delete($subscription);
-
-		$subscription->transport->disabled($subscription, $reason);
 	}
 
 	private function executeForRoot(Schema $schema, Subscription $subscription, mixed $root): ExecutionResult

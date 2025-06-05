@@ -3,10 +3,9 @@
 namespace Tests;
 
 use Carbon\CarbonImmutable;
-use GraphQL\Error\Error;
-use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
+use Throwable;
 
 class FakeSubscriptionTransport implements SubscriptionTransport
 {
@@ -37,5 +36,5 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 		$this->sent[] = [$subscription, $data];
 	}
 
-	public function disabled(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void {}
+	public function deactivated(Subscription $subscription, ?Throwable $reason = null): void {}
 }

@@ -16,6 +16,7 @@ use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportMana
 
 /**
  * @property string                $id
+ * @property bool                  $active
  * @property string                $channel
  * @property SubscriptionTransport $transport
  * @property string                $schema_name
@@ -32,6 +33,7 @@ class GraphQLStoredSubscription extends Model implements Subscription
 	protected $table = 'graphql_subscriptions';
 
 	protected $casts = [
+		'active'     => 'boolean',
 		'variables'  => 'array',
 		'expires_at' => 'immutable_datetime',
 	];

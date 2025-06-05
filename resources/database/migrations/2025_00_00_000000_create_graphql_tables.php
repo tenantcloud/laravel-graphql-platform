@@ -13,6 +13,9 @@ return new class () extends Migration {
 		Schema::create('graphql_subscriptions', function (Blueprint $table) {
 			$table->uuid('id')->primary();
 
+			$table->boolean('active')
+				->default(true)
+				->index();
 			$table->string('channel')
 				->index();
 			$table->string('transport');
@@ -24,6 +27,8 @@ return new class () extends Migration {
 			$table->timestamp('expires_at')->nullable();
 
 			$table->timestamps();
+
+			$table->index(['active', 'channel']);
 		});
 	}
 

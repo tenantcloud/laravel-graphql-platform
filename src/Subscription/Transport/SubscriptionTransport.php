@@ -3,9 +3,8 @@
 namespace TenantCloud\GraphQLPlatform\Subscription\Transport;
 
 use Carbon\CarbonImmutable;
-use GraphQL\Error\Error;
-use TenantCloud\GraphQLPlatform\Schema\SchemaNotFoundException;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
+use Throwable;
 
 /**
  * Subscriptions cannot be returned as SSE stream or switched to WS directly from a Laravel PHP server,
@@ -44,7 +43,7 @@ interface SubscriptionTransport
 	public function send(Subscription $subscription, array $data): void;
 
 	/**
-	 * Called when a subscription is cancelled/deleted.
+	 * Called when a subscription is canceled/disabled by the system.
 	 */
-	public function disabled(Subscription $subscription, SchemaNotFoundException|Error|null $reason = null): void;
+	public function deactivated(Subscription $subscription, ?Throwable $reason = null): void;
 }

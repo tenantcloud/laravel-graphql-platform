@@ -19,6 +19,7 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 		?CarbonImmutable $expiresAt = null
 	): Subscription {
 		$subscription = new GraphQLStoredSubscription();
+		$subscription->active = true;
 		$subscription->channel = $channelSubscription->channel;
 		$subscription->transport = $transport;
 		$subscription->schema_name = $schemaName;
@@ -37,16 +38,12 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 		return GraphQLStoredSubscription::find($id);
 	}
 
-	public function subscriptionsByChannels(array $channels): iterable
+	public function activeSubscriptionsByChannels(array $channels): iterable
 	{
 		return GraphQLStoredSubscription::query()
+			->where('active', true)
 			->whereIn('channel', $channels)
 			->lazy();
-	}
-
-	public function delete(Subscription $subscription): void
-	{
-		GraphQLStoredSubscription::destroy($subscription->id);
 	}
 
 	public function expired(): iterable
@@ -64,5 +61,19 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 			->update([
 				'expires_at' => $expiresAt,
 			]);
+	}
+
+	public function updateActive(Subscription $subscription, bool $value): void
+	{
+		GraphQLStoredSubscription::query()
+			->whereKey($subscription->id)
+			->update([
+				'active' => $value,
+			]);
+	}
+
+	public function delete(Subscription $subscription): void
+	{
+		GraphQLStoredSubscription::destroy($subscription->id);
 	}
 }
