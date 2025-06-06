@@ -36,8 +36,7 @@
 		"ecodev/graphql-upload": "^7.0",
 		"nunomaduro/larastan": "^2.6",
 		"laravel/octane": "^2.6",
-		"phpbench/phpbench": "^1.4",
-		"pusher/pusher-php-server": "^7.2"
+		"phpbench/phpbench": "^1.4"
 	},
 	"suggest": {
 		"ecodev/graphql-upload": "^7.0"
