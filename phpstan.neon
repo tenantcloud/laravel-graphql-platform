@@ -27,6 +27,7 @@ parameters:
 		- '#Parameter \$schemaRegistry of class TenantCloud\\GraphQLPlatform\\Validation\\Constraints\\ValidGraphQLValidator constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given#'
 		- '#Parameter \#1 \$transport of method Tests\\Integration\\SubscriptionsTest::createSubscription\(\) expects TenantCloud\\GraphQLPlatform\\Subscription\\Transport\\SubscriptionTransport, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given.#'
 		- '#Parameter \#1 \$schemaFactory of class TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaFactory, Mockery\\MockInterface given.#'
+		- '#Parameter \#1 \$users of class Tests\\Fixtures\\Valid\\Models\\SelectionResponse constructor expects TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\User>, TenantCloud\\GraphQLPlatform\\Laravel\\Pagination\\LengthAwarePaginatorOffsetConnectionAdapter<mixed> given.#'
 		# Vendor wrong return type
 		- '#Method TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult::fromExecutionResult\(\) should return TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult but returns GraphQL\\Executor\\ExecutionResult\.#i'
 		- '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\ExpectsHigherOrderMessage::#'
