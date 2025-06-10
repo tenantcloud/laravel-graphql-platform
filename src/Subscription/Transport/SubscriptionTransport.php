@@ -40,7 +40,7 @@ interface SubscriptionTransport
 	 *
 	 * @param array<string, mixed> $data
 	 */
-	public function send(Subscription $subscription, array $data): void;
+	public function emit(Subscription $subscription, array $data): void;
 
 	/**
 	 * Called when a subscription is canceled/disabled by the system.

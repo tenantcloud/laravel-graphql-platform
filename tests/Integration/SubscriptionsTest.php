@@ -23,6 +23,8 @@ use TenantCloud\GraphQLPlatform\Subscription\Storage\DatabaseSubscriptionStorage
 use TenantCloud\GraphQLPlatform\Subscription\Storage\GraphQLStoredSubscription;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionChannels;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionDataEmittedEvent;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionEmitter;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionManager;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionRootContainer;
@@ -39,6 +41,8 @@ use Tests\Fixtures\Valid\Models\User as UserFixture;
 #[CoversClass(GraphQLStoredSubscription::class)]
 #[CoversClass(ChannelSubscription::class)]
 #[CoversClass(SubscriptionChannels::class)]
+#[CoversClass(SubscriptionDataEmittedEvent::class)]
+#[CoversClass(SubscriptionEmitter::class)]
 #[CoversClass(SubscriptionFieldMiddleware::class)]
 #[CoversClass(SubscriptionManager::class)]
 #[CoversClass(SubscriptionRootContainer::class)]
@@ -53,7 +57,7 @@ class SubscriptionsTest extends IntegrationTestCase
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
 		$result = $this
-			->graphQL(
+			->httpGraphQL(
 				<<<'GRAPHQL'
 					subscription {
 						newUser {
@@ -62,37 +66,27 @@ class SubscriptionsTest extends IntegrationTestCase
 					}
 					GRAPHQL,
 			)
-			->assertErrors([
-				[
-					'message'    => 'Subscriptions require a different transport. See error extensions for details on how to continue with the subscription.',
-					'extensions' => [
-						'code'         => SubscriptionTransportChangedException::CODE,
-						'subscription' => [
-							'transport' => [
-								'type'    => FakeSubscriptionTransport::TYPE,
-								'channel' => $channel = 'auth:123:users.new',
+			->assertSuccessful()
+			->assertJson([
+				'errors' => [
+					[
+						'message'    => 'Subscriptions require a different transport. See error extensions for details on how to continue with the subscription.',
+						'extensions' => [
+							'code'         => SubscriptionTransportChangedException::CODE,
+							'subscription' => [
+								'transport' => [
+									'type'    => FakeSubscriptionTransport::TYPE,
+									'channel' => $channel = 'auth:123:users.new',
+								],
 							],
 						],
 					],
 				],
 			]);
-
-		self::assertCount(1, $result->errors);
-		self::assertNotNull($originalException = $result->errors[0]->getPrevious());
-		self::assertInstanceOf(SubscriptionTransportChangedException::class, $originalException);
-		self::assertSame([
-			'code'         => SubscriptionTransportChangedException::CODE,
-			'subscription' => [
-				'transport' => [
-					'type'    => FakeSubscriptionTransport::TYPE,
-					'channel' => $channel,
-				],
-			],
-		], $originalException->getExtensions());
 	}
 
 	#[Test]
-	public function sendsDataToASubscription(): void
+	public function emitsDataToASubscription(): void
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
@@ -103,7 +97,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->send(Mockery::any(), [
+			->emit(Mockery::any(), [
 				'data' => [
 					'newUser' => [
 						'name' => 'Alex',
@@ -115,7 +109,7 @@ class SubscriptionsTest extends IntegrationTestCase
 
 		$this->app->make(Guard::class)->forgetUser();
 
-		$this->app->make(SubscriptionManager::class)->send(
+		$this->app->make(SubscriptionEmitter::class)->emitForSubscription(
 			$subscription,
 			new UserFixture('Alex', CarbonImmutable::now())
 		);
@@ -133,7 +127,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 		$subscriptionTransport->expects()
-			->send(Mockery::any(), [
+			->emit(Mockery::any(), [
 				'data' => [
 					'newUser' => [
 						'name' => 'Alex',
@@ -182,7 +176,7 @@ class SubscriptionsTest extends IntegrationTestCase
 
 		$this->app->make(Guard::class)->forgetUser();
 
-		$this->app->make(SubscriptionManager::class)->send(
+		$this->app->make(SubscriptionEmitter::class)->emitForSubscription(
 			$subscription,
 			new UserFixture('Alex', CarbonImmutable::now())
 		);
@@ -217,7 +211,7 @@ class SubscriptionsTest extends IntegrationTestCase
 
 		$this->app->make(Guard::class)->forgetUser();
 
-		$this->app->make(SubscriptionManager::class)->send(
+		$this->app->make(SubscriptionEmitter::class)->emitForSubscription(
 			$subscription,
 			new UserFixture('Alex', CarbonImmutable::now())
 		);

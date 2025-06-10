@@ -5,23 +5,41 @@ namespace TenantCloud\GraphQLPlatform\Testing;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert;
 use Illuminate\Testing\Fluent\AssertableJson;
 use ReflectionProperty;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionTransportChangedException;
 
 class TestExecutionResult extends ExecutionResult
 {
-	public function __construct(?array $data = null, array $errors = [], array $extensions = [])
-	{
+	use Macroable;
+
+	public function __construct(
+		?array $data = null,
+		array $errors = [],
+		array $extensions = [],
+		public readonly TestExecutionResultEmitted $emitted = new TestExecutionResultEmitted(
+		)
+	) {
 		parent::__construct($data, $errors, $extensions);
 	}
 
-	public static function fromExecutionResult(ExecutionResult $result): self
-	{
+	public static function fromExecutionResult(
+		ExecutionResult $result,
+		TestExecutionResultEmitted $emitted = new TestExecutionResultEmitted(),
+	): self {
+		$errors = $result->errors;
+
+		if (count($errors) === 1 && $errors[0]->getPrevious() instanceof SubscriptionTransportChangedException) {
+			$errors = [];
+		}
+
 		$testResult = new self(
 			$result->data,
-			$result->errors,
+			$errors,
 			$result->extensions,
+			$emitted,
 		);
 
 		return $testResult

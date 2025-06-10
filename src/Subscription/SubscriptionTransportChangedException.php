@@ -2,9 +2,10 @@
 
 namespace TenantCloud\GraphQLPlatform\Subscription;
 
-use GraphQL\Error\Error;
+use RuntimeException;
+use TheCodingMachine\GraphQLite\Exceptions\GraphQLExceptionInterface;
 
-class SubscriptionTransportChangedException extends Error
+class SubscriptionTransportChangedException extends RuntimeException implements GraphQLExceptionInterface
 {
 	public const CODE = 'SUBSCRIPTION_TRANSPORT_CHANGED';
 

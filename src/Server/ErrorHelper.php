@@ -21,7 +21,7 @@ class ErrorHelper
 				!$error->getPrevious() ||
 				$error->getPrevious() instanceof RequestError ||
 				$error->getPrevious() instanceof Error
-			)
+			),
 		);
 	}
 }

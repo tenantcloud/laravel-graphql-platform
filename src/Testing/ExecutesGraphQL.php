@@ -8,6 +8,7 @@ use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -26,6 +27,8 @@ trait ExecutesGraphQL
 	 *   - doesn't execute HTTP middleware
 	 *   - doesn't allow HTTP headers
 	 *   - doesn't generate HTTP response (status, body etc)
+	 *   - allows properly testing the "successfulness"
+	 *   - allows properly testing subscriptions
 	 *
 	 * @param string               $query     The GraphQL operation to send
 	 * @param array<string, mixed> $variables The variables to include in the query
@@ -41,8 +44,6 @@ trait ExecutesGraphQL
 				$this->app->make(SchemaRegistry::class)->first();
 		}
 
-		$serverHelper = $this->app->make(Helper::class);
-
 		$config = $this->app->make(ServerConfig::class);
 		$config->setSchema($schema);
 
@@ -53,8 +54,11 @@ trait ExecutesGraphQL
 
 		$this->app->make(Request::class)->setUserResolver(fn () => $this->app->make(Guard::class)->user());
 
+		$emitted = TestExecutionResultEmitted::fromEvents($this->app->make(Dispatcher::class));
+
 		return TestExecutionResult::fromExecutionResult(
-			$serverHelper->executeOperation($config, $params)
+			$this->app->make(Helper::class)->executeOperation($config, $params),
+			$emitted,
 		);
 	}
 

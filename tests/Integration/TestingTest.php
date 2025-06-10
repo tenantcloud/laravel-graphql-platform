@@ -4,14 +4,20 @@ namespace Tests\Integration;
 
 use Illuminate\Testing\Assert;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Orchestra\Testbench\Factories\UserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionChannels;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionEmitter;
 use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
 use TenantCloud\GraphQLPlatform\Testing\TestExecutionResult;
+use TenantCloud\GraphQLPlatform\Testing\TestExecutionResultEmitted;
+use Tests\Fixtures\Valid\Models\User;
 
 #[CoversClass(ExecutesGraphQL::class)]
 #[CoversClass(TestExecutionResult::class)]
+#[CoversClass(TestExecutionResultEmitted::class)]
 class TestingTest extends IntegrationTestCase
 {
 	#[Test]
@@ -92,5 +98,51 @@ class TestingTest extends IntegrationTestCase
 			],
 		]), ExpectationFailedException::class);
 		self::assertThrows(fn () => $result->data('updateUser'), ExpectationFailedException::class);
+	}
+
+	#[Test]
+	public function executesGraphQLSubscriptionAndAssertsSuccessfulResult(): void
+	{
+		$this->actingAs($auth = UserFactory::new()->make(['id' => 123]));
+
+		$result = $this
+			->graphQL(
+				<<<'GRAPHQL'
+					subscription {
+						newUser {
+							name
+						}
+					}
+					GRAPHQL,
+			)
+			->assertSuccessful();
+
+		$this->app->make(SubscriptionEmitter::class)->emit(SubscriptionChannels::private($auth, 'users.new'), User::dummy());
+
+		$allEmitted = $result->emitted
+			->assertTimes(1)
+			->at(
+				0,
+				fn (TestExecutionResult $result) => $result
+					->assertData([
+						'name' => 'Alex',
+					])
+					->assertData([
+						'name' => 'Alex',
+					], field: 'newUser'),
+			)
+			->all();
+
+		self::assertCount(1, $allEmitted);
+		self::assertContainsOnlyInstancesOf(TestExecutionResult::class, $allEmitted);
+
+		self::assertSame([
+			'name' => 'Alex',
+		], $allEmitted[0]->data());
+		self::assertSame([
+			'name' => 'Alex',
+		], $allEmitted[0]->data('newUser'));
+
+		self::assertThrows(fn () => $allEmitted[0]->data('oldUser'), ExpectationFailedException::class);
 	}
 }

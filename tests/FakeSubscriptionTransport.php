@@ -11,9 +11,6 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 {
 	public const TYPE = 'fake';
 
-	/** @var list<array{ Subscription, array<string, mixed> }> */
-	public array $sent = [];
-
 	public function type(): string
 	{
 		return self::TYPE;
@@ -31,10 +28,7 @@ class FakeSubscriptionTransport implements SubscriptionTransport
 		return now()->toImmutable()->addHour();
 	}
 
-	public function send(Subscription $subscription, array $data): void
-	{
-		$this->sent[] = [$subscription, $data];
-	}
+	public function emit(Subscription $subscription, array $data): void {}
 
 	public function deactivated(Subscription $subscription, ?Throwable $reason = null): void {}
 }

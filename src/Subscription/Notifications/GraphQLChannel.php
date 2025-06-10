@@ -4,9 +4,8 @@ namespace TenantCloud\GraphQLPlatform\Subscription\Notifications;
 
 use Illuminate\Notifications\Notification;
 use RuntimeException;
-use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionChannels;
-use TenantCloud\GraphQLPlatform\Subscription\SubscriptionManager;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionEmitter;
 
 /**
  * A Laravel notifications channel you should use to send new items into subscriptions.
@@ -16,18 +15,14 @@ use TenantCloud\GraphQLPlatform\Subscription\SubscriptionManager;
 class GraphQLChannel
 {
 	public function __construct(
-		private readonly SubscriptionStorage $subscriptionStorage,
-		private readonly SubscriptionManager $subscriptionManager,
+		private readonly SubscriptionEmitter $subscriptionEmitter,
 	) {}
 
 	public function send(mixed $notifiable, Notification $notification): GraphQLMessage
 	{
 		$message = $this->data($notifiable, $notification);
-		$subscriptions = $this->subscriptionStorage->activeSubscriptionsByChannels($this->notifiableChannels($notifiable, $message->channels));
 
-		foreach ($subscriptions as $subscription) {
-			$this->subscriptionManager->send($subscription, $message->root);
-		}
+		$this->subscriptionEmitter->emit($this->notifiableChannels($notifiable, $message->channels), $message->root);
 
 		return $message;
 	}
