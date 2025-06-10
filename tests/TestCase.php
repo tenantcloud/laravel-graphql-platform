@@ -10,6 +10,7 @@ use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
+use TenantCloud\GraphQLPlatform\Testing\FakeSubscriptionTransport;
 use Tests\Fixtures\Valid\TypeMappers\AnyRootTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryContext;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;

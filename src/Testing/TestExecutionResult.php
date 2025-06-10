@@ -19,7 +19,7 @@ class TestExecutionResult extends ExecutionResult
 		?array $data = null,
 		array $errors = [],
 		array $extensions = [],
-		public readonly TestExecutionResultEmitted $emitted = new TestExecutionResultEmitted(
+		public readonly SubscriptionEmitRecorder $subscriptionEmitRecorder = new SubscriptionEmitRecorder(
 		)
 	) {
 		parent::__construct($data, $errors, $extensions);
@@ -27,7 +27,7 @@ class TestExecutionResult extends ExecutionResult
 
 	public static function fromExecutionResult(
 		ExecutionResult $result,
-		TestExecutionResultEmitted $emitted = new TestExecutionResultEmitted(),
+		SubscriptionEmitRecorder $subscriptionEmitRecorder = new SubscriptionEmitRecorder(),
 	): self {
 		$errors = $result->errors;
 
@@ -39,7 +39,7 @@ class TestExecutionResult extends ExecutionResult
 			$result->data,
 			$errors,
 			$result->extensions,
-			$emitted,
+			$subscriptionEmitRecorder,
 		);
 
 		return $testResult
@@ -159,6 +159,33 @@ class TestExecutionResult extends ExecutionResult
 		$errors = $this->toArray()['errors'] ?? [];
 
 		return array_filter($errors, fn (array $error) => ($error['path'][0] ?? null) === $field);
+	}
+
+	public function assertEmittedTimes(int $times): self
+	{
+		Assert::assertCount($times, $this->emitted());
+
+		return $this;
+	}
+
+	/**
+	 * @param callable(self): mixed $assert
+	 */
+	public function assertEmitted(int $index, callable $assert): self
+	{
+		Assert::assertArrayHasKey($index, $this->emitted(), "Subscription data at index #{$index} wasn't emitted.");
+
+		$assert($this->emitted()[$index]);
+
+		return $this;
+	}
+
+	/**
+	 * @return list<self>
+	 */
+	public function emitted(): array
+	{
+		return $this->subscriptionEmitRecorder->all();
 	}
 
 	/**

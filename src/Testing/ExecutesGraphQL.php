@@ -3,9 +3,6 @@
 namespace TenantCloud\GraphQLPlatform\Testing;
 
 use GraphQL\GraphQL;
-use GraphQL\Server\Helper;
-use GraphQL\Server\OperationParams;
-use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -13,9 +10,12 @@ use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\TestResponse;
+use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
+use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 
 /**
  * @mixin TestCase
@@ -30,13 +30,15 @@ trait ExecutesGraphQL
 	 *   - allows properly testing the "successfulness"
 	 *   - allows properly testing subscriptions
 	 *
-	 * @param string               $query     The GraphQL operation to send
-	 * @param array<string, mixed> $variables The variables to include in the query
+	 * @param string                            $query        The GraphQL operation to send
+	 * @param array<string, mixed>              $variables    The variables to include in the query
+	 * @param (callable(Context): Context)|null $applyContext Optionally modify the context
 	 */
 	protected function graphQL(
 		string $query,
 		array $variables = [],
 		string|Schema|null $schema = null,
+		?callable $applyContext = null,
 	): TestExecutionResult {
 		if (!$schema instanceof Schema) {
 			$schema = $schema ?
@@ -44,22 +46,26 @@ trait ExecutesGraphQL
 				$this->app->make(SchemaRegistry::class)->first();
 		}
 
-		$config = $this->app->make(ServerConfig::class);
-		$config->setSchema($schema);
-
-		$params = OperationParams::create([
-			'query'     => $query,
-			'variables' => $variables,
-		]);
-
+		// A hack that correctly resolves the user when it's pulled from the request.
+		// A better idea would be to have it inside the context - an idea for the future.
 		$this->app->make(Request::class)->setUserResolver(fn () => $this->app->make(Guard::class)->user());
 
-		$emitted = TestExecutionResultEmitted::fromEvents($this->app->make(Dispatcher::class));
+		$this->app->make(SubscriptionTransportManager::class)->extend(FakeSubscriptionTransport::TYPE, fn () => new FakeSubscriptionTransport());
 
-		return TestExecutionResult::fromExecutionResult(
-			$this->app->make(Helper::class)->executeOperation($config, $params),
-			$emitted,
+		$subscriptionEmits = SubscriptionEmitRecorder::recordFromEvents($this->app->make(Dispatcher::class));
+
+		$result = $this->app->make(GraphQLPlatform::class)->executeQuery(
+			schema: $schema,
+			source: $query,
+			applyContext: function (Context $context) use ($applyContext) {
+				$context->set($this->app->make(GraphQLPlatformServiceProvider::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN), FakeSubscriptionTransport::TYPE);
+
+				return with($context, $applyContext);
+			},
+			variableValues: $variables,
 		);
+
+		return TestExecutionResult::fromExecutionResult($result, $subscriptionEmits);
 	}
 
 	/**

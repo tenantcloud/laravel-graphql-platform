@@ -12,12 +12,10 @@ use TenantCloud\GraphQLPlatform\Subscription\SubscriptionChannels;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionEmitter;
 use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
 use TenantCloud\GraphQLPlatform\Testing\TestExecutionResult;
-use TenantCloud\GraphQLPlatform\Testing\TestExecutionResultEmitted;
 use Tests\Fixtures\Valid\Models\User;
 
 #[CoversClass(ExecutesGraphQL::class)]
 #[CoversClass(TestExecutionResult::class)]
-#[CoversClass(TestExecutionResultEmitted::class)]
 class TestingTest extends IntegrationTestCase
 {
 	#[Test]
@@ -119,9 +117,9 @@ class TestingTest extends IntegrationTestCase
 
 		$this->app->make(SubscriptionEmitter::class)->emit(SubscriptionChannels::private($auth, 'users.new'), User::dummy());
 
-		$allEmitted = $result->emitted
-			->assertTimes(1)
-			->at(
+		$allEmitted = $result
+			->assertEmittedTimes(1)
+			->assertEmitted(
 				0,
 				fn (TestExecutionResult $result) => $result
 					->assertData([
@@ -131,7 +129,7 @@ class TestingTest extends IntegrationTestCase
 						'name' => 'Alex',
 					], field: 'newUser'),
 			)
-			->all();
+			->emitted();
 
 		self::assertCount(1, $allEmitted);
 		self::assertContainsOnlyInstancesOf(TestExecutionResult::class, $allEmitted);

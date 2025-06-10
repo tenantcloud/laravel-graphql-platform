@@ -3,14 +3,10 @@
 namespace TenantCloud\GraphQLPlatform\Testing;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Traits\Macroable;
-use PHPUnit\Framework\Assert;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionDataEmittedEvent;
 
-class TestExecutionResultEmitted
+class SubscriptionEmitRecorder
 {
-	use Macroable;
-
 	/**
 	 * @param list<TestExecutionResult> $data
 	 */
@@ -18,7 +14,7 @@ class TestExecutionResultEmitted
 		private array $data = [],
 	) {}
 
-	public static function fromEvents(Dispatcher $dispatcher): self
+	public static function recordFromEvents(Dispatcher $dispatcher): self
 	{
 		$that = new self();
 
@@ -27,25 +23,6 @@ class TestExecutionResultEmitted
 		);
 
 		return $that;
-	}
-
-	public function assertTimes(int $times): self
-	{
-		Assert::assertCount($times, $this->data);
-
-		return $this;
-	}
-
-	/**
-	 * @param callable(TestExecutionResult): mixed $assert
-	 */
-	public function at(int $index, callable $assert): self
-	{
-		Assert::assertArrayHasKey($index, $this->data, "Subscription data at index #{$index} wasn't emitted.");
-
-		$assert($this->data[$index]);
-
-		return $this;
 	}
 
 	/**

@@ -32,7 +32,7 @@ use TenantCloud\GraphQLPlatform\Subscription\SubscriptionTransportChangedExcepti
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TenantCloud\GraphQLPlatform\Subscription\UpkeepSubscriptionsCommand;
-use Tests\FakeSubscriptionTransport;
+use TenantCloud\GraphQLPlatform\Testing\FakeSubscriptionTransport;
 use Tests\Fixtures\Valid\Models\User as UserFixture;
 
 #[CoversClass(GraphQLChannel::class)]

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace TenantCloud\GraphQLPlatform\Testing;
 
 use Carbon\CarbonImmutable;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
