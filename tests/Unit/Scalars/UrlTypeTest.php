@@ -72,6 +72,10 @@ class UrlTypeTest extends TestCase
 				'https://google.com',
 			],
 			[
+				Uri::new('https://google.com'),
+				Uri::new('https://google.com'),
+			],
+			[
 				Uri::new('s3://anyschemeallowed'),
 				's3://anyschemeallowed',
 			],

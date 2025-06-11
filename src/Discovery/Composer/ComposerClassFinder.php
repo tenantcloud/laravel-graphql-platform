@@ -40,7 +40,7 @@ class ComposerClassFinder implements ClassFinder
 		private readonly ClassLoader $classLoader,
 		private readonly FileFinder $fileFinder,
 		private readonly ReflectionFactory $reflectionFactory,
-		private readonly array|null $namespaces,
+		private readonly ?array $namespaces,
 		private array $pathFilters = [],
 	) {}
 
@@ -49,7 +49,7 @@ class ComposerClassFinder implements ClassFinder
 	 * @param list<callable(string): bool> $pathFilters
 	 */
 	public static function default(
-		array|null $namespaces,
+		?array $namespaces,
 		array $pathFilters = []
 	): self {
 		static $loader, $fileFinder, $reflectionFactory;
@@ -104,7 +104,7 @@ class ComposerClassFinder implements ClassFinder
 		return $this->hash ??= md5(implode(',', $this->namespaces ?? '__ALL__'));
 	}
 
-	private static function findClassLoader(): ClassLoader
+	public static function findClassLoader(): ClassLoader
 	{
 		foreach (spl_autoload_functions() as $autoloadFn) {
 			if (is_array($autoloadFn) && class_exists(DebugClassLoader::class) && $autoloadFn[0] instanceof DebugClassLoader) {
@@ -221,7 +221,7 @@ class ComposerClassFinder implements ClassFinder
 	}
 
 	/**
-	 * @param array<string, string[]|string> $prefixes
+	 * @param array<string, list<string>|string> $prefixes
 	 *
 	 * @return Generator<string, string>
 	 */

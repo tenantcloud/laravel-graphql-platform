@@ -15,6 +15,4 @@ use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
  * @template-extends CursorConnectable<NodeType, CursorConnectionEdgeType>
  * @template-extends OffsetConnectable<NodeType, OffsetConnectionEdgeType>
  */
-interface Connectable extends CursorConnectable, OffsetConnectable
-{
-}
+interface Connectable extends CursorConnectable, OffsetConnectable {}

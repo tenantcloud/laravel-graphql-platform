@@ -12,7 +12,7 @@ use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Object_;
 use ReflectionMethod;
 use ReflectionProperty;
-use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
+use TenantCloud\GraphQLPlatform\Utility\PhpDocTypes;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
 
 class ModelIDTypeMapper implements RootTypeMapperInterface

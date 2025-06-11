@@ -16,7 +16,7 @@ class DateTimeType extends ScalarType
 
 	public string $name = 'DateTime';
 
-	public string|null $description = 'The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`.';
+	public ?string $description = 'The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`.';
 
 	private static self $INSTANCE;
 

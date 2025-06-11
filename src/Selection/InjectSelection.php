@@ -41,6 +41,9 @@ class InjectSelection implements ParameterAnnotationInterface
 		public readonly ?string $prefix = null
 	) {}
 
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function getTarget(): string
 	{
 		throw new RuntimeException();

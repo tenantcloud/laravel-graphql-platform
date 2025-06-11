@@ -36,7 +36,7 @@ class ModelIDInputFieldMiddleware implements InputFieldMiddlewareInterface
 				$query = $query->lockForUpdate();
 			}
 
-			$model = $query->find($id->val());
+			$model = $query->find($id);
 
 			return $inputFieldDescriptor->getResolver()($source, $model, ...$args);
 		});

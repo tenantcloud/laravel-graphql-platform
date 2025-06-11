@@ -8,7 +8,7 @@ use TheCodingMachine\GraphQLite\Security\AuthenticationServiceInterface;
 class LaravelAuthenticationService implements AuthenticationServiceInterface
 {
 	/**
-	 * @param string[] $guards
+	 * @param list<string> $guards
 	 */
 	public function __construct(
 		private readonly array $guards

@@ -17,7 +17,7 @@ class LaravelCompositeTranslatorAdapter implements TranslatorInterface
 		private readonly Translator $translator,
 	) {}
 
-	public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+	public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
 	{
 		$translated = $this->symfonyTrans($id, $parameters, $domain, $locale);
 

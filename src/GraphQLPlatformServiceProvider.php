@@ -22,6 +22,10 @@ use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
+use Laravel\Octane\Events\RequestReceived;
+use Laravel\Octane\Events\TaskReceived;
+use Laravel\Octane\Events\TickReceived;
+use Laravel\Octane\Octane;
 use PackageVersions\Versions;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -38,15 +42,16 @@ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
-use TenantCloud\GraphQLPlatform\Internal\FixNonNullTypeDefaultValuesInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Context\Context;
+use TenantCloud\GraphQLPlatform\Context\ContextToken;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
+use TenantCloud\GraphQLPlatform\Laravel\Container\GiveNewApplicationInstanceToContainerHandle;
+use TenantCloud\GraphQLPlatform\Laravel\Container\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\PreventLazyLoadingFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\TransactionalFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
-use TenantCloud\GraphQLPlatform\Laravel\Octane\GiveNewApplicationInstanceToContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Scalars\IdType;
@@ -56,14 +61,22 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Selection\InjectSelectionParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLResponseHttpCodeDecider;
+use TenantCloud\GraphQLPlatform\Subscription\Storage\DatabaseSubscriptionStorage;
+use TenantCloud\GraphQLPlatform\Subscription\Storage\SubscriptionStorage;
+use TenantCloud\GraphQLPlatform\Subscription\SubscriptionFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
+use TenantCloud\GraphQLPlatform\Subscription\UpkeepSubscriptionsCommand;
+use TenantCloud\GraphQLPlatform\Utility\FixNonNullTypeDefaultValuesInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\DescribeValidationInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ReflectionConstraintDescriptionProvider;
+use TenantCloud\GraphQLPlatform\Validation\Constraints\ValidGraphQLValidator;
 use TenantCloud\GraphQLPlatform\Validation\LaravelCompositeTranslatorAdapter;
 use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFactory;
 use TheCodingMachine\GraphQLite\AnnotationReader;
 use TheCodingMachine\GraphQLite\Cache\ClassBoundCache;
 use TheCodingMachine\GraphQLite\Cache\FilesSnapshot;
 use TheCodingMachine\GraphQLite\Cache\SnapshotClassBoundCache;
+use TheCodingMachine\GraphQLite\Context\ContextInterface;
 use TheCodingMachine\GraphQLite\Discovery\Cache\ClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\HardClassFinderComputedCache;
 use TheCodingMachine\GraphQLite\Discovery\Cache\SnapshotClassFinderComputedCache;
@@ -92,6 +105,8 @@ use TheCodingMachine\GraphQLite\Types\ArgumentResolver;
 class GraphQLPlatformServiceProvider extends ServiceProvider
 {
 	public const CONTAINER_HANDLE = 'graphql-platform.container_handle';
+	public const VALIDATION_RULES = 'graphql-platform.validation_rules';
+	public const SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN = 'graphql-platform.subscriptions.transport_context_token';
 
 	public function register(): void
 	{
@@ -99,6 +114,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->registerContainer();
 		$this->registerCache();
 		$this->registerUtils();
+		$this->registerSubscriptions();
 		$this->registerSchema();
 		$this->registerHttp();
 		$this->registerConnections();
@@ -118,13 +134,18 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			$this->commands([
 				DebugCommand::class,
 				PrintCommand::class,
+				UpkeepSubscriptionsCommand::class,
 			]);
+
+			$this->publishes([
+				__DIR__ . '/../resources/database/migrations' => database_path('migrations'),
+			], 'graphql-platform-migrations');
 		}
 
-		if (class_exists(\Laravel\Octane\Octane::class)) {
-			$events->listen(\Laravel\Octane\Events\RequestReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
-			$events->listen(\Laravel\Octane\Events\TaskReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
-			$events->listen(\Laravel\Octane\Events\TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+		if (class_exists(Octane::class)) {
+			$events->listen(RequestReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+			$events->listen(TaskReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
+			$events->listen(TickReceived::class, GiveNewApplicationInstanceToContainerHandle::class);
 		}
 
 		$viewFactory->addNamespace(GraphQLPlatform::NAMESPACE, __DIR__ . '/../resources/views');
@@ -207,8 +228,21 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		);
 	}
 
+	private function registerSubscriptions(): void
+	{
+		$this->app->singleton(SubscriptionStorage::class, DatabaseSubscriptionStorage::class);
+		$this->app->singleton(SubscriptionTransportManager::class);
+		$this->app->singleton(
+			self::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN,
+			fn (Application $app) => new ContextToken(
+				fn () => $app->make(GraphQLConfigurator::class)->subscriptionTransportName,
+			)
+		);
+	}
+
 	private function registerSchema(): void
 	{
+		$this->app->bind(ContextInterface::class, Context::class);
 		$this->app->singleton(
 			GraphQLConfigurator::class,
 			fn (Application $app) => new GraphQLConfigurator(devMode: $app->isLocal() || $app->runningUnitTests())
@@ -222,6 +256,13 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			SchemaConfigurator::class,
 			fn (Application $app) => (new SchemaConfigurator())
+				->addFieldMiddleware(new SubscriptionFieldMiddleware(
+					$app->make(SchemaRegistry::class),
+					$app->make(SubscriptionStorage::class),
+					$app->make(self::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN),
+					$app->make(AuthenticationServiceInterface::class),
+					$app->make(SubscriptionTransportManager::class),
+				))
 				->addFieldMiddleware(new TransactionalFieldMiddleware())
 				->addFieldMiddleware(new PreventLazyLoadingFieldMiddleware())
 				->addFieldMiddleware(new SecurityFieldMiddleware(
@@ -256,6 +297,10 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->addParameterMiddleware(new ResolveInfoParameterHandler())
 				->addParameterMiddleware(new ContainerParameterHandler($app->make(self::CONTAINER_HANDLE)))
 		);
+		$this->app->bind(self::VALIDATION_RULES, fn (Application $app) => [
+			...DocumentValidator::allRules(),
+			...$app->make(GraphQLConfigurator::class)->validationRules,
+		]);
 	}
 
 	private function registerHttp(): void
@@ -268,6 +313,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->app->singleton(HttpCodeDeciderInterface::class, GraphQLResponseHttpCodeDecider::class);
 		$this->app->singleton(ServerConfig::class, static function (Application $app) {
 			$serverConfig = new ServerConfig();
+			$serverConfig->setContext($app->factory(ContextInterface::class));
 			$serverConfig->setErrorFormatter([WebonyxErrorHandler::class, 'errorFormatter']);
 			$serverConfig->setErrorsHandler([WebonyxErrorHandler::class, 'errorHandler']);
 			$serverConfig->setDebugFlag(
@@ -275,10 +321,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					DebugFlag::RETHROW_UNSAFE_EXCEPTIONS | DebugFlag::INCLUDE_TRACE :
 					DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
 			);
-			$serverConfig->setValidationRules([
-				...DocumentValidator::allRules(),
-				...$app->make(GraphQLConfigurator::class)->validationRules,
-			]);
+			$serverConfig->setValidationRules($app->make(self::VALIDATION_RULES));
 			$serverConfig->setPersistedQueryLoader(
 				$app->make(GraphQLConfigurator::class)->persistedQueryLoader
 			);
@@ -311,6 +354,14 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 			}
 		);
 		$this->app->bind(MetadataFactoryInterface::class, ValidatorInterface::class);
+
+		$this->app->bind(
+			ValidGraphQLValidator::class,
+			fn (Application $app) => new ValidGraphQLValidator(
+				$app->make(SchemaRegistry::class),
+				$app->make(self::VALIDATION_RULES),
+			)
+		);
 	}
 
 	private function registerConnections(): void

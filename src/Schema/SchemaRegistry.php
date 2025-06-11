@@ -29,7 +29,15 @@ class SchemaRegistry
 		return array_keys($this->schemas);
 	}
 
-	public function first(): ?Schema
+	public function nameFor(Schema $schema): string
+	{
+		return collect($this->schemas)
+			->filter(fn (Lazy $lazySchema) => $lazySchema->isInitialized() && $schema === $lazySchema->value())
+			->keys()
+			->first();
+	}
+
+	public function first(): Schema
 	{
 		return $this->getOrFail(Arr::first($this->names()));
 	}
@@ -41,6 +49,10 @@ class SchemaRegistry
 
 	public function getOrFail(string $name): Schema
 	{
+		if (!isset($this->schemas[$name])) {
+			throw new SchemaNotFoundException($name);
+		}
+
 		return $this->schemas[$name]->value();
 	}
 

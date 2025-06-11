@@ -10,14 +10,14 @@ use TenantCloud\APIVersioning\Version\Version;
 use TenantCloud\APIVersioning\Version\VersionParser;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
+use TenantCloud\GraphQLPlatform\Laravel\Container\LaravelContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
-use TenantCloud\GraphQLPlatform\Laravel\LaravelContainerHandle;
-use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\Pagination\LaravelPaginationTypeMapper;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptions;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptionsParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMapping;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyMappingInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
@@ -132,7 +132,6 @@ class SchemaFactory
 			$this->container->get(AnnotationReader::class),
 			$configurator->defaultConnectionsLimit,
 		);
-		$rootTypeMapper = new LaravelPaginationTypeMapper($rootTypeMapper);
 
 		$lastTopRootTypeMapper->setNext($rootTypeMapper);
 
@@ -141,6 +140,7 @@ class SchemaFactory
 			$propertyMapping,
 			PropertyAccess::createPropertyAccessor(),
 		);
+		$validationExceptions = new ValidationExceptions($propertyPathMapper);
 
 		$fieldMiddlewarePipe = new FieldMiddlewarePipe();
 		$inputFieldMiddlewarePipe = new InputFieldMiddlewarePipe();
@@ -173,16 +173,18 @@ class SchemaFactory
 			$this->container->get(DocBlockFactory::class),
 			$this->container->get(ArgumentResolver::class)
 		));
-		$fieldMiddlewarePipe->pipe(new LaravelPaginationFieldMiddleware($connectionTypeMapper));
 
 		$inputFieldMiddlewarePipe->pipe(new PropertyMappingInputFieldMiddleware($propertyMapping));
 
 		$parameterMiddlewarePipe->pipe(new ValidationParameterMiddleware(
 			$this->container->get(ValidatorInterface::class),
-			$propertyPathMapper,
+			$validationExceptions,
 		));
 		$parameterMiddlewarePipe->pipe(new PrefetchParameterMiddleware(
 			new ParameterizedCallableResolver($fieldsBuilder, $this->container)
+		));
+		$parameterMiddlewarePipe->pipe(new ValidationExceptionsParameterMiddleware(
+			$validationExceptions,
 		));
 
 		foreach ($configurator->fieldMiddlewares as $fieldMiddleware) {

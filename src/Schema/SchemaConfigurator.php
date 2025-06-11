@@ -20,14 +20,14 @@ final class SchemaConfigurator
 	use Cloneable;
 
 	/**
-	 * @param QueryProviderInterface[]         $queryProviders
-	 * @param QueryProviderFactoryInterface[]  $queryProviderFactories
-	 * @param RootTypeMapperFactoryInterface[] $rootTypeMapperFactories
-	 * @param TypeMapperInterface[]            $typeMappers
-	 * @param TypeMapperFactoryInterface[]     $typeMapperFactories
-	 * @param ParameterMiddlewareInterface[]   $parameterMiddlewares
-	 * @param FieldMiddlewareInterface[]       $fieldMiddlewares
-	 * @param InputFieldMiddlewareInterface[]  $inputFieldMiddlewares
+	 * @param list<QueryProviderInterface>         $queryProviders
+	 * @param list<QueryProviderFactoryInterface>  $queryProviderFactories
+	 * @param list<RootTypeMapperFactoryInterface> $rootTypeMapperFactories
+	 * @param list<TypeMapperInterface>            $typeMappers
+	 * @param list<TypeMapperFactoryInterface>     $typeMapperFactories
+	 * @param list<ParameterMiddlewareInterface>   $parameterMiddlewares
+	 * @param list<FieldMiddlewareInterface>       $fieldMiddlewares
+	 * @param list<InputFieldMiddlewareInterface>  $inputFieldMiddlewares
 	 */
 	public function __construct(
 		public readonly ?ClassFinder $classFinder = null,
@@ -52,7 +52,7 @@ final class SchemaConfigurator
 	 * @param list<string>                $namespaces
 	 * @param callable(string): bool|null $pathFilter
 	 */
-	public function usingComposerClassFinder(array $namespaces, callable $pathFilter = null): self
+	public function usingComposerClassFinder(array $namespaces, ?callable $pathFilter = null): self
 	{
 		return $this->usingClassFinder(
 			ComposerClassFinder::default($namespaces, $pathFilter ? [$pathFilter] : []),

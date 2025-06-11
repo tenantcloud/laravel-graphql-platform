@@ -4,6 +4,7 @@ namespace Tests\Unit\Scalars;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use DateTime;
 use DateTimeImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Error\SerializationError;
@@ -81,6 +82,7 @@ class DateTypeTest extends TestCase
 			[new Error('Date cannot represent a non ISO formatted date'), '03/01/2020'],
 
 			[new CarbonImmutable('2020-01-03T00:00:00.000000Z'), '2020-01-03'],
+			[new CarbonImmutable('2020-01-03T00:00:00.000000Z'), new DateTime('2020-01-03')],
 		];
 	}
 }

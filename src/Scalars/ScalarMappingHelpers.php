@@ -9,7 +9,7 @@ use ReflectionProperty;
 
 class ScalarMappingHelpers
 {
-	public static function reflector(ReflectionMethod|ReflectionProperty $reflector, string $argumentName = null): ReflectionMethod|ReflectionProperty|ReflectionParameter
+	public static function reflector(ReflectionMethod|ReflectionProperty $reflector, ?string $argumentName = null): ReflectionMethod|ReflectionProperty|ReflectionParameter
 	{
 		if ($argumentName && $reflector instanceof ReflectionMethod) {
 			$reflector = Arr::first($reflector->getParameters(), fn (ReflectionParameter $parameter) => $argumentName === $parameter->getName());
