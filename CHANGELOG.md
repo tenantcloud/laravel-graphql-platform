@@ -1,3 +1,10 @@
+# [1.0.0-alpha.5](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2025-06-11)
+
+
+### Features
+
+* Stored subscriptions ([#13](https://github.com/tenantcloud/laravel-graphql-platform/issues/13)) ([1bcbbcb](https://github.com/tenantcloud/laravel-graphql-platform/commit/1bcbbcbda7e454b9a9bf41aa0b6bbba2353187c4))
+
 # [1.0.0-alpha.4](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2025-03-13)
 
 
