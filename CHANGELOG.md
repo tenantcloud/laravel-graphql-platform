@@ -1,3 +1,10 @@
+# [1.0.0-alpha.6](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.5...v1.0.0-alpha.6) (2025-06-12)
+
+
+### Bug Fixes
+
+* Allow different type fields on unions to be selected ([#14](https://github.com/tenantcloud/laravel-graphql-platform/issues/14)) ([82c6628](https://github.com/tenantcloud/laravel-graphql-platform/commit/82c6628b37407b12834c95320c1acad89db56373))
+
 # [1.0.0-alpha.5](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2025-06-11)
 
 
