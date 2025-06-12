@@ -56,6 +56,7 @@ use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Scalars\IdType;
 use TenantCloud\GraphQLPlatform\Schema\PrintCommand;
+use TenantCloud\GraphQLPlatform\Schema\Rules\CustomOverlappingFieldsCanBeMerged;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaFactory;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
@@ -110,7 +111,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 	public function register(): void
 	{
-		$this->overwriteGraphQLTypes();
+		$this->overwriteGraphQLTypesAndRules();
 		$this->registerContainer();
 		$this->registerCache();
 		$this->registerUtils();
@@ -161,11 +162,13 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		}
 	}
 
-	private function overwriteGraphQLTypes(): void
+	private function overwriteGraphQLTypesAndRules(): void
 	{
 		Type::overrideStandardTypes([
 			Type::ID => new IdType(),
 		]);
+
+		DocumentValidator::addRule(new CustomOverlappingFieldsCanBeMerged());
 	}
 
 	private function registerUtils(): void
