@@ -3,19 +3,19 @@
 namespace TenantCloud\GraphQLPlatform\Testing;
 
 use GraphQL\GraphQL;
-use GraphQL\Server\Helper;
-use GraphQL\Server\OperationParams;
-use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\TestResponse;
+use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
+use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaRegistry;
 use TenantCloud\GraphQLPlatform\Server\Http\GraphQLController;
-use TheCodingMachine\GraphQLite\Context\Context;
+use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 
 /**
  * @mixin TestCase
@@ -23,15 +23,22 @@ use TheCodingMachine\GraphQLite\Context\Context;
 trait ExecutesGraphQL
 {
 	/**
-	 * Execute a GraphQL operation as if it was sent as a request to the server.
+	 * Execute a GraphQL operation:
+	 *   - doesn't execute HTTP middleware
+	 *   - doesn't allow HTTP headers
+	 *   - doesn't generate HTTP response (status, body etc)
+	 *   - allows properly testing the "successfulness"
+	 *   - allows properly testing subscriptions
 	 *
-	 * @param string               $query     The GraphQL operation to send
-	 * @param array<string, mixed> $variables The variables to include in the query
+	 * @param string                            $query        The GraphQL operation to send
+	 * @param array<string, mixed>              $variables    The variables to include in the query
+	 * @param (callable(Context): Context)|null $applyContext Optionally modify the context
 	 */
 	protected function graphQL(
 		string $query,
 		array $variables = [],
-		string|Schema $schema = null,
+		string|Schema|null $schema = null,
+		?callable $applyContext = null,
 	): TestExecutionResult {
 		if (!$schema instanceof Schema) {
 			$schema = $schema ?
@@ -39,28 +46,35 @@ trait ExecutesGraphQL
 				$this->app->make(SchemaRegistry::class)->first();
 		}
 
-		$serverHelper = $this->app->make(Helper::class);
-
-		$config = $this->app->make(ServerConfig::class);
-		$config->setSchema($schema);
-		$config->setContext(new Context());
-
-		$params = OperationParams::create([
-			'query'     => $query,
-			'variables' => $variables,
-		]);
-
+		// A hack that correctly resolves the user when it's pulled from the request.
+		// A better idea would be to have it inside the context - an idea for the future.
 		$this->app->make(Request::class)->setUserResolver(fn () => $this->app->make(Guard::class)->user());
 
-		return TestExecutionResult::fromExecutionResult(
-			$serverHelper->executeOperation($config, $params)
+		$this->app->make(SubscriptionTransportManager::class)->extend(FakeSubscriptionTransport::TYPE, fn () => new FakeSubscriptionTransport());
+
+		$subscriptionEmits = SubscriptionEmitRecorder::recordFromEvents($this->app->make(Dispatcher::class));
+
+		$result = $this->app->make(GraphQLPlatform::class)->executeQuery(
+			schema: $schema,
+			source: $query,
+			applyContext: function (Context $context) use ($applyContext) {
+				$context->set($this->app->make(GraphQLPlatformServiceProvider::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN), FakeSubscriptionTransport::TYPE);
+
+				return with($context, $applyContext);
+			},
+			variableValues: $variables,
 		);
+
+		return TestExecutionResult::fromExecutionResult($result, $subscriptionEmits);
 	}
 
 	/**
-	 * Execute a GraphQL operation as if it was sent as an HTTP request to the server.
+	 * Execute a GraphQL operation as an HTTP request:
+	 *   - executes HTTP middleware
+	 *   - allows HTTP headers and cookies
+	 *   - allows testing HTTP response
 	 *
-	 * Not recommended unless required to test the HTTP part specifically.
+	 * Generally not recommended, unless you specifically need one of the above.
 	 *
 	 * @param string               $query     The GraphQL operation to send
 	 * @param array<string, mixed> $variables The variables to include in the query
@@ -89,16 +103,16 @@ trait ExecutesGraphQL
 	}
 
 	/**
-	 * Send a multipart form request to the GraphQL endpoint.
+	 * Execute a GraphQL operation as a multipart HTTP request:
+	 *   - in addition to `httpGraphQL`, allows file uploads
 	 *
-	 * Not recommended unless required to test the HTTP part specifically.
+	 * Again, unless you need file uploads specifically, you shouldn't use this.
 	 *
-	 * This is used for file uploads conforming to the specification:
 	 * https://github.com/jaydenseric/graphql-multipart-request-spec
 	 *
 	 * @param array<string, mixed>|array<int, array<string, mixed>> $operations
-	 * @param array<array<int, string>>                             $map
-	 * @param array<UploadedFile>|array<array<mixed>>               $files
+	 * @param list<array<int, string>>                              $map
+	 * @param list<UploadedFile>|list<list<mixed>>                  $files
 	 * @param array<string, mixed>                                  $headers
 	 */
 	protected function httpMultipartGraphQL(

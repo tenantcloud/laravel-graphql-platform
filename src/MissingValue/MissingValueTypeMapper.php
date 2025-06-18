@@ -14,8 +14,8 @@ use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
 use ReflectionMethod;
 use ReflectionProperty;
-use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TenantCloud\GraphQLPlatform\MissingValue;
+use TenantCloud\GraphQLPlatform\Utility\PhpDocTypes;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
 
 /**

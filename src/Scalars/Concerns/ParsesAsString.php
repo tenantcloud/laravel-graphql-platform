@@ -3,6 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Scalars\Concerns;
 
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\Printer;
 
@@ -11,7 +12,7 @@ use GraphQL\Language\Printer;
  */
 trait ParsesAsString
 {
-	public function parseLiteral($valueNode, array $variables = null): string
+	public function parseLiteral(Node $valueNode, ?array $variables = null): string
 	{
 		if ($valueNode instanceof StringValueNode) {
 			return $valueNode->value;

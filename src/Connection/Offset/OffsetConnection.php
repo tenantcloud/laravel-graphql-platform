@@ -9,12 +9,12 @@ namespace TenantCloud\GraphQLPlatform\Connection\Offset;
 interface OffsetConnection
 {
 	/**
-	 * @return NodeType[]
+	 * @return list<NodeType>
 	 */
 	public function nodes(): array;
 
 	/**
-	 * @return EdgeType[]
+	 * @return list<EdgeType>
 	 */
 	public function edges(): array;
 }

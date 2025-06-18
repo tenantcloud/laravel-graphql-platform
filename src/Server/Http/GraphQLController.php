@@ -15,7 +15,6 @@ use Illuminate\Support\Arr;
 use RuntimeException;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use TheCodingMachine\GraphQLite\Context\Context;
 use TheCodingMachine\GraphQLite\Http\HttpCodeDeciderInterface;
 
 use function array_map;
@@ -33,12 +32,11 @@ class GraphQLController
 	) {}
 
 	/**
-	 * @param OperationParams|OperationParams[] $parsedBody
+	 * @param OperationParams|list<OperationParams> $parsedBody
 	 */
 	private function handlePsr7Request(Schema $schema, ServerConfig $config, array|OperationParams $parsedBody): JsonResponse
 	{
 		$config->setSchema($schema);
-		$config->setContext(new Context());
 
 		$result = match (true) {
 			is_array($parsedBody) => $this->serverHelper->executeBatch($config, $parsedBody),
@@ -55,6 +53,8 @@ class GraphQLController
 			);
 		}
 
+		// Ignored coverage as this functionality is currently hard disabled.
+		// @codeCoverageIgnoreStart
 		if (is_array($result)) {
 			$statusCodes = array_map($this->httpCodeDecider->decideHttpStatusCode(...), $result);
 			$anySucceeded = (bool) Arr::first($statusCodes, fn (int $code) => $code < 300);
@@ -67,6 +67,7 @@ class GraphQLController
 				]
 			);
 		}
+		// @codeCoverageIgnoreEnd
 
 		throw new RuntimeException('Unexpected response from StandardServer::executePsrRequest');
 	}

@@ -1,3 +1,31 @@
+# [1.0.0-alpha.7](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.6...v1.0.0-alpha.7) (2025-06-18)
+
+
+### Bug Fixes
+
+* psr-http-message-bridge v7 ([ac36450](https://github.com/tenantcloud/laravel-graphql-platform/commit/ac36450bb01ae1ab7cf8cf903a85f59b53dd4860))
+
+# [1.0.0-alpha.6](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.5...v1.0.0-alpha.6) (2025-06-12)
+
+
+### Bug Fixes
+
+* Allow different type fields on unions to be selected ([#14](https://github.com/tenantcloud/laravel-graphql-platform/issues/14)) ([82c6628](https://github.com/tenantcloud/laravel-graphql-platform/commit/82c6628b37407b12834c95320c1acad89db56373))
+
+# [1.0.0-alpha.5](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2025-06-11)
+
+
+### Features
+
+* Stored subscriptions ([#13](https://github.com/tenantcloud/laravel-graphql-platform/issues/13)) ([1bcbbcb](https://github.com/tenantcloud/laravel-graphql-platform/commit/1bcbbcbda7e454b9a9bf41aa0b6bbba2353187c4))
+
+# [1.0.0-alpha.4](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2025-03-13)
+
+
+### Features
+
+* New scalar types and some general improvements ([#12](https://github.com/tenantcloud/laravel-graphql-platform/issues/12)) ([b9c1bb3](https://github.com/tenantcloud/laravel-graphql-platform/commit/b9c1bb340296365feddcd8f2e0297065cf41b13a))
+
 # [1.0.0-alpha.3](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.2...v1.0.0-alpha.3) (2025-02-28)
 
 

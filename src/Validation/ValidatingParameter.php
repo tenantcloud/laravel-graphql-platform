@@ -6,7 +6,7 @@ use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use TenantCloud\GraphQLPlatform\Validation\PathMapping\PropertyPathMapper;
+use TenantCloud\GraphQLPlatform\Validation\Exceptions\ValidationExceptions;
 use TheCodingMachine\GraphQLite\Parameters\InputTypeParameterInterface;
 
 class ValidatingParameter implements InputTypeParameterInterface
@@ -14,13 +14,13 @@ class ValidatingParameter implements InputTypeParameterInterface
 	public function __construct(
 		private readonly InputTypeParameterInterface $delegate,
 		private readonly ValidatorInterface $validator,
-		private readonly PropertyPathMapper $propertyPathMapper,
+		private readonly ValidationExceptions $validationExceptions,
 	) {}
 
 	/**
 	 * @param array<string, mixed> $args
 	 */
-	public function resolve(object|null $source, array $args, mixed $context, ResolveInfo $info): mixed
+	public function resolve(?object $source, array $args, mixed $context, ResolveInfo $info): mixed
 	{
 		$value = $this->delegate->resolve($source, $args, $context, $info);
 
@@ -33,7 +33,7 @@ class ValidatingParameter implements InputTypeParameterInterface
 		$violations = $this->validator->validate($value);
 
 		if ($violations->count() > 0) {
-			throw new ValidationFailedException($violations, $this->delegate->getName(), $this->propertyPathMapper);
+			throw $this->validationExceptions->forViolations($this->delegate->getName(), $violations);
 		}
 
 		return $value;

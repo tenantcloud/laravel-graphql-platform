@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
+use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Object_;
 use ReflectionMethod;
@@ -179,7 +180,7 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 			});
 	}
 
-	private function getDocBlocReturnType(DocBlock $docBlock, ReflectionMethod $refMethod): \phpDocumentor\Reflection\Type|null
+	private function getDocBlocReturnType(DocBlock $docBlock, ReflectionMethod $refMethod): ?Type
 	{
 		/** @var array<int, Return_> $returnTypeTags */
 		$returnTypeTags = $docBlock->getTagsByName('return');
@@ -196,9 +197,9 @@ class ConnectionFieldMiddleware implements FieldMiddlewareInterface
 		return $docBlockReturnType;
 	}
 
-	private function getDocBlockPropertyType(DocBlock $docBlock, ReflectionProperty $refProperty): \phpDocumentor\Reflection\Type|null
+	private function getDocBlockPropertyType(DocBlock $docBlock, ReflectionProperty $refProperty): ?Type
 	{
-		/** @var Var_[] $varTags */
+		/** @var list<Var_> $varTags */
 		$varTags = $docBlock->getTagsByName('var');
 
 		if (!$varTags) {

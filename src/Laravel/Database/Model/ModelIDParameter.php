@@ -29,7 +29,7 @@ class ModelIDParameter implements InputTypeParameterInterface
 			$query->lockForUpdate();
 		}
 
-		return $query->findOrFail($id->val());
+		return $query->findOrFail($id);
 	}
 
 	public function getType(): InputType&Type

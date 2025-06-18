@@ -14,6 +14,9 @@ class ModelID implements MiddlewareAnnotationInterface, ParameterAnnotationInter
 		public readonly ?bool $lockForUpdate = null
 	) {}
 
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function getTarget(): string
 	{
 		throw new RuntimeException();

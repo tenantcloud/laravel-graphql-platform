@@ -7,6 +7,7 @@ use Carbon\CarbonInterval;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\OutputType;
@@ -20,7 +21,6 @@ use phpDocumentor\Reflection\Types\String_;
 use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
-use TenantCloud\GraphQLPlatform\Internal\PhpDocTypes;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\CountryCode;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Currency;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Date;
@@ -29,6 +29,7 @@ use TenantCloud\GraphQLPlatform\Scalars\Hints\HexColor;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\ID;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Markdown;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\PhoneNumber;
+use TenantCloud\GraphQLPlatform\Utility\PhpDocTypes;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
 
 /**
@@ -53,18 +54,19 @@ class ScalarsRootTypeMapper implements RootTypeMapperInterface
 	public function mapNameToType(string $typeName): NamedType&GraphQLType
 	{
 		return match ($typeName) {
-			CountryCodeType::instance()->name  => CountryCodeType::instance(),
-			CurrencyType::instance()->name     => CurrencyType::instance(),
-			DateTimeType::instance()->name     => DateTimeType::instance(),
-			DateType::instance()->name         => DateType::instance(),
-			DurationType::instance()->name     => DurationType::instance(),
-			EmailAddressType::instance()->name => EmailAddressType::instance(),
-			HexColorType::instance()->name     => HexColorType::instance(),
-			GraphQLType::id()->name            => GraphQLType::id(),
-			MarkdownType::instance()->name     => MarkdownType::instance(),
-			PhoneNumberType::instance()->name  => PhoneNumberType::instance(),
-			UrlType::instance()->name          => UrlType::instance(),
-			default                            => $this->next->mapNameToType($typeName),
+			CountryCodeType::instance()->name     => CountryCodeType::instance(),
+			CurrencyType::instance()->name        => CurrencyType::instance(),
+			DateTimeType::instance()->name        => DateTimeType::instance(),
+			DateType::instance()->name            => DateType::instance(),
+			DurationType::instance()->name        => DurationType::instance(),
+			EmailAddressType::instance()->name    => EmailAddressType::instance(),
+			GraphQLDocumentType::instance()->name => GraphQLDocumentType::instance(),
+			HexColorType::instance()->name        => HexColorType::instance(),
+			GraphQLType::id()->name               => GraphQLType::id(),
+			MarkdownType::instance()->name        => MarkdownType::instance(),
+			PhoneNumberType::instance()->name     => PhoneNumberType::instance(),
+			UrlType::instance()->name             => UrlType::instance(),
+			default                               => $this->next->mapNameToType($typeName),
 		};
 	}
 
@@ -110,12 +112,11 @@ class ScalarsRootTypeMapper implements RootTypeMapperInterface
 		}
 
 		return match (PhpDocTypes::className($type)) {
-			DateTimeInterface::class, DateTimeImmutable::class, CarbonImmutable::class => (function () use ($reflector) {
-				return $reflector->getAttributes(Date::class) ?
+			DateTimeInterface::class, DateTimeImmutable::class, CarbonImmutable::class => (fn () => $reflector->getAttributes(Date::class) ?
 					DateType::instance() :
-					DateTimeType::instance();
-			})(),
+					DateTimeType::instance())(),
 			DateInterval::class, CarbonInterval::class => DurationType::instance(),
+			DocumentNode::class => GraphQLDocumentType::instance(),
 			UriInterface::class, Uri::class => UrlType::instance(),
 
 			default => null,

@@ -7,9 +7,11 @@ use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Scalars\DateTimeType;
 use TenantCloud\GraphQLPlatform\Scalars\DateType;
 use TenantCloud\GraphQLPlatform\Scalars\DurationType;
+use TenantCloud\GraphQLPlatform\Scalars\ScalarMappingHelpers;
 use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 
 #[CoversClass(ScalarsRootTypeMapper::class)]
+#[CoversClass(ScalarMappingHelpers::class)]
 #[CoversClass(DateType::class)]
 #[CoversClass(DateTimeType::class)]
 #[CoversClass(DurationType::class)]
