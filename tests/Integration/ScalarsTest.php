@@ -22,7 +22,7 @@ class ScalarsTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						firstUser {
 							somethingAfter
@@ -30,7 +30,7 @@ class ScalarsTest extends IntegrationTestCase
 							date
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -45,7 +45,7 @@ class ScalarsTest extends IntegrationTestCase
 	{
 		$response = $this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation ($data: CreateUserDataInput!) {
 						createUser(
 							data: $data
@@ -54,7 +54,7 @@ class ScalarsTest extends IntegrationTestCase
 							somethingAfter
 						}
 					}
-					GRAPHQL,
+					EOD,
 				['data' => [
 					'name'           => 'Alex',
 					'createdAt'      => '2020-01-03T03:45:00-08:15',

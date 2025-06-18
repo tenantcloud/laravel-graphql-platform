@@ -31,12 +31,12 @@ class GraphQLDocumentTypeTest extends TestCase
 		yield from [
 			[new SerializationError('GraphQLDocument cannot represent a non DocumentNode value: 123'), 123],
 			[
-				<<<'GRAPHQL'
+				<<<'EOD'
 					{
 					  id
 					}
 
-					GRAPHQL,
+					EOD,
 				Parser::parse('query { id }'),
 			],
 		];

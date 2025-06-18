@@ -58,13 +58,13 @@ class SubscriptionsTest extends IntegrationTestCase
 
 		$result = $this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					subscription {
 						newUser {
 							name
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertJson([
@@ -289,13 +289,13 @@ class SubscriptionsTest extends IntegrationTestCase
 		$result = $this->app->make(GraphQLPlatform::class)
 			->executeQuery(
 				schema: $this->app->make(SchemaRegistry::class)->first(),
-				source: <<<'GRAPHQL'
+				source: <<<'EOD'
 					subscription {
 						newUser {
 							name
 						}
 					}
-					GRAPHQL,
+					EOD,
 				applyContext: function (Context $context) use ($transport): Context {
 					$context->set($this->app->make(GraphQLPlatformServiceProvider::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN), $transport->type());
 

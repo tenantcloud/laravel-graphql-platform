@@ -26,13 +26,13 @@ class VersionsTest extends TestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						versionedField(data: {
 							id: 123
 						})
 					}
-					GRAPHQL,
+					EOD,
 				headers: ['Version' => '1'],
 			)
 			->assertOk()
@@ -48,13 +48,13 @@ class VersionsTest extends TestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						versionedField(data: {
 							id: "String"
 						})
 					}
-					GRAPHQL,
+					EOD,
 				headers: ['Version' => '2'],
 			)
 			->assertOk()
@@ -70,13 +70,13 @@ class VersionsTest extends TestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						versionedField(data: {
 							id: "String"
 						})
 					}
-					GRAPHQL,
+					EOD,
 				headers: ['Version' => 'latest'],
 			)
 			->assertOk()
@@ -92,13 +92,13 @@ class VersionsTest extends TestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						versionedField(data: {
 							id: "String"
 						})
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertOk()
 			->assertJson([
@@ -113,13 +113,13 @@ class VersionsTest extends TestCase
 	{
 		$this
 			->httpGraphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						versionedField(data: {
 							id: "String"
 						})
 					}
-					GRAPHQL,
+					EOD,
 				headers: ['Version' => '3'],
 			)
 			->assertBadRequest()

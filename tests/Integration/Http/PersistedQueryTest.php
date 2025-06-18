@@ -22,11 +22,11 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80',
-				'query'   => <<<'GRAPHQL'
+				'query'   => <<<'EOD'
 					query {
 						firstUser { name }
 					}
-					GRAPHQL,
+					EOD,
 			])
 			->assertSuccessful()
 			->assertJson([
@@ -57,11 +57,11 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 		$this
 			->postJson($this->endpoint, [
 				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80123123',
-				'query'   => <<<'GRAPHQL'
+				'query'   => <<<'EOD'
 					query {
 						firstUser { name }
 					}
-					GRAPHQL,
+					EOD,
 			])
 			->assertBadRequest()
 			->assertJson([

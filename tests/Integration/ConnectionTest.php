@@ -28,7 +28,7 @@ class ConnectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						offsetConnectable(limit: 3, offset: 10) {
 							nodes {
@@ -42,7 +42,7 @@ class ConnectionTest extends IntegrationTestCase
 							totalCount
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -63,7 +63,7 @@ class ConnectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						offsetConnectable {
 							nodes {
@@ -71,7 +71,7 @@ class ConnectionTest extends IntegrationTestCase
 							}
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -86,7 +86,7 @@ class ConnectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						cursorConnectable(first: 3) {
 							nodes {
@@ -106,7 +106,7 @@ class ConnectionTest extends IntegrationTestCase
 							}
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -133,7 +133,7 @@ class ConnectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						connectable {
 							offset(limit: 3) {
@@ -152,7 +152,7 @@ class ConnectionTest extends IntegrationTestCase
 							}
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([

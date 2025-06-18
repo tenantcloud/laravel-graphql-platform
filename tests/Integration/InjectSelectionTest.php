@@ -18,7 +18,7 @@ class InjectSelectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						fullSelection {
 							users {
@@ -29,7 +29,7 @@ class InjectSelectionTest extends IntegrationTestCase
 							selection
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -49,7 +49,7 @@ class InjectSelectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						nestedSelection {
 							users {
@@ -60,7 +60,7 @@ class InjectSelectionTest extends IntegrationTestCase
 							selection
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -75,13 +75,13 @@ class InjectSelectionTest extends IntegrationTestCase
 	{
 		$this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						nestedSelection {
 							selection
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([

@@ -23,13 +23,13 @@ class TestingTest extends IntegrationTestCase
 	{
 		$result = $this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					query {
 						firstUser {
 							name
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful()
 			->assertData([
@@ -56,7 +56,7 @@ class TestingTest extends IntegrationTestCase
 	{
 		$result = $this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					mutation {
 						updateUser(
 							data: {
@@ -67,7 +67,7 @@ class TestingTest extends IntegrationTestCase
 							name
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertErrors($expectedErrors = [
 				[
@@ -105,13 +105,13 @@ class TestingTest extends IntegrationTestCase
 
 		$result = $this
 			->graphQL(
-				<<<'GRAPHQL'
+				<<<'EOD'
 					subscription {
 						newUser {
 							name
 						}
 					}
-					GRAPHQL,
+					EOD,
 			)
 			->assertSuccessful();
 
