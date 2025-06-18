@@ -1,3 +1,10 @@
+# [1.0.0-alpha.7](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.6...v1.0.0-alpha.7) (2025-06-18)
+
+
+### Bug Fixes
+
+* psr-http-message-bridge v7 ([ac36450](https://github.com/tenantcloud/laravel-graphql-platform/commit/ac36450bb01ae1ab7cf8cf903a85f59b53dd4860))
+
 # [1.0.0-alpha.6](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.5...v1.0.0-alpha.6) (2025-06-12)
 
 
