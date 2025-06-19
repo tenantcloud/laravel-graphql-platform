@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Fixtures\Controllers;
+namespace Tests\Fixtures\Valid\Controllers;
 
 use TenantCloud\GraphQLPlatform\Resolve\ResolveKey;
-use Tests\Fixtures\Models\Nested;
+use Tests\Fixtures\Valid\Models\Nested;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 class ResolveController
