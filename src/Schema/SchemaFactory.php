@@ -38,6 +38,7 @@ use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewarePipe;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\PrefetchParameterMiddleware;
 use TheCodingMachine\GraphQLite\Mappers\RecursiveTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\BaseTypeMapper;
+use TheCodingMachine\GraphQLite\Mappers\Root\CallableTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\CompoundTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\EnumTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\FinalRootTypeMapper;
@@ -85,6 +86,7 @@ class SchemaFactory
 		$topRootTypeMapper = new NullableTypeMapperAdapter($lastTopRootTypeMapper);
 		$topRootTypeMapper = new MissingValueTypeMapper($topRootTypeMapper);
 		$topRootTypeMapper = new VoidTypeMapper($topRootTypeMapper);
+		$topRootTypeMapper = new CallableTypeMapper($topRootTypeMapper, $lastTopRootTypeMapper);
 
 		$errorRootTypeMapper = new FinalRootTypeMapper($recursiveTypeMapper);
 
