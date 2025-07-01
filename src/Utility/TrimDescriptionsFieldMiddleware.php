@@ -11,7 +11,7 @@ class TrimDescriptionsFieldMiddleware implements FieldMiddlewareInterface
 {
 	public function process(QueryFieldDescriptor $queryFieldDescriptor, FieldHandlerInterface $fieldHandler): ?FieldDefinition
 	{
-		$trimmed = trim($queryFieldDescriptor->getComment() ?? '') ?: null;
+		$trimmed = mb_trim($queryFieldDescriptor->getComment() ?? '') ?: null;
 
 		return $fieldHandler->handle(
 			$queryFieldDescriptor->withComment($trimmed)

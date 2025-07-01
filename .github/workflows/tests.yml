@@ -17,17 +17,18 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                php: [8.2]
-                test-bench: [^8.0]
+                php: [8.4]
+                test-bench: [^10.0]
 
         runs-on: packages
         container: chialab/php:${{ matrix.php }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Composer cache
-              uses: actions/cache@v3
+              uses: actions/cache@v4
+              if: ${{ !env.ACT }}
               with:
                   path: vendor
                   key: composer-${{ hashFiles('composer.json') }}
@@ -43,13 +44,14 @@ jobs:
     php-cs-fixer:
         name: php-cs-fixer
         runs-on: packages
-        container: chialab/php:8.2
+        container: chialab/php:8.4
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Composer cache
-              uses: actions/cache@v3
+              uses: actions/cache@v4
+              if: ${{ !env.ACT }}
               with:
                   path: vendor
                   key: composer-${{ hashFiles('composer.json') }}
@@ -58,7 +60,7 @@ jobs:
               run: composer install --prefer-dist --no-progress
 
             - name: Execute php-cs-fixer
-              run: composer cs-fix -- --dry-run --diff --using-cache=no
+              run: PHP_CS_FIXER_IGNORE_ENV=1 composer cs-fix --using-cache=no
 
     prettier:
         name: Prettier
@@ -67,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Run prettier
               uses: actionsx/prettier@v3
@@ -79,17 +81,18 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                php: [8.2]
-                test-bench: [^8.0]
+                php: [8.4]
+                test-bench: [^10.0]
 
         runs-on: packages
         container: chialab/php:${{ matrix.php }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Composer cache
-              uses: actions/cache@v3
+              uses: actions/cache@v4
+              if: ${{ !env.ACT }}
               with:
                   path: vendor
                   key: composer-${{ hashFiles('composer.json') }}
