@@ -1,3 +1,10 @@
+# [1.0.0-alpha.8](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.7...v1.0.0-alpha.8) (2025-07-01)
+
+
+### Bug Fixes
+
+* Update composer.json for Laravel 12 ([4050a99](https://github.com/tenantcloud/laravel-graphql-platform/commit/4050a99893bc73412b11f89effe1fef7974e60e1))
+
 # [1.0.0-alpha.7](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.6...v1.0.0-alpha.7) (2025-06-18)
 
 
