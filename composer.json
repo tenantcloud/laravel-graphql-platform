@@ -18,7 +18,7 @@
 		"symfony/psr-http-message-bridge": "^2.0|^v7.0",
 		"laminas/laminas-diactoros": "^3.0",
 		"tenantcloud/php-standard": "^2.1.1",
-		"tenantcloud/laravel-api-versioning": "^1.0",
+		"tenantcloud/laravel-api-versioning": "^1.0|^2.0",
 		"sokil/php-isocodes": "^4.2",
 		"sokil/php-isocodes-db-only": "^4.0",
 		"giggsey/libphonenumber-for-php": "^8.13",
