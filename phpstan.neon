@@ -17,6 +17,10 @@ parameters:
 		- tests/Fixtures/Invalid
 
 	ignoreErrors:
+		# php-cs-fixer removes annotation like @param Context<*> $param for some reason
+		- '#Method TenantCloud\\GraphQLPlatform\\Context\\Context::has\(\) has parameter \$token with generic class TenantCloud\\GraphQLPlatform\\Context\\ContextToken but does not specify its types: T#'
+		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\DatabaseSubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
+		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\SubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		# PHPStan is wrong here.
 		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
 		- '#Readonly property TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder::\$\w+ is assigned outside of the constructor\.#'

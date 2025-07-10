@@ -13,7 +13,6 @@ interface SubscriptionStorage
 {
 	/**
 	 * @param array<string, mixed> $variables
-	 * @param ChannelSubscription<*> $channelSubscription
 	 */
 	public function subscribe(
 		ChannelSubscription $channelSubscription,
