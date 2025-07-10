@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Closure;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Utils\AST;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +40,9 @@ class GraphQLStoredSubscription extends Model implements Subscription
 		'expires_at' => 'immutable_datetime',
 	];
 
+	/**
+	 * @return MorphTo<Authenticatable&Model, $this>
+	 */
 	public function owner(): MorphTo
 	{
 		return $this->morphTo();
