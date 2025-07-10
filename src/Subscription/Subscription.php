@@ -4,10 +4,12 @@ namespace TenantCloud\GraphQLPlatform\Subscription;
 
 use Closure;
 use GraphQL\Language\AST\DocumentNode;
+use Illuminate\Contracts\Auth\Authenticatable;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 
 /**
  * @property-read string $id
+ * @property-read Authenticatable|null $owner
  * @property-read string $channel
  * @property-read SubscriptionTransport $transport
  * @property-read string $schema_name

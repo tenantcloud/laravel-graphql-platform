@@ -77,7 +77,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 			// existing field and pass it in as-is to GraphQL's executeQuery().
 			$subscription = $this->subscriptionStorage->subscribe(
 				channelSubscription: $channelSubscription->withChannel(
-					SubscriptionChannels::private($this->authenticationService->getUser(), $channelSubscription->channel)
+					SubscriptionChannels::private($owner, $channelSubscription->channel)
 				),
 				transport: $transport,
 				schemaName: $this->schemaRegistry->nameFor($info->schema),
@@ -89,6 +89,7 @@ class SubscriptionFieldMiddleware implements FieldMiddlewareInterface
 				]),
 				variables: $info->variableValues,
 				expiresAt: $transport->calculateExpiration(null),
+				owner: $owner,
 			);
 
 			// We can't return a value of type that doesn't match the output type of the subscription. E.g. if a

@@ -9,6 +9,7 @@ use GraphQL\Utils\AST;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\SerializableClosure\SerializableClosure;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
@@ -37,6 +38,11 @@ class GraphQLStoredSubscription extends Model implements Subscription
 		'variables'  => 'array',
 		'expires_at' => 'immutable_datetime',
 	];
+
+	public function owner(): MorphTo
+	{
+		return $this->morphTo();
+	}
 
 	/**
 	 * @return Attribute<SubscriptionTransport, SubscriptionTransport>

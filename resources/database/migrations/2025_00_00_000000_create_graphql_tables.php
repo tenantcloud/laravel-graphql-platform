@@ -13,6 +13,7 @@ return new class () extends Migration {
 		Schema::create('graphql_subscriptions', function (Blueprint $table) {
 			$table->uuid('id')->primary();
 
+			$table->nullableMorphs('owner');
 			$table->boolean('active')
 				->default(true)
 				->index();
