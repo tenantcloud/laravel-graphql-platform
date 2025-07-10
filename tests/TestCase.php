@@ -74,5 +74,8 @@ abstract class TestCase extends BaseTestCase
 		$this->loadMigrationsFrom(
 			package_path('resources/database/migrations')
 		);
+		$this->loadMigrationsFrom(
+			package_path('tests/Fixtures/Database/migrations')
+		);
 	}
 }

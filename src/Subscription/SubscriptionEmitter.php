@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Subscription;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use TenantCloud\GraphQLPlatform\GraphQLPlatform;
@@ -18,6 +19,7 @@ class SubscriptionEmitter
 		private readonly SchemaRegistry $schemaRegistry,
 		private readonly GraphQLPlatform $graphQLPlatform,
 		private readonly Dispatcher $events,
+		private readonly AuthManager $authManager,
 	) {}
 
 	/**
@@ -46,12 +48,20 @@ class SubscriptionEmitter
 			return;
 		}
 
-		$result = $this->graphQLPlatform->executeQuery(
-			schema: $schema,
-			source: $subscription->document,
-			rootValue: new SubscriptionRootContainer($root, $subscription->resolve),
-			variableValues: $subscription->variables,
-		);
+		if ($subscription->owner) {
+			$this->authManager->guard()->setUser($subscription->owner);
+		}
+
+		try {
+			$result = $this->graphQLPlatform->executeQuery(
+				schema: $schema,
+				source: $subscription->document,
+				rootValue: new SubscriptionRootContainer($root, $subscription->resolve),
+				variableValues: $subscription->variables,
+			);
+		} finally {
+			$this->authManager->forgetGuards();
+		}
 
 		if ($exception = ErrorHelper::malformedError($result)) {
 			$this->subscriptionManager->deactivate($subscription, $exception);
