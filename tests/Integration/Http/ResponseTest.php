@@ -105,7 +105,7 @@ class ResponseTest extends HttpIntegrationTestCase
 			->httpGraphQL(
 				<<<'GRAPHQL'
 					query ($limit: Int!) {
-						listUsers(limit: $limit) {
+						blogs(limit: $limit) {
 							__typename
 						}
 					}
@@ -195,7 +195,9 @@ class ResponseTest extends HttpIntegrationTestCase
 			->httpGraphQL(
 				<<<'GRAPHQL'
 					query {
-						firstUser { name }
+						blogs {
+							__typename
+						}
 					}
 					GRAPHQL,
 			)
@@ -203,8 +205,8 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
 			->assertExactJson([
 				'data' => [
-					'firstUser' => [
-						'name' => 'Alex',
+					'blogs' => [
+						'__typename' => 'BlogOffsetConnection',
 					],
 				],
 			]);

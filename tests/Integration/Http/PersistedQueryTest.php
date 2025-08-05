@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
+use Tests\Fixtures\Database\Factories\BlogFactory;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\CachePersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\NotSupportedPersistedQueryLoader;
 use TheCodingMachine\GraphQLite\Server\PersistedQuery\PersistedQueryIdInvalidException;
@@ -19,33 +20,45 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 	#[Test]
 	public function usesPersistedQuery(): void
 	{
+		BlogFactory::new()->create([
+			'name' => 'Alex Blog',
+		]);
+
 		$this
 			->postJson($this->endpoint, [
-				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80',
+				'queryId' => 'bbee3083a7801d6a57f954cc981944086f60788664b3d0775594dd4a068cb47b',
 				'query'   => <<<'GRAPHQL'
 					query {
-						firstUser { name }
+						blogs {
+							nodes {
+								name
+							}
+						}
 					}
 					GRAPHQL,
 			])
 			->assertSuccessful()
 			->assertJson([
 				'data' => [
-					'firstUser' => [
-						'name' => 'Alex',
+					'blogs' => [
+						'nodes' => [
+							['name' => 'Alex Blog'],
+						],
 					],
 				],
 			]);
 
 		$this
 			->postJson($this->endpoint, [
-				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80',
+				'queryId' => 'bbee3083a7801d6a57f954cc981944086f60788664b3d0775594dd4a068cb47b',
 			])
 			->assertSuccessful()
 			->assertJson([
 				'data' => [
-					'firstUser' => [
-						'name' => 'Alex',
+					'blogs' => [
+						'nodes' => [
+							['name' => 'Alex Blog'],
+						],
 					],
 				],
 			]);
@@ -59,7 +72,11 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 				'queryId' => 'dd5db1d773346021ba20c90f1a0140cc3739063083658ab9a3c88ca4c1cb8b80123123',
 				'query'   => <<<'GRAPHQL'
 					query {
-						firstUser { name }
+						blogs {
+							nodes {
+								name
+							}
+						}
 					}
 					GRAPHQL,
 			])

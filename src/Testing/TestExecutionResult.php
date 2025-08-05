@@ -2,6 +2,7 @@
 
 namespace TenantCloud\GraphQLPlatform\Testing;
 
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Arr;
@@ -95,7 +96,7 @@ class TestExecutionResult extends ExecutionResult
 		return $this;
 	}
 
-	public function assertCount(int $count, string $key, string $field = null): self
+	public function assertCount(int $count, string $key, ?string $field = null): self
 	{
 		$data = $this->data($field);
 
@@ -219,5 +220,15 @@ class TestExecutionResult extends ExecutionResult
 		dump($this->toArray());
 
 		return $this;
+	}
+
+	/**
+	 * Same as parent, but with a different default debug params.
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function toArray(int $debug = DebugFlag::RETHROW_UNSAFE_EXCEPTIONS | DebugFlag::INCLUDE_TRACE): array
+	{
+		return parent::toArray($debug);
 	}
 }

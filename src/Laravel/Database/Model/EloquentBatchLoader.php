@@ -1,8 +1,8 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel\Database;
+namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model;
 
-use GraphQL\Deferred;
+use Closure;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +15,7 @@ class EloquentBatchLoader
 	/** @var array<class-string<Model>, array<string, array{ ids: Collection<int, string|int>, apply: callable(Builder): Builder }>> */
 	private array $defers = [];
 
+	/** @var array<class-string<Model>, array<string, array<string|int, Model>>> */
 	private array $loaded;
 
 	/**
@@ -24,21 +25,21 @@ class EloquentBatchLoader
 	 * @param callable(Builder): Builder $apply
 	 * @param callable(TModel): TReturn  $map
 	 *
-	 * @return callable(): TReturn
+	 * @return Closure(): TReturn
 	 */
 	public function defer(
 		mixed $key,
 		Model $model,
 		callable $apply,
 		callable $map,
-	): callable {
+	): Closure {
 		if (isset($this->loaded)) {
 			throw new RuntimeException('Data for this loader has already been loaded');
 		}
 
 		// Not developer friendly, but at least it's secure - in a sense that we don't have to escape any
 		// of the key parts, join arrays, serialize objects separately etc.
-		$key = $key instanceof ResolveKey ? $key->hash() : md5(serialize($key));
+		$key = self::keyHash($key);
 
 		$modelClass = $model::class;
 		$modelKey = $model->getKey();
@@ -58,29 +59,43 @@ class EloquentBatchLoader
 	}
 
 	/**
-	 * @return callable(): int
+	 * @return Closure(): int
 	 */
-	public function deferCount(Model $model, string $relation, callable $callback = null): callable
-	{
+	public function deferCount(
+		mixed $key,
+		Model $model,
+		string $relation,
+		?callable $callback = null
+	): Closure {
+		$alias = "{$relation}_count";
+
+		if ($callback !== null) {
+			$alias .= '_' . self::keyHash($key);
+		}
+
 		return $this->defer(
-			null,
+			$key,
 			$model,
 			fn (Builder $query) => $callback ?
 				$query->withCount([
-					$relation => $callback,
+					"{$relation} as {$alias}" => $callback,
 				]) :
-				$query->withCount($relation),
-			fn (Model $model) => (int) $model->{"{$relation}_count"}
+				$query->withCount("{$relation} as {$alias}"),
+			fn (Model $model) => (int) $model->{$alias}
 		);
 	}
 
 	/**
-	 * @return callable(): EloquentCollection
+	 * @return Closure(): EloquentCollection<int, Model>
 	 */
-	public function deferWith(Model $model, string $relation, callable $callback = null): callable
-	{
+	public function deferWith(
+		mixed $key,
+		Model $model,
+		string $relation,
+		?callable $callback = null
+	): Closure {
 		return $this->defer(
-			null,
+			$key,
 			$model,
 			fn (Builder $query) => $callback ?
 				$query->with([
@@ -113,7 +128,7 @@ class EloquentBatchLoader
 		// Get the original IDs and apply function, so we can create
 		['ids' => $ids, 'apply' => $apply] = $this->defers[$modelClass][$key];
 
-		$query = $this->newQueryForIds($modelClass, $ids->all());
+		$query = $this->newQueryForIds($modelClass, $ids->unique()->all());
 
 		$similarDefers = $this->findDeferredForSameModels($modelClass, $ids->all());
 
@@ -133,6 +148,8 @@ class EloquentBatchLoader
 	}
 
 	/**
+	 * @param array<int, string|int> $ids
+	 *
 	 * @return array<string, callable(Builder): Builder>
 	 */
 	private function findDeferredForSameModels(string $modelClass, array $ids): array
@@ -140,7 +157,7 @@ class EloquentBatchLoader
 		$result = [];
 
 		foreach ($this->defers[$modelClass] as $key => ['ids' => $candidateIds, 'apply' => $apply]) {
-			if ($ids !== $candidateIds) {
+			if ($ids !== $candidateIds->all()) {
 				continue;
 			}
 
@@ -150,6 +167,10 @@ class EloquentBatchLoader
 		return $result;
 	}
 
+	/**
+	 * @param class-string<Model>    $modelClass
+	 * @param array<int, string|int> $ids
+	 */
 	private function newQueryForIds(string $modelClass, array $ids): Builder
 	{
 		$modelPrototype = new $modelClass();
@@ -157,5 +178,10 @@ class EloquentBatchLoader
 		return $modelPrototype
 			->newModelQuery()
 			->whereKey($ids);
+	}
+
+	private static function keyHash(mixed $key): string
+	{
+		return $key instanceof ResolveKey ? $key->hash() : md5(serialize($key));
 	}
 }

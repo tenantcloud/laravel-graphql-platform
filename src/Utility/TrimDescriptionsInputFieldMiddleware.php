@@ -11,7 +11,7 @@ class TrimDescriptionsInputFieldMiddleware implements InputFieldMiddlewareInterf
 {
 	public function process(InputFieldDescriptor $inputFieldDescriptor, InputFieldHandlerInterface $inputFieldHandler): ?InputField
 	{
-		$trimmed = trim($inputFieldDescriptor->getComment() ?? '') ?: null;
+		$trimmed = mb_trim($inputFieldDescriptor->getComment() ?? '') ?: null;
 
 		return $inputFieldHandler->handle(
 			$inputFieldDescriptor->withComment($trimmed)

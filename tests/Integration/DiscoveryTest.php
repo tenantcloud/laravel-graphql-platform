@@ -9,10 +9,9 @@ use TenantCloud\GraphQLPlatform\Discovery\Composer\File\GlobFileFinder;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\File\MemoizedFileFinder;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\MemoizedReflectionFactory;
 use TenantCloud\GraphQLPlatform\Discovery\Composer\Reflection\NativeReflectionFactory;
-use Tests\Fixtures\Valid\Controllers\UserController;
-use Tests\Fixtures\Valid\Models\CreateUserData;
-use Tests\Fixtures\Valid\Models\UpdateUserData;
-use Tests\Fixtures\Valid\Models\User;
+use Tests\Fixtures\Valid\Controllers\Eloquent\BlogController;
+use Tests\Fixtures\Valid\Models\Eloquent\Blog;
+use Tests\Fixtures\Valid\Models\Eloquent\Data\CreateBlogData;
 use Tests\Fixtures\Valid\TypeMappers\AnyType;
 
 #[CoversClass(GlobFileFinder::class)]
@@ -41,10 +40,9 @@ class DiscoveryTest extends IntegrationTestCase
 
 		self::assertNotContains('Tests\Fixtures\Invalid\SyntaxError', $foundClassNames);
 		self::assertContains(AnyType::class, $foundClassNames);
-		self::assertContains(UpdateUserData::class, $foundClassNames);
-		self::assertContains(CreateUserData::class, $foundClassNames);
-		self::assertContains(User::class, $foundClassNames);
-		self::assertContains(UserController::class, $foundClassNames);
+		self::assertContains(Blog::class, $foundClassNames);
+		self::assertContains(BlogController::class, $foundClassNames);
+		self::assertContains(CreateBlogData::class, $foundClassNames);
 
 		// Iterator is rewindable and finds the exact same classes, in the same orders,
 		// and using the same Reflection instances (thanks to memoization)
@@ -62,11 +60,10 @@ class DiscoveryTest extends IntegrationTestCase
 			$resultWithoutControllers,
 			$result,
 		);
-		self::assertNotContains(UserController::class, $foundClassNamesWithoutControllers);
+		self::assertNotContains(BlogController::class, $foundClassNamesWithoutControllers);
 		self::assertContains(AnyType::class, $foundClassNamesWithoutControllers);
-		self::assertContains(UpdateUserData::class, $foundClassNamesWithoutControllers);
-		self::assertContains(CreateUserData::class, $foundClassNamesWithoutControllers);
-		self::assertContains(User::class, $foundClassNamesWithoutControllers);
+		self::assertContains(Blog::class, $foundClassNamesWithoutControllers);
+		self::assertContains(CreateBlogData::class, $foundClassNamesWithoutControllers);
 	}
 
 	#[Test]

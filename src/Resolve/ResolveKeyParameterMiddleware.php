@@ -16,7 +16,7 @@ class ResolveKeyParameterMiddleware implements ParameterMiddlewareInterface
 	public function mapParameter(
 		ReflectionParameter $parameter,
 		DocBlock $docBlock,
-		Type|null $paramTagType,
+		?Type $paramTagType,
 		ParameterAnnotations $parameterAnnotations,
 		ParameterHandlerInterface $next
 	): ParameterInterface {

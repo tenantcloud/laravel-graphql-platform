@@ -21,7 +21,7 @@ class InjectSelectionTest extends IntegrationTestCase
 				<<<'GRAPHQL'
 					query {
 						fullSelection {
-							users {
+							blogs {
 								nodes {
 									name
 								}
@@ -34,7 +34,7 @@ class InjectSelectionTest extends IntegrationTestCase
 			->assertSuccessful()
 			->assertData([
 				'selection' => [
-					'users' => [
+					'blogs' => [
 						'nodes' => [
 							'name' => true,
 						],
@@ -52,7 +52,7 @@ class InjectSelectionTest extends IntegrationTestCase
 				<<<'GRAPHQL'
 					query {
 						nestedSelection {
-							users {
+							blogs {
 								nodes {
 									name
 								}

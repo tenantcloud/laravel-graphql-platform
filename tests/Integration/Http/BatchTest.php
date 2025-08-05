@@ -22,14 +22,22 @@ class BatchTest extends HttpIntegrationTestCase
 				[
 					'query' => <<<'GRAPHQL'
 						query {
-							firstUser { name }
+							blogs {
+								nodes {
+									id
+								}
+							}
 						}
 						GRAPHQL,
 				],
 				[
 					'query' => <<<'GRAPHQL'
 						query {
-							firstUser { somethingAfter }
+							blogs {
+								nodes {
+									name
+								}
+							}
 						}
 						GRAPHQL,
 				],
@@ -45,14 +53,22 @@ class BatchTest extends HttpIntegrationTestCase
 				[
 					'query' => <<<'GRAPHQL'
 						query {
-							firstUser { name }
+							blogs {
+								nodes {
+									id
+								}
+							}
 						}
 						GRAPHQL,
 				],
 				[
 					'query' => <<<'GRAPHQL'
 						query {
-							firstUser { somethingAfter }
+							blogs {
+								nodes {
+									name
+								}
+							}
 						}
 						GRAPHQL,
 				],
@@ -90,14 +106,22 @@ class BatchTest extends HttpIntegrationTestCase
 					[
 						'query' => <<<'GRAPHQL'
 							query {
-								firstUser { name }
+								blogs {
+									nodes {
+										id
+									}
+								}
 							}
 							GRAPHQL,
 					],
 					[
 						'query' => <<<'GRAPHQL'
 							query {
-								firstUser { somethingAfter }
+								blogs {
+									nodes {
+										name
+									}
+								}
 							}
 							GRAPHQL,
 					],

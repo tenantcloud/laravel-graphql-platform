@@ -14,7 +14,7 @@ class PhpDocTypes
 {
 	public static function className(Object_|Collection $type): string
 	{
-		return ltrim((string) $type->getFqsen(), '\\');
+		return mb_ltrim((string) $type->getFqsen(), '\\');
 	}
 
 	/**

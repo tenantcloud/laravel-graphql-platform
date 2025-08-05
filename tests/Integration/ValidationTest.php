@@ -22,6 +22,8 @@ use TenantCloud\GraphQLPlatform\Validation\SkipMissingValueConstraintValidatorFa
 use TenantCloud\GraphQLPlatform\Validation\ValidatingParameter;
 use TenantCloud\GraphQLPlatform\Validation\ValidationFailedException;
 use TenantCloud\GraphQLPlatform\Validation\ValidationParameterMiddleware;
+use Tests\Fixtures\Database\Factories\BlogFactory;
+use Tests\Fixtures\Database\Factories\PostFactory;
 
 #[CoversClass(ConstraintDescription::class)]
 #[CoversClass(ReflectionConstraintDescriptionProvider::class)]
@@ -48,63 +50,73 @@ class ValidationTest extends IntegrationTestCase
 			->assertSuccessful()
 			->data();
 
-		$type = Arr::first($result['types'], fn (array $data) => $data['name'] === 'UpdateUserDataInput');
+		$updatePostDataType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'UpdatePostDataInput');
 
 		Assert::assertArraySubset([
-			['name' => 'id', 'description' => null],
-			['name' => 'name', 'description' => 'Constraints: Length(max: 255, min: 1), PersonName'],
-			['name' => 'somethingAfter', 'description' => null],
-			['name' => 'fileIds', 'description' => "Constraints: \nAtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])"],
-		], $type['inputFields']);
+			['name' => 'post', 'description' => null],
+			['name' => 'content', 'description' => 'Constraints: Length(max: 255, min: 1), NotEqualTo(value: "Trash")'],
+			['name' => 'readTime', 'description' => null],
+		], $updatePostDataType['inputFields']);
+
+		$tagDataType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'TagDataInput');
+
+		Assert::assertArraySubset([
+			['name' => 'name', 'description' => 'Constraints: Length(max: 20, min: 1)'],
+		], $tagDataType['inputFields']);
 	}
 
 	#[Test]
 	public function validatesInputs(): void
 	{
+		$blog = BlogFactory::new()->create();
+
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					mutation {
-						updateUser(
+					mutation ($blog: ID!) {
+						createPost (
 							data: {
-								id: 123,
-								name: "",
-								fileIds: ["123", "123"],
-								nested: [
-									{ name: "val" },
-									{ name: "something2" }
+								blog: $blog,
+								content: "",
+								tags: [
+									{ name: "s" },
+									{ name: "somethingsomethingsomethingsomething" },
+									{ name: "s" },
+									{ name: "s" },
+									{ name: "s" },
+									{ name: "" },
 								]
 							}
 						) {
-							name
-							somethingAfter
+							id
 						}
 					}
 					GRAPHQL,
+				['blog' => $blog->id]
 			)
 			->assertErrors([
 				[
-					'path'       => ['updateUser'],
+					'path'       => ['createPost'],
 					'message'    => 'Validation failed.',
 					'extensions' => [
 						'errors' => [
 							[
 								'parameter' => 'data',
-								'path'      => ['name'],
+								'path'      => ['tags'],
+								'code'      => '756b1212-697c-468d-a9ad-50dd783bb169',
+								'message'   => 'This collection should contain 5 elements or less.',
+							],
+							[
+								'parameter' => 'data',
+								'path'      => ['tags', '1', 'name'],
+								'code'      => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
+								'message'   => 'This value is too long. It should have 20 characters or less.',
+							],
+							[
+								'parameter' => 'data',
+								'path'      => ['tags', '5', 'name'],
 								'code'      => '9ff3fdc4-b214-49db-8718-39c315e33d45',
 								'message'   => 'This value is too short. It should have 1 character or more.',
-							],
-							[
-								'parameter' => 'data',
-								'path'      => ['fileIds'],
-								'code'      => 'f27e6d6c-261a-4056-b391-6673a623531c',
-								'message'   => 'This value should satisfy at least one of the following constraints: [1] This collection should contain only unique elements. [2] This value should be equal to array.',
-							],
-							[
-								'parameter' => 'data',
-								'path'      => ['nested', '1', 'name'],
-								'code'      => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
-								'message'   => 'This value is too long. It should have 4 characters or less.',
 							],
 						],
 					],
@@ -115,33 +127,45 @@ class ValidationTest extends IntegrationTestCase
 	#[Test]
 	public function validatesSelectedFieldInputs(): void
 	{
+		// Bug: validation is only checked when executing the field, so if there are no items (posts in this case),
+		// then the validation will never be checked. This isn't a huge issue, but definitely a bug.
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					mutation {
-						updateUser(
-							data: {
-								id: 123,
+					query {
+						blogs {
+							nodes {
+								posts {
+									comments (data: {
+										minRating: 11,
+									}) {
+										cursor {
+											nodes {
+												content
+											}
+										}
+									}
+								}
 							}
-						) {
-							name
-							somethingAfter
-							avatar(nest: [{ name: "something2" }], size: 123)
 						}
 					}
 					GRAPHQL,
 			)
 			->assertErrors([
 				[
-					'path'       => ['updateUser', 'avatar'],
+					'path'       => ['blogs', 'nodes', 0, 'posts', 0, 'comments'],
 					'message'    => 'Validation failed.',
 					'extensions' => [
 						'errors' => [
 							[
-								'parameter' => 'nest',
-								'path'      => ['0', 'name'],
-								'code'      => 'd94b19cc-114f-4f44-9cc4-4138e80a87b9',
-								'message'   => 'This value is too long. It should have 4 characters or less.',
+								'parameter' => 'data',
+								'path'      => ['minRating'],
+								'code'      => '04b91c99-a946-4221-afc5-e65ebac401eb',
+								'message'   => 'This value should be between 1 and 5.',
 							],
 						],
 					],
@@ -152,34 +176,37 @@ class ValidationTest extends IntegrationTestCase
 	#[Test]
 	public function allowsThrowingValidationErrorsFromController(): void
 	{
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					mutation {
-						updateUser(
-							data: {
-								id: 123,
-								nested: [
-									{ name: "bobo" },
-								]
-							}
+					mutation ($data: UpdatePostDataInput!) {
+						updatePost(
+							data: $data
 						) {
-							name
+							id
 						}
 					}
 					GRAPHQL,
+				['data' => [
+					'post'     => $post->id,
+					'readTime' => 'PT1337H',
+				]]
 			)
 			->assertErrors([
 				[
-					'path'       => ['updateUser'],
+					'path'       => ['updatePost'],
 					'message'    => 'Validation failed.',
 					'extensions' => [
 						'errors' => [
 							[
 								'parameter' => 'data',
-								'path'      => ['nested', '0', 'name'],
+								'path'      => ['readTime'],
 								'code'      => null,
-								'message'   => 'Name is bobo - dont you see?',
+								'message'   => 'Cannot be equal to 1337 hours :/',
 							],
 						],
 					],

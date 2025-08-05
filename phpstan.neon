@@ -22,6 +22,9 @@ parameters:
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\DatabaseSubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\SubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		# PHPStan is wrong here.
+		- '#Using nullsafe property access "\?->maxLimit" on left side of \?\? is unnecessary. Use -> instead.#'
+		- '#Class TenantCloud\\GraphQLPlatform\\Resolve\\ResolveKey has an uninitialized readonly property \$hash. Assign it in the constructor.#'
+		- '#Readonly property TenantCloud\\GraphQLPlatform\\Resolve\\ResolveKey::\$hash is assigned outside of the constructor.#'
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\GraphQLStoredSubscription::owner\(\) should return Illuminate\\Database\\Eloquent\\Relations\\MorphTo<Illuminate\\Contracts\\Auth\\Authenticatable&Illuminate\\Database\\Eloquent\\Model, \$this\(TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\GraphQLStoredSubscription\)> but returns Illuminate\\Database\\Eloquent\\Relations\\MorphTo<Illuminate\\Database\\Eloquent\\Model, TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\GraphQLStoredSubscription>.#'
 		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
 		- '#Readonly property TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder::\$\w+ is assigned outside of the constructor\.#'
@@ -32,12 +35,12 @@ parameters:
 		- '#Parameter \$schemaRegistry of class TenantCloud\\GraphQLPlatform\\Validation\\Constraints\\ValidGraphQLValidator constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given#'
 		- '#Parameter \#1 \$transport of method Tests\\Integration\\SubscriptionsTest::createSubscription\(\) expects TenantCloud\\GraphQLPlatform\\Subscription\\Transport\\SubscriptionTransport, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given.#'
 		- '#Parameter \#1 \$schemaFactory of class TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaFactory, Mockery\\MockInterface given.#'
-		- '#Parameter \#1 \$users of class Tests\\Fixtures\\Valid\\Models\\SelectionResponse constructor expects TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\User>, TenantCloud\\GraphQLPlatform\\Laravel\\Pagination\\LengthAwarePaginatorOffsetConnectionAdapter<mixed> given.#'
+		- '#Parameter \#1 \$blogs of class Tests\\Fixtures\\Valid\\Models\\SelectionResponse constructor expects TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\Eloquent\\Blog>, TenantCloud\\GraphQLPlatform\\Laravel\\Pagination\\LengthAwarePaginatorOffsetConnectionAdapter<mixed> given.#'
 		# Vendor wrong return type
 		- '#Method TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult::fromExecutionResult\(\) should return TenantCloud\\GraphQLPlatform\\Testing\\TestExecutionResult but returns GraphQL\\Executor\\ExecutionResult\.#i'
 		- '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\ExpectsHigherOrderMessage::#'
 		# Broken in the stupid phpDocumentor library
-		- '#Generic type TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\User> in PHPDoc type for property Tests\\Fixtures\\Valid\\Models\\SelectionResponse::\$users does not specify all template types of interface TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection: NodeType, EdgeType#'
+		- '#Generic type TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\Eloquent\\Blog> in PHPDoc type for property Tests\\Fixtures\\Valid\\Models\\SelectionResponse::\$blogs does not specify all template types of interface TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection: NodeType, EdgeType#'
 		# Vendor inherited without types
 		- '#Method TenantCloud\\GraphQLPlatform\\Validation\\LaravelCompositeTranslatorAdapter::trans\(\) has parameter \$parameters with no value type specified in iterable type array\.#i'
 		-

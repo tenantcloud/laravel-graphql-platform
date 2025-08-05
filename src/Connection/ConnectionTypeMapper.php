@@ -104,7 +104,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		DocBlock $docBlock,
 	): FieldDefinition {
 		$useConnections = $this->useConnectionsAnnotation($reflector);
-		$maxLimit = $useConnections->maxLimit ?? $this->defaultConnectionsLimit;
+		$maxLimit = $useConnections?->maxLimit ?? $this->defaultConnectionsLimit;
 
 		return new FieldDefinition([
 			'name' => 'cursor',
@@ -144,7 +144,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		DocBlock $docBlock,
 	): FieldDefinition {
 		$useConnections = $this->useConnectionsAnnotation($reflector);
-		$maxLimit = $useConnections->maxLimit ?? $this->defaultConnectionsLimit;
+		$maxLimit = $useConnections?->maxLimit ?? $this->defaultConnectionsLimit;
 
 		return new FieldDefinition([
 			'name' => 'offset',
@@ -367,7 +367,7 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		$useConnections = $this->useConnectionsAnnotation($reflector);
 
 		[$docNodeType, $docEdgeType] = PhpDocTypes::genericToTypes($type) + [1 => null];
-		[$nodeType, $nodeName] = $this->guessType($docNodeType, $useConnections->nodeType, $reflector, $docBlockObj);
+		[$nodeType, $nodeName] = $this->guessType($docNodeType, $useConnections?->nodeType, $reflector, $docBlockObj);
 
 		$prefix = $this->guessConnectionPrefix($useConnections, $nodeName);
 		$typeName = "{$prefix}Connectable";
@@ -375,16 +375,16 @@ class ConnectionTypeMapper implements RootTypeMapperInterface
 		return $this->cache[$typeName] ??= $this->connectableCache[$typeName] ??= new ObjectType([
 			'name'   => $typeName,
 			'fields' => fn () => [
-				...($useConnections->cursor ? [$this->cursorConnectionField(
+				...($useConnections?->cursor === false ? [] : [$this->cursorConnectionField(
 					PhpDocTypes::generic(CursorConnection::class, array_filter([$docNodeType, $docEdgeType])),
 					$reflector,
 					$docBlockObj
-				)] : []),
-				...($useConnections->offset ? [$this->offsetConnectionField(
+				)]),
+				...($useConnections?->offset === false ? [] : [$this->offsetConnectionField(
 					PhpDocTypes::generic(OffsetConnection::class, array_filter([$docNodeType, $docEdgeType])),
 					$reflector,
 					$docBlockObj,
-				)] : []),
+				)]),
 			],
 		]);
 	}

@@ -4,80 +4,105 @@ namespace Tests\Integration;
 
 use Illuminate\Testing\Assert;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Orchestra\Testbench\Factories\UserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use TenantCloud\GraphQLPlatform\Subscription\SubscriptionChannels;
-use TenantCloud\GraphQLPlatform\Subscription\SubscriptionEmitter;
 use TenantCloud\GraphQLPlatform\Testing\ExecutesGraphQL;
+use TenantCloud\GraphQLPlatform\Testing\FakeSubscriptionTransport;
+use TenantCloud\GraphQLPlatform\Testing\SubscriptionEmitRecorder;
 use TenantCloud\GraphQLPlatform\Testing\TestExecutionResult;
-use Tests\Fixtures\Valid\Models\User;
+use Tests\Fixtures\Database\Factories\BlogFactory;
+use Tests\Fixtures\Database\Factories\CommentFactory;
+use Tests\Fixtures\Database\Factories\PostFactory;
+use Tests\Fixtures\Database\Factories\UserFactory;
+use Tests\Fixtures\Valid\Notifications\CommentCreatedNotification;
 
 #[CoversClass(ExecutesGraphQL::class)]
+#[CoversClass(FakeSubscriptionTransport::class)]
+#[CoversClass(SubscriptionEmitRecorder::class)]
 #[CoversClass(TestExecutionResult::class)]
 class TestingTest extends IntegrationTestCase
 {
 	#[Test]
 	public function executesGraphQLAndAssertsSuccessfulResult(): void
 	{
+		BlogFactory::new()->create([
+			'name' => 'Alex Blog',
+		]);
+
 		$result = $this
 			->graphQL(
 				<<<'GRAPHQL'
 					query {
-						firstUser {
-							name
+						blogs {
+							nodes {
+								name
+							}
 						}
 					}
 					GRAPHQL,
 			)
 			->assertSuccessful()
+			->assertCount(1, 'nodes')
 			->assertData([
-				'name' => 'Alex',
+				'nodes' => [
+					['name' => 'Alex Blog'],
+				],
 			])
 			->assertData([
-				'name' => 'Alex',
-			], field: 'firstUser')
-			->assertData(fn (AssertableJson $json) => $json->has('name'))
-			->assertData(fn (AssertableJson $json) => $json->has('name'), field: 'firstUser');
+				'nodes' => [
+					['name' => 'Alex Blog'],
+				],
+			], field: 'blogs')
+			->assertData(fn (AssertableJson $json) => $json->has('nodes'))
+			->assertData(fn (AssertableJson $json) => $json->has('nodes'), field: 'blogs');
 
 		self::assertSame([
-			'name' => 'Alex',
+			'nodes' => [
+				['name' => 'Alex Blog'],
+			],
 		], $result->data());
 		self::assertSame([
-			'name' => 'Alex',
-		], $result->data('firstUser'));
+			'nodes' => [
+				['name' => 'Alex Blog'],
+			],
+		], $result->data('blogs'));
 
-		self::assertThrows(fn () => $result->data('secondUser'), ExpectationFailedException::class);
+		self::assertThrows(fn () => $result->data('otherBlogs'), ExpectationFailedException::class);
 	}
 
 	#[Test]
 	public function executesGraphQLAndAssertsErrors(): void
 	{
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$result = $this
 			->graphQL(
 				<<<'GRAPHQL'
-					mutation {
-						updateUser(
-							data: {
-								id: 123,
-								name: "",
-							}
+					mutation ($data: UpdatePostDataInput!) {
+						updatePost(
+							data: $data
 						) {
-							name
+							content
 						}
 					}
 					GRAPHQL,
+				['data' => [
+					'post'    => $post->id,
+					'content' => '',
+				]]
 			)
 			->assertErrors($expectedErrors = [
 				[
-					'path'       => ['updateUser'],
+					'path'       => ['updatePost'],
 					'message'    => 'Validation failed.',
 					'extensions' => [
 						'errors' => [
 							[
 								'parameter' => 'data',
-								'path'      => ['name'],
+								'path'      => ['content'],
 								'code'      => '9ff3fdc4-b214-49db-8718-39c315e33d45',
 								'message'   => 'This value is too short. It should have 1 character or more.',
 							],
@@ -87,15 +112,15 @@ class TestingTest extends IntegrationTestCase
 			]);
 
 		Assert::assertArraySubset($expectedErrors, $result->errors());
-		Assert::assertArraySubset($expectedErrors, $result->errors('updateUser'));
+		Assert::assertArraySubset($expectedErrors, $result->errors('updatePost'));
 
 		self::assertThrows(fn () => $result->assertSuccessful(), ExpectationFailedException::class);
 		self::assertThrows(fn () => $result->assertData([
 			[
-				'path' => ['updateUser'],
+				'path' => ['updatePost'],
 			],
 		]), ExpectationFailedException::class);
-		self::assertThrows(fn () => $result->data('updateUser'), ExpectationFailedException::class);
+		self::assertThrows(fn () => $result->data('updatePost'), ExpectationFailedException::class);
 	}
 
 	#[Test]
@@ -103,19 +128,30 @@ class TestingTest extends IntegrationTestCase
 	{
 		$this->actingAs($auth = UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$result = $this
 			->graphQL(
 				<<<'GRAPHQL'
-					subscription {
-						newUser {
-							name
+					subscription ($id: ID!) {
+						commentCreated (post: $id) {
+							content
 						}
 					}
 					GRAPHQL,
+				['id' => $post->id],
 			)
 			->assertSuccessful();
 
-		$this->app->make(SubscriptionEmitter::class)->emit(SubscriptionChannels::private($auth, 'users.new'), User::dummy());
+		$comment = CommentFactory::new()
+			->forPost($post)
+			->create([
+				'content' => 'test',
+			]);
+
+		$auth->notifyNow(new CommentCreatedNotification($comment));
 
 		$allEmitted = $result
 			->assertEmittedTimes(1)
@@ -123,11 +159,11 @@ class TestingTest extends IntegrationTestCase
 				0,
 				fn (TestExecutionResult $result) => $result
 					->assertData([
-						'name' => 'Alex',
+						'content' => 'test',
 					])
 					->assertData([
-						'name' => 'Alex',
-					], field: 'newUser'),
+						'content' => 'test',
+					], field: 'commentCreated'),
 			)
 			->emitted();
 
@@ -135,12 +171,12 @@ class TestingTest extends IntegrationTestCase
 		self::assertContainsOnlyInstancesOf(TestExecutionResult::class, $allEmitted);
 
 		self::assertSame([
-			'name' => 'Alex',
+			'content' => 'test',
 		], $allEmitted[0]->data());
 		self::assertSame([
-			'name' => 'Alex',
-		], $allEmitted[0]->data('newUser'));
+			'content' => 'test',
+		], $allEmitted[0]->data('commentCreated'));
 
-		self::assertThrows(fn () => $allEmitted[0]->data('oldUser'), ExpectationFailedException::class);
+		self::assertThrows(fn () => $allEmitted[0]->data('oldComment'), ExpectationFailedException::class);
 	}
 }

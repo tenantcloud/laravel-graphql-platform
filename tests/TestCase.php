@@ -11,6 +11,7 @@ use TenantCloud\GraphQLPlatform\GraphQLPlatformServiceProvider;
 use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TenantCloud\GraphQLPlatform\Testing\FakeSubscriptionTransport;
+use Tests\Fixtures\Valid\Models\Eloquent\User;
 use Tests\Fixtures\Valid\TypeMappers\AnyRootTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryContext;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
@@ -67,6 +68,7 @@ abstract class TestCase extends BaseTestCase
 		parent::resolveApplicationConfiguration($app);
 
 		$app['config']->set('app.debug', true);
+		$app['config']->set('auth.providers.users.model', User::class);
 	}
 
 	protected function defineDatabaseMigrations(): void

@@ -11,7 +11,8 @@ use TenantCloud\APIVersioning\Version\VersionParser;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Connection\ConnectionTypeMapper;
 use TenantCloud\GraphQLPlatform\Laravel\Container\LaravelContainerHandle;
-use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDTypeMapper;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID\ModelIDTypeMapper;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\RelationRootTypeMapper;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypeMapper;
 use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 use TenantCloud\GraphQLPlatform\Utility\TrimDescriptionsFieldMiddleware;
@@ -38,7 +39,7 @@ use TheCodingMachine\GraphQLite\Mappers\Parameters\ParameterMiddlewarePipe;
 use TheCodingMachine\GraphQLite\Mappers\Parameters\PrefetchParameterMiddleware;
 use TheCodingMachine\GraphQLite\Mappers\RecursiveTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\BaseTypeMapper;
-use TheCodingMachine\GraphQLite\Mappers\Root\CallableTypeMapper;
+use TheCodingMachine\GraphQLite\Mappers\Root\ClosureTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\CompoundTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\EnumTypeMapper;
 use TheCodingMachine\GraphQLite\Mappers\Root\FinalRootTypeMapper;
@@ -85,8 +86,9 @@ class SchemaFactory
 		$lastTopRootTypeMapper = new LastDelegatingTypeMapper();
 		$topRootTypeMapper = new NullableTypeMapperAdapter($lastTopRootTypeMapper);
 		$topRootTypeMapper = new MissingValueTypeMapper($topRootTypeMapper);
+		$topRootTypeMapper = new RelationRootTypeMapper($topRootTypeMapper, $lastTopRootTypeMapper);
 		$topRootTypeMapper = new VoidTypeMapper($topRootTypeMapper);
-		$topRootTypeMapper = new CallableTypeMapper($topRootTypeMapper, $lastTopRootTypeMapper);
+		$topRootTypeMapper = new ClosureTypeMapper($topRootTypeMapper, $lastTopRootTypeMapper);
 
 		$errorRootTypeMapper = new FinalRootTypeMapper($recursiveTypeMapper);
 

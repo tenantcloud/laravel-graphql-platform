@@ -19,7 +19,7 @@ class ResolveKeyTest extends IntegrationTestCase
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
-					query ($arg2: NestedInput!) {
+					query ($arg2: TagDataInput!) {
 						resolveKey(arg1: true, arg2: $arg2)
 					}
 					GRAPHQL,
@@ -35,6 +35,7 @@ class ResolveKeyTest extends IntegrationTestCase
 						'name' => 'asd',
 					],
 				],
+				'hash' => 'c4487a86fc2da481c9a8913d8e52b86e',
 			]);
 	}
 }

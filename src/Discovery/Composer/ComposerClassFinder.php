@@ -185,7 +185,7 @@ class ComposerClassFinder implements ClassFinder
 					}
 
 					/** @phpstan-var class-string $class */
-					$class = ltrim(
+					$class = mb_ltrim(
 						str_replace(
 							'/',
 							'\\',
@@ -268,7 +268,7 @@ class ComposerClassFinder implements ClassFinder
 			return true;
 		}
 
-		$namespacePrefix = rtrim($namespacePrefix, '\\');
+		$namespacePrefix = mb_rtrim($namespacePrefix, '\\');
 
 		foreach ($namespaces as $namespace) {
 			if (str_starts_with($namespacePrefix, $namespace) || str_starts_with($namespace, $namespacePrefix)) {
