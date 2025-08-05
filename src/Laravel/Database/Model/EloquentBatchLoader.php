@@ -170,14 +170,13 @@ class EloquentBatchLoader
 		ResolveKey|string $key,
 		Model $model,
 		string $relation,
-		string|Expression $column,
 		?callable $callback = null
 	): Closure {
 		return $this->deferAggregate(
 			key: $key,
 			model: $model,
 			relation: $relation,
-			column: $column,
+			column: '*',
 			function: 'exists',
 			map: fn (mixed $aggregate) => (bool) $aggregate,
 			callback: $callback,
