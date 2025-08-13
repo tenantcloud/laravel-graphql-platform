@@ -39,12 +39,20 @@ class RelationTest extends IntegrationTestCase
 				'description' => null,
 				'args'        => [],
 				'type'        => [
-					'kind'   => TypeKind::LIST,
+					'kind'   => TypeKind::NON_NULL,
 					'name'   => null,
 					'ofType' => [
-						'kind'   => TypeKind::OBJECT,
-						'name'   => 'Post',
-						'ofType' => null,
+						'kind'   => TypeKind::LIST,
+						'name'   => null,
+						'ofType' => [
+							'kind'   => TypeKind::NON_NULL,
+							'name'   => null,
+							'ofType' => [
+								'kind'   => TypeKind::OBJECT,
+								'name'   => 'Post',
+								'ofType' => null,
+							],
+						],
 					],
 				],
 			],

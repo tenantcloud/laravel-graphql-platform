@@ -25,7 +25,6 @@ class RelationRootTypeMapper implements RootTypeMapperInterface
 {
 	public function __construct(
 		private readonly RootTypeMapperInterface $next,
-		private readonly RootTypeMapperInterface $topRootTypeMapper,
 	) {}
 
 	public function toGraphQLOutputType(PhpDocType $type, ?OutputType $subType, ReflectionMethod|ReflectionProperty $reflector, DocBlock $docBlockObj): OutputType&GraphQLType
@@ -46,10 +45,10 @@ class RelationRootTypeMapper implements RootTypeMapperInterface
 			throw new CannotMapTypeException('Relation must specify the type of the model it returns like so: /** @return HasMany<User> */');
 		}
 
-		$modelType = $this->topRootTypeMapper->toGraphQLOutputType($modelReflectionType, null, $reflector, $docBlockObj);
+		$modelType = $this->next->toGraphQLOutputType($modelReflectionType, null, $reflector, $docBlockObj);
 
 		return self::isManyRelation($relationClassName) ?
-			GraphQLType::listOf($modelType) :
+			GraphQLType::nonNull(GraphQLType::listOf($modelType)) :
 			$modelType;
 	}
 

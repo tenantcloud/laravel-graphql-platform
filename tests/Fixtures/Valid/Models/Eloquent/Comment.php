@@ -9,7 +9,7 @@ use TheCodingMachine\GraphQLite\Annotations\MagicField;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 
 /**
- * @property int    $id
+ * @property int $id
  * @property string $content
  */
 #[Type]
@@ -26,11 +26,13 @@ class Comment extends Model
 	}
 
 	/**
-	 * @return BelongsTo<Comment, Comment>
+	 * @return BelongsTo<Comment|null, Comment>
+	 * @phpstan-ignore-next-line https://github.com/larastan/larastan/issues/2335
 	 */
 	#[Field]
 	public function parent(): BelongsTo
 	{
+		/** @phpstan-ignore-next-line https://github.com/larastan/larastan/issues/2335 */
 		return $this->belongsTo(self::class);
 	}
 }

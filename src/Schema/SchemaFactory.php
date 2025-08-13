@@ -86,9 +86,9 @@ class SchemaFactory
 		$lastTopRootTypeMapper = new LastDelegatingTypeMapper();
 		$topRootTypeMapper = new NullableTypeMapperAdapter($lastTopRootTypeMapper);
 		$topRootTypeMapper = new MissingValueTypeMapper($topRootTypeMapper);
-		$topRootTypeMapper = new RelationRootTypeMapper($topRootTypeMapper, $lastTopRootTypeMapper);
 		$topRootTypeMapper = new VoidTypeMapper($topRootTypeMapper);
 		$topRootTypeMapper = new ClosureTypeMapper($topRootTypeMapper, $lastTopRootTypeMapper);
+		$topRootTypeMapper = new RelationRootTypeMapper($topRootTypeMapper);
 
 		$errorRootTypeMapper = new FinalRootTypeMapper($recursiveTypeMapper);
 
