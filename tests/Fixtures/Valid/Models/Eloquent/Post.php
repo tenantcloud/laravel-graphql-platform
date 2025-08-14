@@ -9,7 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use TenantCloud\GraphQLPlatform\Connection\Connectable;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\EloquentBatchLoader;
+use TenantCloud\GraphQLPlatform\Resolve\ResolveKey;
 use Tests\Fixtures\Valid\Models\Eloquent\Data\CommentsData;
+use TheCodingMachine\GraphQLite\Annotations\Autowire;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\MagicField;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -50,6 +53,18 @@ class Post extends Model
 	public function comments(): HasMany
 	{
 		return $this->hasMany(Comment::class);
+	}
+
+	/**
+	 * @return \Closure(): int
+	 */
+	#[Field]
+	public function commentsCount(
+		ResolveKey $resolveKey,
+		#[Autowire] EloquentBatchLoader $eloquentBatchLoader,
+	): \Closure
+	{
+		return $eloquentBatchLoader->deferCount($resolveKey, $this, 'comments');
 	}
 
 	/**

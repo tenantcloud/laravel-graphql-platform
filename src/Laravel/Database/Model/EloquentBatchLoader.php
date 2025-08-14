@@ -8,7 +8,6 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use RuntimeException;
 use TenantCloud\GraphQLPlatform\Resolve\ResolveKey;
 
 class EloquentBatchLoader
@@ -34,10 +33,6 @@ class EloquentBatchLoader
 		callable $apply,
 		callable $map,
 	): Closure {
-		if (isset($this->loaded)) {
-			throw new RuntimeException('Data for this loader has already been loaded');
-		}
-
 		// Not developer friendly, but at least it's secure - in a sense that we don't have to escape any
 		// of the key parts, join arrays, serialize objects separately etc.
 		$key = self::keyHash($key);
@@ -270,7 +265,7 @@ class EloquentBatchLoader
 
 		$similarDefers = $this->findDeferredForSameModels($modelClass, $ids->all());
 
-		foreach ([$apply, ...array_values($similarDefers)] as $callback) {
+		foreach ($similarDefers as $callback) {
 			$query = $callback($query);
 		}
 

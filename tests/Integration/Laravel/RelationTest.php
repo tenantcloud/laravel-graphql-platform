@@ -126,6 +126,7 @@ class RelationTest extends IntegrationTestCase
 									id
 									posts {
 										id
+										commentsCount
 									}
 									postsCount
 									boringPostsCount: postsCount(search: "boring")
@@ -156,7 +157,7 @@ class RelationTest extends IntegrationTestCase
 				])
 			);
 
-		self::assertCount(4, $queries);
+		self::assertCount(5, $queries);
 		with($queries->shift(), function (array $log) {
 			self::assertSame('select count(*) as aggregate from "blogs"', $log['query']);
 		});
@@ -168,6 +169,9 @@ class RelationTest extends IntegrationTestCase
 		});
 		with($queries->shift(), function (array $log) {
 			self::assertSame('select * from "posts" where "posts"."blog_id" in (1, 2, 3)', $log['query']);
+		});
+		with($queries->shift(), function (array $log) {
+			self::assertSame('select "posts".*, (select count(*) from "comments" where "posts"."id" = "comments"."post_id") as "comments_count" from "posts" where "posts"."id" in (1, 2, 3, 4, 5, 6, 7)', $log['query']);
 		});
 		self::assertEmpty($queries);
 	}
