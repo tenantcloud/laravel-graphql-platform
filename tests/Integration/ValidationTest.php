@@ -4,7 +4,7 @@ namespace Tests\Integration;
 
 use GraphQL\Type\Introspection;
 use Illuminate\Support\Arr;
-use Illuminate\Testing\Assert;
+use Illuminate\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ConstraintDescription;
@@ -60,9 +60,9 @@ class ValidationTest extends IntegrationTestCase
 
 		$tagDataType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'TagDataInput');
 
-		Assert::assertArraySubset([
+		self::assertThat($tagDataType['inputFields'], new ArraySubset([
 			['name' => 'name', 'description' => 'Constraints: Length(max: 20, min: 1)'],
-		], $tagDataType['inputFields']);
+		]));
 	}
 
 	#[Test]

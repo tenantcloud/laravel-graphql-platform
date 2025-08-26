@@ -22,10 +22,6 @@ parameters:
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\DatabaseSubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\SubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		# PHPStan is wrong here.
-		- '#Using nullsafe property access "\?->maxLimit" on left side of \?\? is unnecessary. Use -> instead.#'
-		- '#Class TenantCloud\\GraphQLPlatform\\Resolve\\ResolveKey has an uninitialized readonly property \$hash. Assign it in the constructor.#'
-		- '#Readonly property TenantCloud\\GraphQLPlatform\\Resolve\\ResolveKey::\$hash is assigned outside of the constructor.#'
-		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\GraphQLStoredSubscription::owner\(\) should return Illuminate\\Database\\Eloquent\\Relations\\MorphTo<Illuminate\\Contracts\\Auth\\Authenticatable&Illuminate\\Database\\Eloquent\\Model, \$this\(TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\GraphQLStoredSubscription\)> but returns Illuminate\\Database\\Eloquent\\Relations\\MorphTo<Illuminate\\Database\\Eloquent\\Model, TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\GraphQLStoredSubscription>.#'
 		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
 		- '#Readonly property TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder::\$\w+ is assigned outside of the constructor\.#'
 		- '#Using nullsafe property access "\?->attributes" on left side of \?\? is unnecessary\. Use -> instead\.#'
@@ -35,7 +31,6 @@ parameters:
 		- '#Parameter \$schemaRegistry of class TenantCloud\\GraphQLPlatform\\Validation\\Constraints\\ValidGraphQLValidator constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given#'
 		- '#Parameter \#1 \$transport of method Tests\\Integration\\SubscriptionsTest::createSubscription\(\) expects TenantCloud\\GraphQLPlatform\\Subscription\\Transport\\SubscriptionTransport, Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\|Mockery\\MockInterface given.#'
 		- '#Parameter \#1 \$schemaFactory of class TenantCloud\\GraphQLPlatform\\Schema\\SchemaRegistry constructor expects TenantCloud\\GraphQLPlatform\\Schema\\SchemaFactory, Mockery\\MockInterface given.#'
-		- '#Parameter \#1 \$blogs of class Tests\\Fixtures\\Valid\\Models\\SelectionResponse constructor expects TenantCloud\\GraphQLPlatform\\Connection\\Offset\\OffsetConnection<Tests\\Fixtures\\Valid\\Models\\Eloquent\\Blog>, TenantCloud\\GraphQLPlatform\\Laravel\\Pagination\\LengthAwarePaginatorOffsetConnectionAdapter<mixed> given.#'
 		- '#Call to method .* of internal class TheCodingMachine\\GraphQLite\\Middlewares\\.*#'
 		- '#Instanceof references internal class TheCodingMachine\\GraphQLite\\Middlewares\\.*#'
 		- '#Return type of method .* has typehint with internal class TheCodingMachine\\GraphQLite\\.*#'

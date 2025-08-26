@@ -7,8 +7,9 @@ use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Testing\Assert;
+use Illuminate\Testing\Constraints\ArraySubset;
 use Illuminate\Testing\Fluent\AssertableJson;
+use PHPUnit\Framework\Assert;
 use ReflectionProperty;
 use TenantCloud\GraphQLPlatform\Subscription\SubscriptionTransportChangedException;
 
@@ -88,7 +89,7 @@ class TestExecutionResult extends ExecutionResult
 			}
 		} elseif (is_array($expected)) {
 			Assert::assertNotNull($data);
-			Assert::assertArraySubset($expected, $data, true);
+			Assert::assertThat($data, new ArraySubset($expected, true));
 		} else {
 			Assert::assertSame($expected, $data);
 		}
@@ -123,7 +124,7 @@ class TestExecutionResult extends ExecutionResult
 				$assert->interacted();
 			}
 		} else {
-			Assert::assertArraySubset($expected, $data, true);
+			Assert::assertThat($data, new ArraySubset($expected, true));
 		}
 
 		return $this;
