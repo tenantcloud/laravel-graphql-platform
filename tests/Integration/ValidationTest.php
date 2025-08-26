@@ -50,12 +50,12 @@ class ValidationTest extends IntegrationTestCase
 
 		$type = Arr::first($result['types'], fn (array $data) => $data['name'] === 'UpdateUserDataInput');
 
-		self::assertThat([
+		self::assertThat($type['inputFields'], new ArraySubset([
 			['name' => 'id', 'description' => null],
 			['name' => 'name', 'description' => 'Constraints: Length(max: 255, min: 1), PersonName'],
 			['name' => 'somethingAfter', 'description' => null],
 			['name' => 'fileIds', 'description' => "Constraints: \nAtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])"],
-		], new ArraySubset($type['inputFields']));
+		]));
 	}
 
 	#[Test]

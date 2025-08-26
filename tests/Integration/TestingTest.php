@@ -86,8 +86,8 @@ class TestingTest extends IntegrationTestCase
 				],
 			]);
 
-		self::assertThat($expectedErrors, new ArraySubset($result->errors()));
-		self::assertThat($expectedErrors, new ArraySubset($result->errors('updateUser')));
+		self::assertThat($result->errors(), new ArraySubset($expectedErrors));
+		self::assertThat($result->errors('updateUser'), new ArraySubset($expectedErrors));
 
 		self::assertThrows(fn () => $result->assertSuccessful(), ExpectationFailedException::class);
 		self::assertThrows(fn () => $result->assertData([

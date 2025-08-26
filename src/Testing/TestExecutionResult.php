@@ -88,7 +88,7 @@ class TestExecutionResult extends ExecutionResult
 			}
 		} elseif (is_array($expected)) {
 			Assert::assertNotNull($data);
-			Assert::assertThat($expected, new ArraySubset($data, true));
+			Assert::assertThat($data, new ArraySubset($expected, true));
 		} else {
 			Assert::assertSame($expected, $data);
 		}
@@ -114,7 +114,7 @@ class TestExecutionResult extends ExecutionResult
 				$assert->interacted();
 			}
 		} else {
-			Assert::assertThat($expected, new ArraySubset($data, true));
+			Assert::assertThat($data, new ArraySubset($expected, true));
 		}
 
 		return $this;
