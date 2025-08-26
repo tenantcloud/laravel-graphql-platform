@@ -15,8 +15,8 @@ use Webmozart\Assert\Assert;
 class CursorPaginatorCursorConnectionEdgeAdapter implements CursorConnectionEdge
 {
 	/**
-	 * @param CursorPaginator<NodeType> $paginator
-	 * @param NodeType                  $item
+	 * @param CursorPaginator<int, NodeType> $paginator
+	 * @param NodeType                       $item
 	 */
 	public function __construct(
 		public readonly CursorPaginator $paginator,

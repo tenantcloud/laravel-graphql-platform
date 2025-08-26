@@ -14,6 +14,7 @@ class SelectionController
 	public function fullSelection(#[InjectSelection] array $selection): SelectionResponse
 	{
 		return new SelectionResponse(
+			/* @phpstan-ignore argument.type */
 			new LengthAwarePaginatorOffsetConnectionAdapter(
 				new LengthAwarePaginatorImpl([], 10, 10),
 			),
@@ -25,6 +26,7 @@ class SelectionController
 	public function nestedSelection(#[InjectSelection('users.nodes')] array $selection): SelectionResponse
 	{
 		return new SelectionResponse(
+			/* @phpstan-ignore argument.type */
 			new LengthAwarePaginatorOffsetConnectionAdapter(
 				new LengthAwarePaginatorImpl([], 10, 10),
 			),

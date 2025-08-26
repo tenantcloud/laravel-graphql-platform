@@ -15,7 +15,7 @@ use TenantCloud\GraphQLPlatform\Connection\ProvidesTotalCount;
 class LengthAwarePaginatorOffsetConnectionAdapter implements OffsetConnection, ProvidesTotalCount
 {
 	/**
-	 * @param LengthAwarePaginator<NodeType> $paginator
+	 * @param LengthAwarePaginator<int, NodeType> $paginator
 	 */
 	public function __construct(
 		public readonly LengthAwarePaginator $paginator,

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\TestResponse;
 use TenantCloud\GraphQLPlatform\Context\Context;
@@ -79,6 +80,8 @@ trait ExecutesGraphQL
 	 * @param string               $query     The GraphQL operation to send
 	 * @param array<string, mixed> $variables The variables to include in the query
 	 * @param array<string, mixed> $headers   HTTP headers to pass to the POST request
+	 *
+	 * @return TestResponse<Response>
 	 */
 	protected function httpGraphQL(
 		string $query,
@@ -114,6 +117,8 @@ trait ExecutesGraphQL
 	 * @param list<array<int, string>>                              $map
 	 * @param list<UploadedFile>|list<list<mixed>>                  $files
 	 * @param array<string, mixed>                                  $headers
+	 *
+	 * @return TestResponse<Response>
 	 */
 	protected function httpMultipartGraphQL(
 		array $operations,

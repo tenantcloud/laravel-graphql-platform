@@ -13,9 +13,17 @@ class MemoizedReflectionFactory implements ReflectionFactory
 		private readonly ReflectionFactory $reflectionFactory,
 	) {}
 
+	/**
+	 * @template TClass of object
+	 *
+	 * @param class-string<TClass> $class
+	 *
+	 * @return ReflectionClass<TClass>|null
+	 */
 	public function getOrNull(string $class): ?ReflectionClass
 	{
 		if (array_key_exists($class, $this->cache)) {
+			/** @var ReflectionClass<TClass>|null */
 			return $this->cache[$class];
 		}
 
