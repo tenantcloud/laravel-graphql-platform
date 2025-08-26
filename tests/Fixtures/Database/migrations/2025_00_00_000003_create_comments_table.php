@@ -18,7 +18,8 @@ return new class () extends Migration {
 			$table->foreignIdFor(Comment::class, 'parent_id')
 				->nullable();
 			$table->text('content');
-			$table->unsignedFloat('rating')
+			$table->float('rating')
+				->unsigned()
 				->nullable();
 			$table->timestamps();
 		});

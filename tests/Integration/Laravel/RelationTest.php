@@ -7,7 +7,7 @@ use GraphQL\Type\TypeKind;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Testing\Assert;
+use Illuminate\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\EloquentBatchLoader;
@@ -33,7 +33,7 @@ class RelationTest extends IntegrationTestCase
 		$blogType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'Blog');
 
 		// List of items
-		Assert::assertArraySubset([
+		self::assertThat($blogType['fields'], new ArraySubset([
 			[
 				'name'        => 'posts',
 				'description' => null,
@@ -56,12 +56,12 @@ class RelationTest extends IntegrationTestCase
 					],
 				],
 			],
-		], $blogType['fields']);
+		]));
 
 		$commentType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'Comment');
 
 		// Single item
-		Assert::assertArraySubset([
+		self::assertThat($commentType['fields'], new ArraySubset([
 			[
 				'name'        => 'parent',
 				'description' => null,
@@ -72,7 +72,7 @@ class RelationTest extends IntegrationTestCase
 					'ofType' => null,
 				],
 			],
-		], $commentType['fields']);
+		]));
 	}
 
 	#[Test]
@@ -153,7 +153,7 @@ class RelationTest extends IntegrationTestCase
 				fn (array $log) => str_starts_with($log['query'], 'select') &&
 				!Str::contains($log['query'], [
 					'from "migrations"',
-					'from sqlite_master',
+					'from "main".sqlite_master',
 				])
 			);
 

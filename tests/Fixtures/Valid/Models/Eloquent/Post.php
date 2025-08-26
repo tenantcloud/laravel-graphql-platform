@@ -40,7 +40,7 @@ class Post extends Model
 	}
 
 	/**
-	 * @return BelongsTo<Blog, Post>
+	 * @return BelongsTo<Blog, $this>
 	 */
 	public function blog(): BelongsTo
 	{
@@ -48,7 +48,7 @@ class Post extends Model
 	}
 
 	/**
-	 * @return HasMany<Comment>
+	 * @return HasMany<Comment, $this>
 	 */
 	public function comments(): HasMany
 	{

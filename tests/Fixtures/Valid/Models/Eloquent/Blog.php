@@ -24,7 +24,7 @@ use TheCodingMachine\GraphQLite\Annotations\Type;
 class Blog extends Model
 {
 	/**
-	 * @return HasMany<Post>
+	 * @return HasMany<Post, $this>
 	 */
 	#[Field]
 	public function posts(): HasMany

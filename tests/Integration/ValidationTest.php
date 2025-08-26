@@ -52,11 +52,11 @@ class ValidationTest extends IntegrationTestCase
 
 		$updatePostDataType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'UpdatePostDataInput');
 
-		Assert::assertArraySubset([
+		self::assertThat($updatePostDataType['inputFields'], new ArraySubset([
 			['name' => 'post', 'description' => null],
 			['name' => 'content', 'description' => 'Constraints: Length(max: 255, min: 1), NotEqualTo(value: "Trash")'],
 			['name' => 'readTime', 'description' => null],
-		], $updatePostDataType['inputFields']);
+		]));
 
 		$tagDataType = Arr::first($result['types'], fn (array $data) => $data['name'] === 'TagDataInput');
 

@@ -22,6 +22,9 @@ parameters:
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\DatabaseSubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		- '#Method TenantCloud\\GraphQLPlatform\\Subscription\\Storage\\SubscriptionStorage::subscribe\(\) has parameter \$channelSubscription with generic class TenantCloud\\GraphQLPlatform\\Subscription\\ChannelSubscription but does not specify its types: TOutput#'
 		# PHPStan is wrong here.
+		- '#Using nullsafe property access "\?->maxLimit" on left side of \?\? is unnecessary. Use -> instead.#'
+		- '#Class TenantCloud\\GraphQLPlatform\\Resolve\\ResolveKey has an uninitialized readonly property \$hash. Assign it in the constructor.#'
+		- '#Readonly property TenantCloud\\GraphQLPlatform\\Resolve\\ResolveKey::\$hash is assigned outside of the constructor.#'
 		- '#Class TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder has an uninitialized readonly property \$\w+\. Assign it in the constructor\.#'
 		- '#Readonly property TenantCloud\\GraphQLPlatform\\Discovery\\Composer\\ComposerClassFinder::\$\w+ is assigned outside of the constructor\.#'
 		- '#Using nullsafe property access "\?->attributes" on left side of \?\? is unnecessary\. Use -> instead\.#'

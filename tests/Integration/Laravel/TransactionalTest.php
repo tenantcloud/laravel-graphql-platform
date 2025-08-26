@@ -4,7 +4,7 @@ namespace Tests\Integration\Laravel;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
-use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -25,7 +25,7 @@ class TransactionalTest extends IntegrationTestCase
 		$events = collect();
 
 		Event::listen(fn (TransactionBeginning $event) => $events->push($event));
-		Event::listen(fn (TransactionCommitting $event) => $events->push($event));
+		Event::listen(fn (TransactionCommitted $event) => $events->push($event));
 		Event::listen(fn (QueryExecuted $event) => $events->push($event));
 
 		$comment = CommentFactory::new()
@@ -45,7 +45,7 @@ class TransactionalTest extends IntegrationTestCase
 
 		$events = $events->filter(
 			fn ($event) => $event instanceof TransactionBeginning ||
-			$event instanceof TransactionCommitting ||
+			$event instanceof TransactionCommitted ||
 			($event instanceof QueryExecuted && str_contains($event->sql, 'select * from "comments" where "comments"."id" = ?')) ||
 			($event instanceof QueryExecuted && str_contains($event->sql, 'delete from "comments" where "id" = ?'))
 		);
@@ -58,7 +58,7 @@ class TransactionalTest extends IntegrationTestCase
 		/* @phpstan-ignore-next-line */
 		self::assertInstanceOf(QueryExecuted::class, $events->shift());
 		/* @phpstan-ignore-next-line */
-		self::assertInstanceOf(TransactionCommitting::class, $events->shift());
+		self::assertInstanceOf(TransactionCommitted::class, $events->shift());
 
 		self::assertEmpty($events);
 	}
