@@ -5,9 +5,11 @@ namespace TenantCloud\GraphQLPlatform\Subscription\Storage;
 use Carbon\CarbonImmutable;
 use GraphQL\Language\AST\DocumentNode;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
 use TenantCloud\GraphQLPlatform\Subscription\Subscription;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
+use Webmozart\Assert\Assert;
 
 class DatabaseSubscriptionStorage implements SubscriptionStorage
 {
@@ -20,6 +22,8 @@ class DatabaseSubscriptionStorage implements SubscriptionStorage
 		?CarbonImmutable $expiresAt = null,
 		?Authenticatable $owner = null,
 	): Subscription {
+		Assert::nullOrIsInstanceOf($owner, Model::class);
+
 		$subscription = new GraphQLStoredSubscription();
 		$subscription->owner()->associate($owner);
 		$subscription->active = true;

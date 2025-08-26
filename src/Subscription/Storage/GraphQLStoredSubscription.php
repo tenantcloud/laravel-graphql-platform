@@ -45,6 +45,7 @@ class GraphQLStoredSubscription extends Model implements Subscription
 	 */
 	public function owner(): MorphTo
 	{
+		/* @phpstan-ignore return.type */
 		return $this->morphTo();
 	}
 

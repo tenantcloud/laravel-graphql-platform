@@ -4,7 +4,7 @@ namespace Tests\Integration;
 
 use GraphQL\Type\Introspection;
 use Illuminate\Support\Arr;
-use Illuminate\Testing\Assert;
+use Illuminate\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Validation\ConstraintDescription\ConstraintDescription;
@@ -50,12 +50,12 @@ class ValidationTest extends IntegrationTestCase
 
 		$type = Arr::first($result['types'], fn (array $data) => $data['name'] === 'UpdateUserDataInput');
 
-		Assert::assertArraySubset([
+		self::assertThat([
 			['name' => 'id', 'description' => null],
 			['name' => 'name', 'description' => 'Constraints: Length(max: 255, min: 1), PersonName'],
 			['name' => 'somethingAfter', 'description' => null],
 			['name' => 'fileIds', 'description' => "Constraints: \nAtLeastOneOf(constraints: [Unique, EqualTo(value: [123, 9999999999, 9999999999, 9999999999, 9999999999])])"],
-		], $type['inputFields']);
+		], new ArraySubset($type['inputFields']));
 	}
 
 	#[Test]

@@ -2,7 +2,7 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Testing\Assert;
+use Illuminate\Testing\Constraints\ArraySubset;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Orchestra\Testbench\Factories\UserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -86,8 +86,8 @@ class TestingTest extends IntegrationTestCase
 				],
 			]);
 
-		Assert::assertArraySubset($expectedErrors, $result->errors());
-		Assert::assertArraySubset($expectedErrors, $result->errors('updateUser'));
+		self::assertThat($expectedErrors, new ArraySubset($result->errors()));
+		self::assertThat($expectedErrors, new ArraySubset($result->errors('updateUser')));
 
 		self::assertThrows(fn () => $result->assertSuccessful(), ExpectationFailedException::class);
 		self::assertThrows(fn () => $result->assertData([

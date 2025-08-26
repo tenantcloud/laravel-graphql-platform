@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use TenantCloud\APIVersioning\APIVersioningServiceProvider;
 use TenantCloud\GraphQLPlatform\GraphQLConfigurator;
@@ -18,6 +19,7 @@ use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
 
 use function Orchestra\Testbench\package_path;
 
+#[WithConfig('app.debug', true)]
 abstract class TestCase extends BaseTestCase
 {
 	use LazilyRefreshDatabase;
@@ -60,13 +62,6 @@ abstract class TestCase extends BaseTestCase
 			APIVersioningServiceProvider::class,
 			GraphQLPlatformServiceProvider::class,
 		];
-	}
-
-	protected function resolveApplicationConfiguration($app): void
-	{
-		parent::resolveApplicationConfiguration($app);
-
-		$app['config']->set('app.debug', true);
 	}
 
 	protected function defineDatabaseMigrations(): void

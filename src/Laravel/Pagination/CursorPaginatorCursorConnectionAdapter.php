@@ -15,7 +15,7 @@ use TenantCloud\GraphQLPlatform\Connection\Cursor\CursorConnectionPageInfo;
 class CursorPaginatorCursorConnectionAdapter implements CursorConnection
 {
 	/**
-	 * @param CursorPaginator<NodeType> $paginator
+	 * @param CursorPaginator<int, NodeType> $paginator
 	 */
 	public function __construct(
 		public readonly CursorPaginator $paginator,

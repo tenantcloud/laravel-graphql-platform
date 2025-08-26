@@ -13,8 +13,8 @@ use TenantCloud\GraphQLPlatform\Connection\Offset\OffsetConnectionEdge;
 class LengthAwarePaginatorOffsetConnectionEdgeAdapter implements OffsetConnectionEdge
 {
 	/**
-	 * @param LengthAwarePaginator<NodeType> $paginator
-	 * @param NodeType                       $item
+	 * @param LengthAwarePaginator<int, NodeType> $paginator
+	 * @param NodeType                            $item
 	 */
 	public function __construct(
 		public readonly LengthAwarePaginator $paginator,
