@@ -1,3 +1,10 @@
+# [1.0.0-alpha.9](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.8...v1.0.0-alpha.9) (2025-08-26)
+
+
+### Features
+
+* Laravel 12 ([#16](https://github.com/tenantcloud/laravel-graphql-platform/issues/16)) ([11bd31f](https://github.com/tenantcloud/laravel-graphql-platform/commit/11bd31fb568591e744404430746c1b9f5b2eef75))
+
 # [1.0.0-alpha.8](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.7...v1.0.0-alpha.8) (2025-07-10)
 
 
