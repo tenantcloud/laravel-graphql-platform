@@ -222,14 +222,4 @@ class TestExecutionResult extends ExecutionResult
 
 		return $this;
 	}
-
-	/**
-	 * Same as parent, but with a different default debug params.
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function toArray(int $debug = DebugFlag::RETHROW_UNSAFE_EXCEPTIONS | DebugFlag::INCLUDE_TRACE): array
-	{
-		return parent::toArray($debug);
-	}
 }
