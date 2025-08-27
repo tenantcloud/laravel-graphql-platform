@@ -1,6 +1,6 @@
 # Eloquent integration
 
-There are some things built specifically for Laravel Eloquent models to make it 
+There are some things built specifically for Laravel Eloquent models to make it
 easier to eager load relations, counts and other aggregations in as few SQL
 queries as possible - the same way you would in a regular API.
 
@@ -34,7 +34,7 @@ queries for every post, it would actually make a single query:
 Now this is what powers the automatic loading of relations under the hood, and allows you
 to do much more complex loads or aggregations. What it is a singleton object that
 allows batching calls on a query builder (like `->with()` or `->withCount()`) and
-returning results from those calls automatically by utilizing 
+returning results from those calls automatically by utilizing
 [GraphQLite's field deferring](https://graphqlite.thecodingmachine.io/docs/type-mapping#promise-mapping).
 
 Here's how it could look:
@@ -60,15 +60,16 @@ class Post {
 ```
 
 Looks a bit clunky. Let's decompose:
-- `@return Closure(): int` is what tells GraphQLite that the field type is `int` - because
-we're returning a count of a relation. However, it can be any other type, the same way
-it could in a regular return type: `@return Closure(): OtherModel`
-- `ResolveKey $resolveKey` is a unique key for that specific field. It's necessary for
-`EloquentBatchLoader` not to mix stuff in more complex scenarios we'll talk about later
-- `#[Autowire] EloquentBatchLoader $eloquentBatchLoader` simply injects the dependency we need
-- `$eloquentBatchLoader->deferCount($resolveKey, $this, 'comments');` basically tells
-the `EloquentBatchLoader` "hey, record this model ($this) for future reference. When asked, 
-load the 'comments' relation on all models of this type, and return the result"
+
+-   `@return Closure(): int` is what tells GraphQLite that the field type is `int` - because
+    we're returning a count of a relation. However, it can be any other type, the same way
+    it could in a regular return type: `@return Closure(): OtherModel`
+-   `ResolveKey $resolveKey` is a unique key for that specific field. It's necessary for
+    `EloquentBatchLoader` not to mix stuff in more complex scenarios we'll talk about later
+-   `#[Autowire] EloquentBatchLoader $eloquentBatchLoader` simply injects the dependency we need
+-   `$eloquentBatchLoader->deferCount($resolveKey, $this, 'comments');` basically tells
+    the `EloquentBatchLoader` "hey, record this model ($this) for future reference. When asked,
+    load the 'comments' relation on all models of this type, and return the result"
 
 How it works under the hood is basically this:
 
@@ -89,7 +90,7 @@ class Post {
 	public function commentsCount(): Closure {
 		// If there are three posts (our model), this will first get executed three times
 		self::$modelsToLoadCommentsCount[] = $this->id;
-		
+
 		return function () {
 			// And only after the above lines was already executed for ALL three posts
 			// will this get executed. At this point we know all models that requested
@@ -101,7 +102,7 @@ class Post {
 					->withCount('comments')
 					->get();
 			}
-			
+
 			// Once the counts were loaded for all models, we can just
 			// find the result we wanted in the first place
 			return self::$modelsToLoadCommentsCountResults
