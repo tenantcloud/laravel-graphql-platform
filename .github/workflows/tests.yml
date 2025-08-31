@@ -60,7 +60,7 @@ jobs:
               run: composer install --prefer-dist --no-progress
 
             - name: Execute php-cs-fixer
-              run: PHP_CS_FIXER_IGNORE_ENV=1 composer cs-fix --using-cache=no
+              run: composer cs-fix -- --dry-run --diff --using-cache=no
 
     prettier:
         name: Prettier
