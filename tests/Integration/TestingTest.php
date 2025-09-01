@@ -124,6 +124,33 @@ class TestingTest extends IntegrationTestCase
 	}
 
 	#[Test]
+	public function executesGraphQLAndAssertsErrorsWithoutField(): void
+	{
+		$result = $this
+			->graphQL(
+				<<<'GRAPHQL'
+					mutation ($data: UpdateUserDataInput!) {
+						updateUser(
+							data: $data
+						) {
+							name
+						}
+					}
+					GRAPHQL,
+				['data' => [
+					'id' => ['invalid scalar'],
+				]]
+			)
+			->assertErrors($expectedErrors = [
+				[
+					'message' => 'Variable "$data" got invalid value ["invalid scalar"] at "data.id"; ID cannot represent a non-string and non-integer value',
+				],
+			]);
+
+		self::assertThat($result->errors(), new ArraySubset($expectedErrors));
+	}
+
+	#[Test]
 	public function executesGraphQLSubscriptionAndAssertsSuccessfulResult(): void
 	{
 		$this->actingAs($auth = UserFactory::new()->make(['id' => 123]));

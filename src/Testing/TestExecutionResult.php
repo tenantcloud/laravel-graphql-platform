@@ -111,9 +111,9 @@ class TestExecutionResult extends ExecutionResult
 	 *
 	 * @param callable|array<mixed, mixed> $expected
 	 */
-	public function assertErrors(callable|array $expected): self
+	public function assertErrors(callable|array $expected, ?string $field = null): self
 	{
-		$data = $this->toArray()['errors'] ?? [];
+		$data = $this->errors($field);
 
 		if (is_callable($expected)) {
 			$assert = AssertableJson::fromArray($data);
@@ -162,14 +162,18 @@ class TestExecutionResult extends ExecutionResult
 				array_map(fn (Error $error) => $error->path[0] ?? null, $this->errors),
 			);
 
-			Assert::assertCount(1, $fieldNames, 'When more than one field result is returned, field name must be specified.');
+			Assert::assertLessThanOrEqual(1, count($fieldNames), 'When more than one field result is returned, field name must be specified.');
 
-			$field = $fieldNames[0];
+			$field = $fieldNames[0] ?? null;
 		}
 
 		$errors = $this->toArray()['errors'] ?? [];
 
-		return array_filter($errors, fn (array $error) => ($error['path'][0] ?? null) === $field);
+		return array_filter($errors, function (array $error) use ($field) {
+			$errorPathFirst = $error['path'][0] ?? null;
+
+			return $errorPathFirst === null || $errorPathFirst === $field;
+		});
 	}
 
 	public function assertEmittedTimes(int $times): self

@@ -1,3 +1,24 @@
+# [1.0.0-alpha.11](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.10...v1.0.0-alpha.11) (2025-09-01)
+
+
+### Bug Fixes
+
+* Testing against GraphQL validation level errors ([#20](https://github.com/tenantcloud/laravel-graphql-platform/issues/20)) ([b18aac9](https://github.com/tenantcloud/laravel-graphql-platform/commit/b18aac9349dbb888b3bdb32eb6c0f246853dd417))
+
+# [1.0.0-alpha.10](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.9...v1.0.0-alpha.10) (2025-08-31)
+
+
+### Bug Fixes
+
+* Revert cs-fixer changes (dry-run) ([05736f1](https://github.com/tenantcloud/laravel-graphql-platform/commit/05736f149dd747bd9f68394a0f4c6a49635c1232))
+
+# [1.0.0-alpha.9](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.8...v1.0.0-alpha.9) (2025-08-26)
+
+
+### Features
+
+* Laravel 12 ([#16](https://github.com/tenantcloud/laravel-graphql-platform/issues/16)) ([11bd31f](https://github.com/tenantcloud/laravel-graphql-platform/commit/11bd31fb568591e744404430746c1b9f5b2eef75))
+
 # [1.0.0-alpha.8](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.7...v1.0.0-alpha.8) (2025-07-10)
 
 
