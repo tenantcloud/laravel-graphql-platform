@@ -1,3 +1,10 @@
+# [1.0.0-alpha.11](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.10...v1.0.0-alpha.11) (2025-09-01)
+
+
+### Bug Fixes
+
+* Testing against GraphQL validation level errors ([#20](https://github.com/tenantcloud/laravel-graphql-platform/issues/20)) ([b18aac9](https://github.com/tenantcloud/laravel-graphql-platform/commit/b18aac9349dbb888b3bdb32eb6c0f246853dd417))
+
 # [1.0.0-alpha.10](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.9...v1.0.0-alpha.10) (2025-08-31)
 
 
