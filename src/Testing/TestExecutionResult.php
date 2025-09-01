@@ -2,7 +2,6 @@
 
 namespace TenantCloud\GraphQLPlatform\Testing;
 
-use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Arr;

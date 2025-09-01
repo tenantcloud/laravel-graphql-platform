@@ -129,21 +129,21 @@ class TestingTest extends IntegrationTestCase
 		$result = $this
 			->graphQL(
 				<<<'GRAPHQL'
-					mutation ($data: UpdateUserDataInput!) {
-						updateUser(
+					mutation ($data: UpdatePostDataInput!) {
+						updatePost(
 							data: $data
 						) {
-							name
+							content
 						}
 					}
 					GRAPHQL,
 				['data' => [
-					'id' => ['invalid scalar'],
+					'post' => ['invalid scalar'],
 				]]
 			)
 			->assertErrors($expectedErrors = [
 				[
-					'message' => 'Variable "$data" got invalid value ["invalid scalar"] at "data.id"; ID cannot represent a non-string and non-integer value',
+					'message' => 'Variable "$data" got invalid value ["invalid scalar"] at "data.post"; ID cannot represent a non-string and non-integer value',
 				],
 			]);
 
