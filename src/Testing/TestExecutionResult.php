@@ -96,6 +96,15 @@ class TestExecutionResult extends ExecutionResult
 		return $this;
 	}
 
+	public function assertCount(int $count, string $key, ?string $field = null): self
+	{
+		$data = $this->data($field);
+
+		Assert::assertCount($count, data_get($data, $key));
+
+		return $this;
+	}
+
 	/**
 	 * Assert the errors of the field when it executed unsuccessfully. Use $field when there 2 or more fields.
 	 *

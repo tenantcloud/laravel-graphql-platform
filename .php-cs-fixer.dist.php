@@ -11,6 +11,7 @@ $finder = Finder::create()
 	->exclude('build')
 	->exclude('tmp')
 	->exclude('vendor')
+	->exclude('tests/Fixtures/Valid/Models/Eloquent')
 	->name('*.php')
 	->notName('_*.php')
 	->ignoreVCS(true);

@@ -1,13 +1,12 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model;
+namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID;
 
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use TheCodingMachine\GraphQLite\Parameters\InputTypeParameterInterface;
-use TheCodingMachine\GraphQLite\Types\ID;
 
 class ModelIDParameter implements InputTypeParameterInterface
 {
@@ -15,18 +14,22 @@ class ModelIDParameter implements InputTypeParameterInterface
 		private readonly InputTypeParameterInterface $delegate,
 		/** @var class-string<Model> */
 		private readonly string $modelClass,
-		private readonly ?bool $lockForUpdate,
+		private readonly ?ModelID $modelIDAttribute,
 	) {}
 
 	public function resolve(?object $source, array $args, mixed $context, ResolveInfo $info): mixed
 	{
-		/** @var ID $id */
+		/** @var string|int|null $id */
 		$id = $this->delegate->resolve($source, $args, $context, $info);
+
+		if ($id === null) {
+			return null;
+		}
 
 		$query = $this->modelClass::query();
 
-		if ($this->lockForUpdate || ($this->lockForUpdate === null && $info->operation->operation === 'mutation')) {
-			$query->lockForUpdate();
+		if ($this->modelIDAttribute?->lockForUpdate) {
+			$query = $query->lockForUpdate();
 		}
 
 		return $query->findOrFail($id);

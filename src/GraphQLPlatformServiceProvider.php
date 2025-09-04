@@ -48,12 +48,14 @@ use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
 use TenantCloud\GraphQLPlatform\Laravel\Container\GiveNewApplicationInstanceToContainerHandle;
 use TenantCloud\GraphQLPlatform\Laravel\Container\LaravelContainerHandle;
-use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDInputFieldMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ModelIDParameterMiddleware;
-use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\PreventLazyLoadingFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\EloquentBatchLoader;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID\ModelIDInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID\ModelIDParameterMiddleware;
+use TenantCloud\GraphQLPlatform\Laravel\Database\Model\Relation\RelationFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Database\TransactionalFieldMiddleware;
 use TenantCloud\GraphQLPlatform\Laravel\Pagination\QueryBuilderConnectable;
 use TenantCloud\GraphQLPlatform\MissingValue\MissingValueInputFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Resolve\ResolveKeyParameterMiddleware;
 use TenantCloud\GraphQLPlatform\Scalars\IdType;
 use TenantCloud\GraphQLPlatform\Schema\PrintCommand;
 use TenantCloud\GraphQLPlatform\Schema\Rules\CustomOverlappingFieldsCanBeMerged;
@@ -121,6 +123,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 		$this->registerConnections();
 		$this->registerValidation();
 		$this->registerAuthentication();
+		$this->registerLaravelDatabase();
 	}
 
 	public function boot(
@@ -267,7 +270,9 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 					$app->make(SubscriptionTransportManager::class),
 				))
 				->addFieldMiddleware(new TransactionalFieldMiddleware())
-				->addFieldMiddleware(new PreventLazyLoadingFieldMiddleware())
+				->addFieldMiddleware(new RelationFieldMiddleware(
+					$app->make(self::CONTAINER_HANDLE),
+				))
 				->addFieldMiddleware(new SecurityFieldMiddleware(
 					$app->make('graphqlite.expression_language'),
 					$app->make(AuthenticationServiceInterface::class),
@@ -299,6 +304,7 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->addParameterMiddleware(new ModelIDParameterMiddleware())
 				->addParameterMiddleware(new ResolveInfoParameterHandler())
 				->addParameterMiddleware(new ContainerParameterHandler($app->make(self::CONTAINER_HANDLE)))
+				->addParameterMiddleware(new ResolveKeyParameterMiddleware())
 		);
 		$this->app->bind(self::VALIDATION_RULES, fn (Application $app) => [
 			...DocumentValidator::allRules(),
@@ -393,5 +399,10 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 	private function registerContainer(): void
 	{
 		$this->app->singleton(self::CONTAINER_HANDLE, LaravelContainerHandle::class);
+	}
+
+	private function registerLaravelDatabase(): void
+	{
+		$this->app->scoped(EloquentBatchLoader::class);
 	}
 }

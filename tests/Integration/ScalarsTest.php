@@ -18,54 +18,38 @@ use TenantCloud\GraphQLPlatform\Scalars\ScalarsRootTypeMapper;
 class ScalarsTest extends IntegrationTestCase
 {
 	#[Test]
-	public function returnsSomeScalarTypes(): void
-	{
-		$this
-			->graphQL(
-				<<<'GRAPHQL'
-					query {
-						firstUser {
-							somethingAfter
-							createdAt
-							date
-						}
-					}
-					GRAPHQL,
-			)
-			->assertSuccessful()
-			->assertData([
-				'somethingAfter' => 'PT1H',
-				'createdAt'      => '2020-01-03T00:00:00.000000Z',
-				'date'           => '2022-03-05',
-			]);
-	}
-
-	#[Test]
-	public function acceptsSomeScalarTypes(): void
+	public function acceptsAndReturnsScalarTypes(): void
 	{
 		$response = $this
 			->graphQL(
 				<<<'GRAPHQL'
-					mutation ($data: CreateUserDataInput!) {
-						createUser(
+					query ($data: ScalarsDataInput!) {
+						scalars(
 							data: $data
 						) {
-							createdAt
-							somethingAfter
+							string
+							dateTime
+							duration
+							date
 						}
 					}
 					GRAPHQL,
 				['data' => [
-					'name'           => 'Alex',
-					'createdAt'      => '2020-01-03T03:45:00-08:15',
-					'somethingAfter' => 'P1W1DT13H23M34S',
+					'string'   => 'Alex',
+					'dateTime' => '2020-01-03T03:45:00-08:15',
+					'duration' => 'P1W1DT13H23M34S',
+					'date'     => '2020-01-04',
 				]]
 			);
 
 		$response->assertSuccessful()
 			->assertData([
-				'createdAt'      => '2020-01-03T12:00:00.000000Z',
-				'somethingAfter' => 'P8DT13H23M34S',
+				'string' => 'Alex',
+				// Original format isn't retained, as inputs support timezone offsets
+				'dateTime' => '2020-01-03T12:00:00.000000Z',
+				// Original format isn't retained, but it's still a valid ISO spec duration
+				'duration' => 'P8DT13H23M34S',
+				'date'     => '2020-01-04',
 			]);
 	}
 }

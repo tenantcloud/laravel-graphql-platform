@@ -16,7 +16,7 @@ class UploadTest extends HttpIntegrationTestCase
 	public function uploadsFile(): void
 	{
 		// curl localhost:5000/graphql \
-		//  -F operations='{ "query": "mutation ($file: Upload!) { uploadFile(file: $file) { success } }", "variables": { "file": null } }' \
+		//  -F operations='{ "query": "mutation ($file: Upload!) { uploadFile(file: $file) }", "variables": { "file": null } }' \
 		//  -F map='{ "0": ["variables.file"] }' \
 		//  -F 0=@file.txt
 		$this

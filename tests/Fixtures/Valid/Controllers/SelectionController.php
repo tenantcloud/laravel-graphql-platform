@@ -23,7 +23,7 @@ class SelectionController
 	}
 
 	#[Query]
-	public function nestedSelection(#[InjectSelection('users.nodes')] array $selection): SelectionResponse
+	public function nestedSelection(#[InjectSelection('blogs.nodes')] array $selection): SelectionResponse
 	{
 		return new SelectionResponse(
 			/* @phpstan-ignore argument.type */

@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model;
+namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID;
 
 use Attribute;
 use RuntimeException;
@@ -11,7 +11,7 @@ use TheCodingMachine\GraphQLite\Annotations\ParameterAnnotationInterface;
 class ModelID implements MiddlewareAnnotationInterface, ParameterAnnotationInterface
 {
 	public function __construct(
-		public readonly ?bool $lockForUpdate = null
+		public readonly bool $lockForUpdate = false,
 	) {}
 
 	/**

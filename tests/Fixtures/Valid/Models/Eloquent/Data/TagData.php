@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\Fixtures\Valid\Models;
+namespace Tests\Fixtures\Valid\Models\Eloquent\Data;
 
 use Symfony\Component\Validator\Constraints\Length;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Input;
 
 #[Input]
-class Nested
+class TagData
 {
 	public function __construct(
 		#[Field]
-		#[Length(min: 3, max: 4)]
+		#[Length(min: 1, max: 20)]
 		public readonly string $name,
 	) {}
 }

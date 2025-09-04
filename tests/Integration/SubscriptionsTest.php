@@ -2,13 +2,10 @@
 
 namespace Tests\Integration;
 
-use Carbon\CarbonImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Language\Parser;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Support\Facades\Notification;
 use Mockery;
-use Orchestra\Testbench\Factories\UserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use TenantCloud\GraphQLPlatform\Context\Context;
@@ -33,7 +30,11 @@ use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransport;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TenantCloud\GraphQLPlatform\Subscription\UpkeepSubscriptionsCommand;
 use TenantCloud\GraphQLPlatform\Testing\FakeSubscriptionTransport;
-use Tests\Fixtures\Valid\Models\User as UserFixture;
+use Tests\Fixtures\Database\Factories\CommentFactory;
+use Tests\Fixtures\Database\Factories\PostFactory;
+use Tests\Fixtures\Database\Factories\UserFactory;
+use Tests\Fixtures\Valid\Models\Eloquent\Post;
+use Tests\Fixtures\Valid\Notifications\CommentCreatedNotification;
 
 #[CoversClass(GraphQLChannel::class)]
 #[CoversClass(GraphQLMessage::class)]
@@ -56,15 +57,20 @@ class SubscriptionsTest extends IntegrationTestCase
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$result = $this
 			->httpGraphQL(
 				<<<'GRAPHQL'
-					subscription {
-						newUser {
-							name
+					subscription ($post: ID!) {
+						commentCreated (post: $post) {
+							content
 						}
 					}
 					GRAPHQL,
+				['post' => $post->id],
 			)
 			->assertSuccessful()
 			->assertJson([
@@ -76,7 +82,7 @@ class SubscriptionsTest extends IntegrationTestCase
 							'subscription' => [
 								'transport' => [
 									'type'    => FakeSubscriptionTransport::TYPE,
-									'channel' => $channel = 'auth:123:users.new',
+									'channel' => $channel = "auth:123:posts:{$post->id}:comments:created",
 								],
 							],
 						],
@@ -90,6 +96,10 @@ class SubscriptionsTest extends IntegrationTestCase
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$subscriptionTransport = mock(SubscriptionTransport::class)
 			->allows([
 				'type'                => 'test',
@@ -99,19 +109,23 @@ class SubscriptionsTest extends IntegrationTestCase
 		$subscriptionTransport->expects()
 			->emit(Mockery::any(), [
 				'data' => [
-					'newUser' => [
-						'name' => 'Alex',
+					'commentCreated' => [
+						'content' => 'test',
 					],
 				],
 			]);
 
-		$subscription = $this->createSubscription($subscriptionTransport);
+		$subscription = $this->createSubscription($subscriptionTransport, $post);
 
 		$this->app->make(Guard::class)->forgetUser();
 
 		$this->app->make(SubscriptionEmitter::class)->emitForSubscription(
 			$subscription,
-			new UserFixture('Alex', CarbonImmutable::now())
+			CommentFactory::new()
+				->forPost($post)
+				->create([
+					'content' => 'test',
+				]),
 		);
 	}
 
@@ -120,6 +134,10 @@ class SubscriptionsTest extends IntegrationTestCase
 	{
 		$this->actingAs($auth = UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$subscriptionTransport = mock(SubscriptionTransport::class)
 			->allows([
 				'type'                => 'test',
@@ -129,34 +147,33 @@ class SubscriptionsTest extends IntegrationTestCase
 		$subscriptionTransport->expects()
 			->emit(Mockery::any(), [
 				'data' => [
-					'newUser' => [
-						'name' => 'Alex',
+					'commentCreated' => [
+						'content' => 'test',
 					],
 				],
 			]);
 
-		$this->createSubscription($subscriptionTransport);
+		$this->createSubscription($subscriptionTransport, $post);
 
 		$this->app->make(Guard::class)->forgetUser();
 
-		Notification::send($auth, new class () extends \Illuminate\Notifications\Notification {
-			public function via(): array
-			{
-				return [GraphQLChannel::class];
-			}
-
-			public function toGraphQL(): GraphQLMessage
-			{
-				return (new GraphQLMessage(new UserFixture('Alex', CarbonImmutable::now())))
-					->on('users.new');
-			}
-		});
+		$auth->notifyNow(new CommentCreatedNotification(
+			CommentFactory::new()
+				->forPost($post)
+				->create([
+					'content' => 'test',
+				]),
+		));
 	}
 
 	#[Test]
 	public function deactivatesSubscriptionWhenSchemaNoLongerExists(): void
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
 
 		$subscriptionTransport = mock(SubscriptionTransport::class)
 			->allows([
@@ -167,7 +184,7 @@ class SubscriptionsTest extends IntegrationTestCase
 		$subscriptionTransport->expects()
 			->deactivated(Mockery::any(), Mockery::type(SchemaNotFoundException::class));
 
-		$subscription = $this->createSubscription($subscriptionTransport);
+		$subscription = $this->createSubscription($subscriptionTransport, $post);
 
 		self::assertInstanceOf(GraphQLStoredSubscription::class, $subscription);
 
@@ -178,7 +195,9 @@ class SubscriptionsTest extends IntegrationTestCase
 
 		$this->app->make(SubscriptionEmitter::class)->emitForSubscription(
 			$subscription,
-			new UserFixture('Alex', CarbonImmutable::now())
+			CommentFactory::new()
+				->forPost($post)
+				->create(),
 		);
 
 		self::assertModelExists($subscription);
@@ -193,6 +212,10 @@ class SubscriptionsTest extends IntegrationTestCase
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$subscriptionTransport = mock(SubscriptionTransport::class)
 			->allows([
 				'type'                => 'test',
@@ -202,7 +225,7 @@ class SubscriptionsTest extends IntegrationTestCase
 		$subscriptionTransport->expects()
 			->deactivated(Mockery::any(), Mockery::type(Error::class));
 
-		$subscription = $this->createSubscription($subscriptionTransport);
+		$subscription = $this->createSubscription($subscriptionTransport, $post);
 
 		self::assertInstanceOf(GraphQLStoredSubscription::class, $subscription);
 
@@ -213,7 +236,9 @@ class SubscriptionsTest extends IntegrationTestCase
 
 		$this->app->make(SubscriptionEmitter::class)->emitForSubscription(
 			$subscription,
-			new UserFixture('Alex', CarbonImmutable::now())
+			CommentFactory::new()
+				->forPost($post)
+				->create(),
 		);
 
 		self::assertModelExists($subscription);
@@ -228,6 +253,10 @@ class SubscriptionsTest extends IntegrationTestCase
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$subscriptionTransport = mock(SubscriptionTransport::class)
 			->allows([
 				'type'                => 'test',
@@ -235,7 +264,7 @@ class SubscriptionsTest extends IntegrationTestCase
 				'clientDetails'       => [],
 			]);
 
-		$subscription = $this->createSubscription($subscriptionTransport);
+		$subscription = $this->createSubscription($subscriptionTransport, $post);
 
 		self::assertInstanceOf(GraphQLStoredSubscription::class, $subscription);
 
@@ -253,6 +282,10 @@ class SubscriptionsTest extends IntegrationTestCase
 	{
 		$this->actingAs(UserFactory::new()->make(['id' => 123]));
 
+		$post = PostFactory::new()
+			->newBlog()
+			->create();
+
 		$subscriptionTransport = mock(SubscriptionTransport::class)
 			->allows([
 				'type'          => 'test',
@@ -265,7 +298,7 @@ class SubscriptionsTest extends IntegrationTestCase
 			->calculateExpiration(Mockery::type(Subscription::class))
 			->andReturn($prolongedUntil = now()->addDay()->toImmutable());
 
-		$subscription = $this->createSubscription($subscriptionTransport);
+		$subscription = $this->createSubscription($subscriptionTransport, $post);
 
 		self::assertInstanceOf(GraphQLStoredSubscription::class, $subscription);
 
@@ -282,7 +315,7 @@ class SubscriptionsTest extends IntegrationTestCase
 		self::assertSame($prolongedUntil->toDateTimeString(), $subscription->expires_at->toDateTimeString());
 	}
 
-	private function createSubscription(SubscriptionTransport $transport): Subscription
+	private function createSubscription(SubscriptionTransport $transport, Post $post): Subscription
 	{
 		$this->app->make(SubscriptionTransportManager::class)->extend($transport->type(), fn () => $transport);
 
@@ -290,12 +323,13 @@ class SubscriptionsTest extends IntegrationTestCase
 			->executeQuery(
 				schema: $this->app->make(SchemaRegistry::class)->first(),
 				source: <<<'GRAPHQL'
-					subscription {
-						newUser {
-							name
+					subscription ($post: ID!) {
+						commentCreated (post: $post) {
+							content
 						}
 					}
 					GRAPHQL,
+				variableValues: ['post' => $post->id],
 				applyContext: function (Context $context) use ($transport): Context {
 					$context->set($this->app->make(GraphQLPlatformServiceProvider::SUBSCRIPTION_TRANSPORT_CONTEXT_TOKEN), $transport->type());
 

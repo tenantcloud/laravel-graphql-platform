@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model;
+namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID;
 
 use Illuminate\Database\Eloquent\Model;
 use ReflectionNamedType;
@@ -27,16 +27,22 @@ class ModelIDInputFieldMiddleware implements InputFieldMiddlewareInterface
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
-		$modelIDAnnotation = $inputFieldDescriptor->getMiddlewareAnnotations()->getAnnotationByType(ModelID::class);
+		/** @var class-string<Model> $modelClass */
+		$modelClass = $type->getName();
+		$modelIDAttribute = $inputFieldDescriptor->getMiddlewareAnnotations()->getAnnotationByType(ModelID::class);
 
-		$inputFieldDescriptor = $inputFieldDescriptor->withResolver(function ($source, $id, ...$args) use ($modelIDAnnotation, $type, $inputFieldDescriptor) {
-			$query = $type->getName()::query();
+		$inputFieldDescriptor = $inputFieldDescriptor->withResolver(function ($source, $id, ...$args) use ($modelClass, $modelIDAttribute, $inputFieldDescriptor) {
+			if ($id === null) {
+				return null;
+			}
 
-			if ($modelIDAnnotation?->lockForUpdate) {
+			$query = $modelClass::query();
+
+			if ($modelIDAttribute?->lockForUpdate) {
 				$query = $query->lockForUpdate();
 			}
 
-			$model = $query->find($id);
+			$model = $query->findOrFail($id);
 
 			return $inputFieldDescriptor->getResolver()($source, $model, ...$args);
 		});

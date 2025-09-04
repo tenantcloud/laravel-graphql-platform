@@ -3,6 +3,7 @@
 namespace TenantCloud\GraphQLPlatform\Laravel\Database;
 
 use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\DB;
 use TheCodingMachine\GraphQLite\Middlewares\FieldHandlerInterface;
 use TheCodingMachine\GraphQLite\Middlewares\FieldMiddlewareInterface;
@@ -18,12 +19,14 @@ class TransactionalFieldMiddleware implements FieldMiddlewareInterface
 			return $fieldHandler->handle($queryFieldDescriptor);
 		}
 
-		$queryFieldDescriptor = $queryFieldDescriptor->withResolver(
-			fn (...$args) => DB::transaction(
-				fn () => $queryFieldDescriptor->getResolver()(...$args)
-			)
-		);
+		$field = $fieldHandler->handle($queryFieldDescriptor);
 
-		return $fieldHandler->handle($queryFieldDescriptor);
+		// Regular ->withResolver() would run the resolver AFTER the args are resolved, meaning that
+		// a `#[ModelID(lockForUpdate: true)]` simply doesn't work as it would run before the transaction.
+		$originalResolve = $field->resolveFn;
+
+		$field->resolveFn = fn (?object $source, array $args, $context, ResolveInfo $info) => DB::transaction(fn () => $originalResolve($source, $args, $context, $info));
+
+		return $field;
 	}
 }

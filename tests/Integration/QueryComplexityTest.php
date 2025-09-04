@@ -15,16 +15,16 @@ class QueryComplexityTest extends IntegrationTestCase
 	#[Test]
 	public function limitsComplexityUsingCost(): void
 	{
-		// Cost is calculated as follows: listUsers is 10, items is 1, name is 1, somethingAfter is 3
+		// Cost is calculated as follows: blogs is 10, nodes is 1, id is 1, name is 3
 		// All have a combined cost of 15, that is then multiplied by limit (3), which gives us 45.
 		$this
 			->graphQL(
 				<<<'GRAPHQL'
 					query {
-						listUsers(limit: 3) {
+						blogs(limit: 3) {
 							nodes {
+								id
 								name
-								somethingAfter
 							}
 						}
 					}

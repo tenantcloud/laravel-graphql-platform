@@ -7,14 +7,16 @@ use Carbon\CarbonInterval;
 use TenantCloud\GraphQLPlatform\Scalars\Hints\Date;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Input;
+use TheCodingMachine\GraphQLite\Annotations\Type;
 
+#[Type]
 #[Input]
-class CreateUserData
+class ScalarsData
 {
 	public function __construct(
-		#[Field] public readonly string $name,
-		#[Field] public readonly CarbonImmutable $createdAt,
-		#[Field] public readonly CarbonInterval $somethingAfter,
+		#[Field] public readonly string $string,
+		#[Field] public readonly CarbonImmutable $dateTime,
+		#[Field] public readonly CarbonInterval $duration,
 		#[Field] #[Date] public readonly ?CarbonImmutable $date = null,
 	) {}
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model;
+namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID;
 
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\NamedType;
