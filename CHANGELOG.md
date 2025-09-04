@@ -1,3 +1,10 @@
+# [1.0.0-alpha.12](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.11...v1.0.0-alpha.12) (2025-09-04)
+
+
+### Features
+
+* Eloquent relation/aggregation loader ([#18](https://github.com/tenantcloud/laravel-graphql-platform/issues/18)) ([50d52f0](https://github.com/tenantcloud/laravel-graphql-platform/commit/50d52f0cbb49e33888537f3e81441a45e35615ac))
+
 # [1.0.0-alpha.11](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.10...v1.0.0-alpha.11) (2025-09-01)
 
 
