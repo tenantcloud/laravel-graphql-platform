@@ -20,9 +20,11 @@ class PersistedQueryTest extends HttpIntegrationTestCase
 	#[Test]
 	public function usesPersistedQuery(): void
 	{
-		BlogFactory::new()->create([
-			'name' => 'Alex Blog',
-		]);
+		BlogFactory::new()
+			->newOwner()
+			->create([
+				'name' => 'Alex Blog',
+			]);
 
 		$this
 			->postJson($this->endpoint, [

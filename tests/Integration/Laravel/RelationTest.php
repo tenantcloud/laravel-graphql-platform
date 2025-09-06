@@ -35,6 +35,9 @@ class RelationTest extends IntegrationTestCase
 		// List of items
 		self::assertThat($blogType['fields'], new ArraySubset([
 			[
+				'name' => 'owner',
+			],
+			[
 				'name'        => 'posts',
 				'description' => null,
 				'args'        => [],
@@ -63,6 +66,9 @@ class RelationTest extends IntegrationTestCase
 		// Single item
 		self::assertThat($commentType['fields'], new ArraySubset([
 			[
+				'name' => 'author',
+			],
+			[
 				'name'        => 'parent',
 				'description' => null,
 				'args'        => [],
@@ -81,6 +87,7 @@ class RelationTest extends IntegrationTestCase
 		DB::enableQueryLog();
 
 		$blog1 = BlogFactory::new()
+			->newOwner()
 			->hasPosts(
 				PostFactory::new()
 					->count(2)
@@ -91,6 +98,7 @@ class RelationTest extends IntegrationTestCase
 			->create();
 
 		$blog2 = BlogFactory::new()
+			->newOwner()
 			->hasPosts(
 				PostFactory::new()
 					->count(1)
@@ -108,6 +116,7 @@ class RelationTest extends IntegrationTestCase
 			->create();
 
 		$blog3 = BlogFactory::new()
+			->newOwner()
 			->hasPosts(
 				PostFactory::new()
 					->count(1)

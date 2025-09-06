@@ -68,7 +68,9 @@ class ValidationTest extends IntegrationTestCase
 	#[Test]
 	public function validatesInputs(): void
 	{
-		$blog = BlogFactory::new()->create();
+		$blog = BlogFactory::new()
+			->newOwner()
+			->create();
 
 		$this
 			->graphQL(

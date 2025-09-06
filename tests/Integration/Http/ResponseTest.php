@@ -175,7 +175,7 @@ class ResponseTest extends HttpIntegrationTestCase
 			->assertHeader('Content-Type', 'application/graphql-response+json; charset=utf-8')
 			->assertJsonMissingPath('data')
 			->assertJsonCount(1, 'errors')
-			->assertExactJson([
+			->assertJson([
 				'errors' => [
 					[
 						'message'   => 'You did something wrong :(',

@@ -26,9 +26,11 @@ class TestingTest extends IntegrationTestCase
 	#[Test]
 	public function executesGraphQLAndAssertsSuccessfulResult(): void
 	{
-		BlogFactory::new()->create([
-			'name' => 'Alex Blog',
-		]);
+		BlogFactory::new()
+			->newOwner()
+			->create([
+				'name' => 'Alex Blog',
+			]);
 
 		$result = $this
 			->graphQL(
@@ -153,7 +155,7 @@ class TestingTest extends IntegrationTestCase
 	#[Test]
 	public function executesGraphQLSubscriptionAndAssertsSuccessfulResult(): void
 	{
-		$this->actingAs($auth = UserFactory::new()->make(['id' => 123]));
+		$this->actingAs($auth = UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -174,6 +176,7 @@ class TestingTest extends IntegrationTestCase
 
 		$comment = CommentFactory::new()
 			->forPost($post)
+			->newAuthor()
 			->create([
 				'content' => 'test',
 			]);

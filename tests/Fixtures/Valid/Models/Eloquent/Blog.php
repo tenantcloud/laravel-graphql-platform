@@ -5,7 +5,10 @@ namespace Tests\Fixtures\Valid\Models\Eloquent;
 use Closure;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use TenantCloud\GraphQLPlatform\Laravel\Auth\Authorization\Authorize;
+use TenantCloud\GraphQLPlatform\Laravel\Auth\Authorization\AuthorizePlaceholder;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\EloquentBatchLoader;
 use TenantCloud\GraphQLPlatform\Resolve\ResolveKey;
 use TheCodingMachine\GraphQLite\Annotations\Autowire;
@@ -23,6 +26,16 @@ use TheCodingMachine\GraphQLite\Annotations\Type;
 #[MagicField(name: 'name', outputType: 'String!', annotations: [new Cost(3)])]
 class Blog extends Model
 {
+	/**
+	 * @return BelongsTo<User, $this>
+	 */
+	#[Field]
+	#[Authorize('view', [AuthorizePlaceholder::RESOLVED_VALUE])]
+	public function owner(): BelongsTo
+	{
+		return $this->belongsTo(User::class);
+	}
+
 	/**
 	 * @return HasMany<Post, $this>
 	 */

@@ -55,7 +55,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function storesSubscriptionAndReturnsIt(): void
 	{
-		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+		$this->actingAs($auth = UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -82,7 +82,7 @@ class SubscriptionsTest extends IntegrationTestCase
 							'subscription' => [
 								'transport' => [
 									'type'    => FakeSubscriptionTransport::TYPE,
-									'channel' => $channel = "auth:123:posts:{$post->id}:comments:created",
+									'channel' => $channel = "auth:{$auth->id}:posts:{$post->id}:comments:created",
 								],
 							],
 						],
@@ -94,7 +94,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function emitsDataToASubscription(): void
 	{
-		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+		$this->actingAs(UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -123,6 +123,7 @@ class SubscriptionsTest extends IntegrationTestCase
 			$subscription,
 			CommentFactory::new()
 				->forPost($post)
+				->newAuthor()
 				->create([
 					'content' => 'test',
 				]),
@@ -132,7 +133,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function sendsDataToASubscriptionFromNotificationChannel(): void
 	{
-		$this->actingAs($auth = UserFactory::new()->make(['id' => 123]));
+		$this->actingAs($auth = UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -160,6 +161,7 @@ class SubscriptionsTest extends IntegrationTestCase
 		$auth->notifyNow(new CommentCreatedNotification(
 			CommentFactory::new()
 				->forPost($post)
+				->newAuthor()
 				->create([
 					'content' => 'test',
 				]),
@@ -169,7 +171,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function deactivatesSubscriptionWhenSchemaNoLongerExists(): void
 	{
-		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+		$this->actingAs(UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -197,6 +199,7 @@ class SubscriptionsTest extends IntegrationTestCase
 			$subscription,
 			CommentFactory::new()
 				->forPost($post)
+				->newAuthor()
 				->create(),
 		);
 
@@ -210,7 +213,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function deactivatesSubscriptionOnMalformedRequestError(): void
 	{
-		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+		$this->actingAs(UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -238,6 +241,7 @@ class SubscriptionsTest extends IntegrationTestCase
 			$subscription,
 			CommentFactory::new()
 				->forPost($post)
+				->newAuthor()
 				->create(),
 		);
 
@@ -251,7 +255,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function upkeepCancelsExpiredSubscriptions(): void
 	{
-		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+		$this->actingAs(UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()
@@ -280,7 +284,7 @@ class SubscriptionsTest extends IntegrationTestCase
 	#[Test]
 	public function upkeepProlongsExpiringSubscriptions(): void
 	{
-		$this->actingAs(UserFactory::new()->make(['id' => 123]));
+		$this->actingAs(UserFactory::new()->create());
 
 		$post = PostFactory::new()
 			->newBlog()

@@ -1,264 +1,274 @@
 type SelectionResponse {
-	blogs: BlogOffsetConnection!
-	selection: Any!
+  blogs: BlogOffsetConnection!
+  selection: Any!
 }
 
 type BlogOffsetConnection {
-	nodes: [Blog!]!
-	edges: [BlogOffsetEdge]!
+  nodes: [Blog!]!
+  edges: [BlogOffsetEdge]!
 }
 
+"The `EmailAddress` scalar type represents an email address, conforming to [`email address` part of the `HTML`](https:\/\/html.spec.whatwg.org\/multipage\/input.html#valid-e-mail-address) standard."
+scalar EmailAddress
+
+"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
+scalar DateTime
+
 input CommentsDataInput {
-	"Constraints: Range(min: 1, max: 5)"
-	minRating: Float = null
+  "Constraints: Range(min: 1, max: 5)"
+  minRating: Float = null
 }
 
 type CommentConnectable {
-	cursor(
-		"Maximum: 100"
-		first: Int = null
+  cursor(
+    "Maximum: 100"
+    first: Int = null
 
-		after: String = null
+    after: String = null
 
-		"Maximum: 100"
-		last: Int = null
+    "Maximum: 100"
+    last: Int = null
 
-		before: String = null
-	): CommentConnection!
-	offset(
-		"Maximum: 100"
-		limit: Int! = 100
+    before: String = null
+  ): CommentConnection!
+  offset(
+    "Maximum: 100"
+    limit: Int! = 100
 
-		offset: Int! = 0
-	): CommentOffsetConnection!
+    offset: Int! = 0
+  ): CommentOffsetConnection!
 }
 
 type CommentConnection {
-	nodes: [Comment!]!
-	edges: [CommentEdge]!
-	pageInfo: PageInfo!
+  nodes: [Comment!]!
+  edges: [CommentEdge]!
+  pageInfo: PageInfo!
 }
 
 type CommentEdge {
-	node: Comment!
-	cursor: String
+  node: Comment!
+  cursor: String
 }
 
 type PageInfo {
-	"Determine if there are more items in the data source after these."
-	hasNextPage: Boolean!
+  "Determine if there are more items in the data source after these."
+  hasNextPage: Boolean!
 
-	"Determine if there are more items in the data source before these."
-	hasPreviousPage: Boolean!
+  "Determine if there are more items in the data source before these."
+  hasPreviousPage: Boolean!
 
-	"A cursor for the first item."
-	startCursor: String
+  "A cursor for the first item."
+  startCursor: String
 
-	"A cursor for the last item."
-	endCursor: String
+  "A cursor for the last item."
+  endCursor: String
 }
 
 type CommentOffsetConnection {
-	nodes: [Comment!]!
-	edges: [CommentOffsetEdge]!
+  nodes: [Comment!]!
+  edges: [CommentOffsetEdge]!
 }
 
 type CommentOffsetEdge {
-	node: Comment!
+  node: Comment!
 }
 
-"The `Duration` scalar type represents a time duration conforming to the [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Durations) standard, such as `P1W1DT13H23M34S`."
+"The `Duration` scalar type represents a time duration conforming to the [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Durations) standard, such as `P1W1DT13H23M34S`."
 scalar Duration
 
 type BlogOffsetEdge {
-	node: Blog!
+  node: Blog!
 }
 
 scalar Any
 
 type Post {
-	comments(
-		data: CommentsDataInput = null
-		parent: ID = null
-	): CommentConnectable!
-	id: ID!
-	content: String!
-	readTime: Duration
+  commentsCount: Int
+  comments(data: CommentsDataInput = null, parent: ID = null): CommentConnectable!
+  id: ID!
+  content: String!
+  readTime: Duration
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: EmailAddress!
+  emailVerifiedAt: DateTime
 }
 
 type Blog {
-	posts: [Post]
-	postsCount(search: String = null): Int
-	id: ID!
+  owner: User!
+  posts: [Post!]!
+  postsCount(search: String = null): Int
+  id: ID!
 
-	"Cost: complexity = 3, multipliers = [], defaultMultiplier = null"
-	name: String!
+  "Cost: complexity = 3, multipliers = [], defaultMultiplier = null"
+  name: String!
 }
 
 type Comment {
-	parent: Comment
-	id: ID!
-	content: String!
+  author: User!
+  parent: Comment
+  id: ID!
+  content: String!
 }
 
 input ScalarsDataInput {
-	string: String!
-	dateTime: DateTime!
-	duration: Duration!
-	date: Date = null
+  string: String!
+  dateTime: DateTime!
+  duration: Duration!
+  date: Date = null
 }
 
-"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
-scalar DateTime
-
-"The `Date` scalar type represents a date, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Dates) standard, such as `2025-02-25`."
+"The `Date` scalar type represents a date, conforming to [`ISO-8601`](https:\/\/en.wikipedia.org\/wiki\/ISO_8601#Dates) standard, such as `2025-02-25`."
 scalar Date
 
 type Query {
-	clientSafeError: Int!
-	clientUnsafeError: Int!
+  clientSafeError: Int!
+  clientUnsafeError: Int!
 
-	"Available in versions: >=2"
-	versionedField(data: VersionedInput!): String!
+  "Available in versions: >=2"
+  versionedField(data: VersionedInput!): String!
 
-	scalars(data: ScalarsDataInput!): ScalarsData!
+  scalars(data: ScalarsDataInput!): ScalarsData!
 
-	"Cost: complexity = 10, multipliers = [limit], defaultMultiplier = null"
-	blogs(
-		"Maximum: 100"
-		limit: Int! = 100
+  "Cost: complexity = 10, multipliers = [limit], defaultMultiplier = null"
+  blogs(
+    "Maximum: 100"
+    limit: Int! = 100
 
-		offset: Int! = 0
-	): BlogOffsetConnection!
+    offset: Int! = 0
+  ): BlogOffsetConnection!
 
-	fullSelection: SelectionResponse!
-	nestedSelection: SelectionResponse!
-	resolveKey(arg1: Boolean!, arg2: TagDataInput!): Any!
-	offsetConnectable(
-		"Maximum: 100"
-		limit: Int! = 100
+  fullSelection: SelectionResponse!
+  nestedSelection: SelectionResponse!
+  resolveKey(arg1: Boolean!, arg2: TagDataInput!): Any!
+  offsetConnectable(
+    "Maximum: 100"
+    limit: Int! = 100
 
-		offset: Int! = 0
-	): BlogOffsetConnection!
-	cursorConnectable(
-		"Maximum: 100"
-		first: Int = null
+    offset: Int! = 0
+  ): BlogOffsetConnection!
+  cursorConnectable(
+    "Maximum: 100"
+    first: Int = null
 
-		after: String = null
+    after: String = null
 
-		"Maximum: 100"
-		last: Int = null
+    "Maximum: 100"
+    last: Int = null
 
-		before: String = null
-	): BlogConnection!
-	connectable: BlogOtherConnectable!
+    before: String = null
+  ): BlogConnection!
+  connectable: BlogOtherConnectable!
 }
 
 input VersionedInput {
-	"Available in versions: >=2"
-	id: String!
+  "Available in versions: >=2"
+  id: String!
 }
 
 type ScalarsData {
-	string: String!
-	dateTime: DateTime!
-	duration: Duration!
-	date: Date
+  string: String!
+  dateTime: DateTime!
+  duration: Duration!
+  date: Date
 }
 
 input TagDataInput {
-	"Constraints: Length(max: 20, min: 1)"
-	name: String!
+  "Constraints: Length(max: 20, min: 1)"
+  name: String!
 }
 
 type BlogConnection {
-	nodes: [Blog!]!
-	edges: [BlogEdge]!
-	pageInfo: PageInfo!
+  nodes: [Blog!]!
+  edges: [BlogEdge]!
+  pageInfo: PageInfo!
 }
 
 type BlogEdge {
-	node: Blog!
-	cursor: String
+  node: Blog!
+  cursor: String
 }
 
 type BlogOtherConnectable {
-	cursor(
-		"Maximum: 100"
-		first: Int = null
+  cursor(
+    "Maximum: 100"
+    first: Int = null
 
-		after: String = null
+    after: String = null
 
-		"Maximum: 100"
-		last: Int = null
+    "Maximum: 100"
+    last: Int = null
 
-		before: String = null
-	): BlogOtherConnection!
-	offset(
-		"Maximum: 100"
-		limit: Int! = 100
+    before: String = null
+  ): BlogOtherConnection!
+  offset(
+    "Maximum: 100"
+    limit: Int! = 100
 
-		offset: Int! = 0
-	): BlogOtherOffsetConnection!
+    offset: Int! = 0
+  ): BlogOtherOffsetConnection!
 }
 
 type BlogOtherConnection {
-	nodes: [Blog!]!
-	edges: [BlogOtherEdge]!
-	pageInfo: PageInfo!
+  nodes: [Blog!]!
+  edges: [BlogOtherEdge]!
+  pageInfo: PageInfo!
 }
 
 type BlogOtherEdge {
-	node: Blog!
-	cursor: String
+  node: Blog!
+  cursor: String
 }
 
 type BlogOtherOffsetConnection {
-	nodes: [Blog!]!
-	edges: [BlogOtherOffsetEdge]!
+  nodes: [Blog!]!
+  edges: [BlogOtherOffsetEdge]!
 }
 
 type BlogOtherOffsetEdge {
-	node: Blog!
+  node: Blog!
 }
 
 type Mutation {
-	createBlog(data: CreateBlogDataInput!): Blog!
-	createComment(data: CreateCommentDataInput!): Comment!
-	deleteComment(comment: ID!): Void
-	createPost(data: CreatePostDataInput!): Post!
-	updatePost(data: UpdatePostDataInput!): Post!
-	deletePost(post: ID!): Void
-	uploadFile(file: Upload!): String!
+  createBlog(data: CreateBlogDataInput!): Blog!
+  createComment(data: CreateCommentDataInput!): Comment!
+  deleteComment(comment: ID!): Void
+  createPost(data: CreatePostDataInput!): Post!
+  updatePost(data: UpdatePostDataInput!): Post!
+  deletePost(post: ID!): Void
+  uploadFile(file: Upload!): String!
 }
 
 input CreateBlogDataInput {
-	name: String!
+  name: String!
 }
 
 input CreateCommentDataInput {
-	post: ID!
-	parent: ID = null
-	content: String!
+  post: ID!
+  parent: ID = null
+  content: String!
 }
 
 "The `Void` scalar type represents no value being returned."
 scalar Void
 
 input CreatePostDataInput {
-	blog: ID!
-	content: String!
+  blog: ID!
+  content: String!
 
-	"Constraints: Count(max: 5)"
-	tags: [TagDataInput!]!
+  "Constraints: Count(max: 5)"
+  tags: [TagDataInput!]!
 }
 
 input UpdatePostDataInput {
-	post: ID!
+  post: ID!
 
-	"Constraints: Length(max: 255, min: 1), NotEqualTo(value: \"Trash\")"
-	content: String
-	readTime: Duration
+  "Constraints: Length(max: 255, min: 1), NotEqualTo(value: \"Trash\")"
+  content: String
+  readTime: Duration
 }
 
 """
@@ -268,5 +278,5 @@ The `Upload` special type represents a file to be uploaded in the same HTTP requ
 scalar Upload
 
 type Subscription {
-	commentCreated(post: ID!): Comment!
+  commentCreated(post: ID!): Comment!
 }

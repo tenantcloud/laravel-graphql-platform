@@ -30,6 +30,7 @@ class TransactionalTest extends IntegrationTestCase
 
 		$comment = CommentFactory::new()
 			->newPost()
+			->newAuthor()
 			->create();
 
 		$this

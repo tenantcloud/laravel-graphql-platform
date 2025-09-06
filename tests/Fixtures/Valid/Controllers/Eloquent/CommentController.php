@@ -8,6 +8,8 @@ use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
 use Tests\Fixtures\Valid\Models\Eloquent\Comment;
 use Tests\Fixtures\Valid\Models\Eloquent\Data\CreateCommentData;
 use Tests\Fixtures\Valid\Models\Eloquent\Post;
+use Tests\Fixtures\Valid\Models\Eloquent\User;
+use TheCodingMachine\GraphQLite\Annotations\InjectUser;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Subscription;
 
@@ -15,9 +17,12 @@ class CommentController
 {
 	#[Mutation]
 	#[Transactional]
-	public function createComment(CreateCommentData $data): Comment
-	{
+	public function createComment(
+		#[InjectUser] User $auth,
+		CreateCommentData $data
+	): Comment {
 		$comment = new Comment();
+		$comment->author()->associate($auth);
 		$comment->post()->associate($data->post);
 		$comment->parent()->associate($data->parent);
 		$comment->content = $data->content;

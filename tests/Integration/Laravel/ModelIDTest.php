@@ -12,6 +12,7 @@ use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID\ModelIDTypeMapper;
 use Tests\Fixtures\Database\Factories\BlogFactory;
 use Tests\Fixtures\Database\Factories\CommentFactory;
 use Tests\Fixtures\Database\Factories\PostFactory;
+use Tests\Fixtures\Database\Factories\UserFactory;
 use Tests\Integration\IntegrationTestCase;
 
 #[CoversClass(ModelID::class)]
@@ -24,7 +25,9 @@ class ModelIDTest extends IntegrationTestCase
 	#[Test]
 	public function treatsModelsAsIdsByDefaultEvenWithoutAttribute(): void
 	{
-		$blog = BlogFactory::new()->create();
+		$blog = BlogFactory::new()
+			->newOwner()
+			->create();
 
 		// In input fields
 		$this
@@ -68,6 +71,8 @@ class ModelIDTest extends IntegrationTestCase
 	#[Test]
 	public function selectModelsLockedForUpdateIfSpecified(): void
 	{
+		$this->actingAs(UserFactory::new()->create());
+
 		$post = PostFactory::new()
 			->newBlog()
 			->create();
@@ -96,6 +101,7 @@ class ModelIDTest extends IntegrationTestCase
 
 		$comment = CommentFactory::new()
 			->forPost($post)
+			->newAuthor()
 			->create();
 
 		// In parameters
@@ -116,6 +122,8 @@ class ModelIDTest extends IntegrationTestCase
 	#[Test]
 	public function ignoresNull(): void
 	{
+		$this->actingAs(UserFactory::new()->create());
+
 		$post = PostFactory::new()
 			->newBlog()
 			->create();
