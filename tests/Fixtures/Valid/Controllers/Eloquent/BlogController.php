@@ -7,7 +7,9 @@ use TenantCloud\GraphQLPlatform\Connection\UseConnections;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Transactional;
 use Tests\Fixtures\Valid\Models\Eloquent\Blog;
 use Tests\Fixtures\Valid\Models\Eloquent\Data\CreateBlogData;
+use Tests\Fixtures\Valid\Models\Eloquent\User;
 use TheCodingMachine\GraphQLite\Annotations\Cost;
+use TheCodingMachine\GraphQLite\Annotations\InjectUser;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
@@ -28,9 +30,12 @@ class BlogController
 
 	#[Mutation]
 	#[Transactional]
-	public function createBlog(CreateBlogData $data): Blog
-	{
+	public function createBlog(
+		#[InjectUser] User $auth,
+		CreateBlogData $data
+	): Blog {
 		$blog = new Blog();
+		$blog->owner()->associate($auth);
 		$blog->name = $data->name;
 		$blog->save();
 

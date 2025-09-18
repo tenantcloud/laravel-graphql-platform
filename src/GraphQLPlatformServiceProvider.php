@@ -44,6 +44,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use TenantCloud\GraphQLPlatform\Context\Context;
 use TenantCloud\GraphQLPlatform\Context\ContextToken;
+use TenantCloud\GraphQLPlatform\Laravel\Auth\Authorization\AuthorizeFieldMiddleware;
+use TenantCloud\GraphQLPlatform\Laravel\Auth\Authorization\RequestCachingGate;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthenticationService;
 use TenantCloud\GraphQLPlatform\Laravel\Auth\LaravelAuthorizationService;
 use TenantCloud\GraphQLPlatform\Laravel\Container\GiveNewApplicationInstanceToContainerHandle;
@@ -273,6 +275,9 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 				->addFieldMiddleware(new RelationFieldMiddleware(
 					$app->make(self::CONTAINER_HANDLE),
 				))
+				->addFieldMiddleware(new AuthorizeFieldMiddleware(
+					$app->factory(RequestCachingGate::class),
+				))
 				->addFieldMiddleware(new SecurityFieldMiddleware(
 					$app->make('graphqlite.expression_language'),
 					$app->make(AuthenticationServiceInterface::class),
@@ -394,6 +399,8 @@ class GraphQLPlatformServiceProvider extends ServiceProvider
 
 		$this->app->bind(AuthenticationServiceInterface::class, LaravelAuthenticationService::class);
 		$this->app->bind(AuthorizationServiceInterface::class, LaravelAuthorizationService::class);
+
+		$this->app->scoped(RequestCachingGate::class);
 	}
 
 	private function registerContainer(): void

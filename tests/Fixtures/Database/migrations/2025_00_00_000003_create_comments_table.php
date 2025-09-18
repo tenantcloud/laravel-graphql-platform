@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Tests\Fixtures\Valid\Models\Eloquent\Comment;
 use Tests\Fixtures\Valid\Models\Eloquent\Post;
+use Tests\Fixtures\Valid\Models\Eloquent\User;
 
 return new class () extends Migration {
 	/**
@@ -14,6 +15,7 @@ return new class () extends Migration {
 	{
 		Schema::create('comments', function (Blueprint $table) {
 			$table->id();
+			$table->foreignIdFor(User::class, 'author_id');
 			$table->foreignIdFor(Post::class);
 			$table->foreignIdFor(Comment::class, 'parent_id')
 				->nullable();

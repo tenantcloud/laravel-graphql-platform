@@ -2,6 +2,12 @@
 
 namespace Tests;
 
+use GraphQL\Error\DebugFlag;
+use GraphQL\Error\Error;
+use GraphQL\Error\FormattedError;
+use GraphQL\Server\ServerConfig;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -13,10 +19,14 @@ use TenantCloud\GraphQLPlatform\Schema\SchemaConfigurator;
 use TenantCloud\GraphQLPlatform\Subscription\Transport\SubscriptionTransportManager;
 use TenantCloud\GraphQLPlatform\Testing\FakeSubscriptionTransport;
 use Tests\Fixtures\Valid\Models\Eloquent\User;
+use Tests\Fixtures\Valid\Policies\UserPolicy;
 use Tests\Fixtures\Valid\TypeMappers\AnyRootTypeMapper;
+use TheCodingMachine\GraphQLite\Exceptions\GraphQLException;
+use TheCodingMachine\GraphQLite\Exceptions\WebonyxErrorHandler;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryContext;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperFactoryInterface;
 use TheCodingMachine\GraphQLite\Mappers\Root\RootTypeMapperInterface;
+use Throwable;
 
 use function Orchestra\Testbench\package_path;
 
@@ -32,6 +42,25 @@ abstract class TestCase extends BaseTestCase
 		parent::setUp();
 
 		$this->afterApplicationCreated(function () {
+			UserPolicy::$calledTimes = 0;
+
+			$this->app->extend(ServerConfig::class, static function (ServerConfig $config, Application $app) {
+				$formatter = FormattedError::prepareFormatter(
+					WebonyxErrorHandler::errorFormatter(...),
+					DebugFlag::RETHROW_UNSAFE_EXCEPTIONS | DebugFlag::INCLUDE_TRACE
+				);
+
+				$config->setErrorFormatter(function (Throwable $error) use ($formatter) {
+					if ($error instanceof Error && $error->getPrevious() instanceof AuthorizationException) {
+						$error = new GraphQLException($error->getPrevious()->getMessage());
+					}
+
+					return $formatter($error);
+				});
+
+				return $config;
+			});
+
 			$this->app->extend(
 				SchemaConfigurator::class,
 				fn (SchemaConfigurator $configurator) => $configurator

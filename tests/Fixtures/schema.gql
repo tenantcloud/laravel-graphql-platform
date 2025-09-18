@@ -8,6 +8,12 @@ type BlogOffsetConnection {
 	edges: [BlogOffsetEdge]!
 }
 
+"The `EmailAddress` scalar type represents an email address, conforming to [`email address` part of the `HTML`](https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address) standard."
+scalar EmailAddress
+
+"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
+scalar DateTime
+
 input CommentsDataInput {
 	"Constraints: Range(min: 1, max: 5)"
 	minRating: Float = null
@@ -87,7 +93,15 @@ type Post {
 	readTime: Duration
 }
 
+type User {
+	id: ID!
+	name: String!
+	email: EmailAddress!
+	emailVerifiedAt: DateTime
+}
+
 type Blog {
+	owner: User!
 	posts: [Post!]!
 	postsCount(search: String = null): Int
 	id: ID!
@@ -97,6 +111,7 @@ type Blog {
 }
 
 type Comment {
+	author: User!
 	parent: Comment
 	id: ID!
 	content: String!
@@ -108,9 +123,6 @@ input ScalarsDataInput {
 	duration: Duration!
 	date: Date = null
 }
-
-"The `DateTime` scalar type represents a point in time in UTC timezone, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) standard, such as `2025-02-25T14:55:33.030448Z`."
-scalar DateTime
 
 "The `Date` scalar type represents a date, conforming to [`ISO-8601`](https://en.wikipedia.org/wiki/ISO_8601#Dates) standard, such as `2025-02-25`."
 scalar Date

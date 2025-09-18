@@ -31,6 +31,6 @@ class PostFactory extends Factory
 
 	public function newBlog(): self
 	{
-		return $this->forBlog(BlogFactory::new());
+		return $this->forBlog(BlogFactory::new()->newOwner());
 	}
 }

@@ -31,9 +31,11 @@ class ConnectionTest extends IntegrationTestCase
 	#[Test]
 	public function returnsOffsetConnectionUsingDefaultLimitAndOffset(): void
 	{
-		$blog = BlogFactory::new()->create([
-			'name' => 'Alex Blog',
-		]);
+		$blog = BlogFactory::new()
+			->newOwner()
+			->create([
+				'name' => 'Alex Blog',
+			]);
 
 		$this
 			->graphQL(
@@ -59,6 +61,7 @@ class ConnectionTest extends IntegrationTestCase
 	public function returnsOffsetConnectionUsingOffsetConnectable(): void
 	{
 		BlogFactory::new()
+			->newOwner()
 			->count(2)
 			->create([
 				'name' => 'Alex Blog',
@@ -99,9 +102,11 @@ class ConnectionTest extends IntegrationTestCase
 	#[Test]
 	public function returnsCursorConnectionUsingCursorConnectable(): void
 	{
-		$blog = BlogFactory::new()->create([
-			'name' => 'Alex Blog',
-		]);
+		$blog = BlogFactory::new()
+			->newOwner()
+			->create([
+				'name' => 'Alex Blog',
+			]);
 
 		$this
 			->graphQL(
@@ -150,9 +155,11 @@ class ConnectionTest extends IntegrationTestCase
 	#[Test]
 	public function returnsOffsetAndCursorConnectionsUsingConnectable(): void
 	{
-		$blog = BlogFactory::new()->create([
-			'name' => 'Alex Blog',
-		]);
+		$blog = BlogFactory::new()
+			->newOwner()
+			->create([
+				'name' => 'Alex Blog',
+			]);
 
 		$this
 			->graphQL(

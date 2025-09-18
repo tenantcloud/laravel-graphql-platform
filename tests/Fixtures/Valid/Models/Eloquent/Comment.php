@@ -18,6 +18,15 @@ use TheCodingMachine\GraphQLite\Annotations\Type;
 class Comment extends Model
 {
 	/**
+	 * @return BelongsTo<User, $this>
+	 */
+	#[Field]
+	public function author(): BelongsTo
+	{
+		return $this->belongsTo(User::class);
+	}
+
+	/**
 	 * @return BelongsTo<Post, $this>
 	 */
 	public function post(): BelongsTo
