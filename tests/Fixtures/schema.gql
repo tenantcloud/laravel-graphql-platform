@@ -77,6 +77,7 @@ type BlogOffsetEdge {
 scalar Any
 
 type Post {
+	commentsCount: Int
 	comments(
 		data: CommentsDataInput = null
 		parent: ID = null
@@ -87,7 +88,7 @@ type Post {
 }
 
 type Blog {
-	posts: [Post]
+	posts: [Post!]!
 	postsCount(search: String = null): Int
 	id: ID!
 
@@ -225,6 +226,7 @@ type BlogOtherOffsetEdge {
 type Mutation {
 	createBlog(data: CreateBlogDataInput!): Blog!
 	createComment(data: CreateCommentDataInput!): Comment!
+	updateComment(data: UpdateCommentDataInput!): Comment!
 	deleteComment(comment: ID!): Void
 	createPost(data: CreatePostDataInput!): Post!
 	updatePost(data: UpdatePostDataInput!): Post!
@@ -240,6 +242,11 @@ input CreateCommentDataInput {
 	post: ID!
 	parent: ID = null
 	content: String!
+}
+
+input UpdateCommentDataInput {
+	comment: ID!
+	parent: ID
 }
 
 "The `Void` scalar type represents no value being returned."

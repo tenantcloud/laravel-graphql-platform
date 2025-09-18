@@ -3,8 +3,8 @@
 namespace TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID;
 
 use Illuminate\Database\Eloquent\Model;
-use ReflectionNamedType;
 use ReflectionProperty;
+use TenantCloud\GraphQLPlatform\MissingValue\MissingValueTypes;
 use TheCodingMachine\GraphQLite\InputField;
 use TheCodingMachine\GraphQLite\InputFieldDescriptor;
 use TheCodingMachine\GraphQLite\Middlewares\InputFieldHandlerInterface;
@@ -23,7 +23,9 @@ class ModelIDInputFieldMiddleware implements InputFieldMiddlewareInterface
 			default                                                         => null,
 		};
 
-		if (!$type instanceof ReflectionNamedType || !is_a($type->getName(), Model::class, true)) {
+		$type = MissingValueTypes::nativeNamedTypeWithoutMissingValue($type);
+
+		if (!$type || !is_a($type->getName(), Model::class, true)) {
 			return $inputFieldHandler->handle($inputFieldDescriptor);
 		}
 
