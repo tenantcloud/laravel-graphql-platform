@@ -4,9 +4,11 @@ namespace Tests\Fixtures\Valid\Controllers\Eloquent;
 
 use TenantCloud\GraphQLPlatform\Laravel\Database\Model\ID\ModelID;
 use TenantCloud\GraphQLPlatform\Laravel\Database\Transactional;
+use TenantCloud\GraphQLPlatform\MissingValue;
 use TenantCloud\GraphQLPlatform\Subscription\ChannelSubscription;
 use Tests\Fixtures\Valid\Models\Eloquent\Comment;
 use Tests\Fixtures\Valid\Models\Eloquent\Data\CreateCommentData;
+use Tests\Fixtures\Valid\Models\Eloquent\Data\UpdateCommentData;
 use Tests\Fixtures\Valid\Models\Eloquent\Post;
 use Tests\Fixtures\Valid\Models\Eloquent\User;
 use TheCodingMachine\GraphQLite\Annotations\InjectUser;
@@ -26,6 +28,21 @@ class CommentController
 		$comment->post()->associate($data->post);
 		$comment->parent()->associate($data->parent);
 		$comment->content = $data->content;
+		$comment->save();
+
+		return $comment;
+	}
+
+	#[Mutation]
+	#[Transactional]
+	public function updateComment(UpdateCommentData $data): Comment
+	{
+		$comment = $data->comment;
+
+		if ($data->parent !== MissingValue::INSTANCE) {
+			$comment->parent()->associate($data->parent);
+		}
+
 		$comment->save();
 
 		return $comment;

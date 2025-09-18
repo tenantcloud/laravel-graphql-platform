@@ -172,4 +172,32 @@ class ModelIDTest extends IntegrationTestCase
 			->assertSuccessful()
 			->assertCount(1, 'nodes.0.posts.0.comments.offset.nodes');
 	}
+
+	#[Test]
+	public function ignoresMissing(): void
+	{
+		$comment = CommentFactory::new()
+			->newPost()
+			->create();
+
+		// In input fields
+		$this
+			->graphQL(
+				<<<'GRAPHQL'
+					mutation ($data: UpdateCommentDataInput!) {
+						updateComment(data: $data) {
+							id
+						}
+					}
+					GRAPHQL,
+				['data' => [
+					'comment' => $comment->id,
+				]]
+			)
+			->assertSuccessful();
+
+		$comment->refresh();
+
+		self::assertNull($comment->parent);
+	}
 }
