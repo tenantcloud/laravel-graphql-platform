@@ -1,3 +1,10 @@
+# [1.0.0-alpha.14](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.13...v1.0.0-alpha.14) (2025-09-18)
+
+
+### Features
+
+* Authorize attribute ([#21](https://github.com/tenantcloud/laravel-graphql-platform/issues/21)) ([dcdb3c6](https://github.com/tenantcloud/laravel-graphql-platform/commit/dcdb3c6c7f986d03e9c1b2a7da49f5207a8abf9a))
+
 # [1.0.0-alpha.13](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.12...v1.0.0-alpha.13) (2025-09-18)
 
 
