@@ -1,3 +1,10 @@
+# [1.0.0-alpha.13](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.12...v1.0.0-alpha.13) (2025-09-18)
+
+
+### Bug Fixes
+
+* Model ID + MissingValue ([#22](https://github.com/tenantcloud/laravel-graphql-platform/issues/22)) ([ff18e71](https://github.com/tenantcloud/laravel-graphql-platform/commit/ff18e712395672210dacbe85d0f05b39dc83f7eb))
+
 # [1.0.0-alpha.12](https://github.com/tenantcloud/laravel-graphql-platform/compare/v1.0.0-alpha.11...v1.0.0-alpha.12) (2025-09-04)
 
 
