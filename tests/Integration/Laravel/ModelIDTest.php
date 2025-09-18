@@ -178,6 +178,7 @@ class ModelIDTest extends IntegrationTestCase
 	{
 		$comment = CommentFactory::new()
 			->newPost()
+			->newAuthor()
 			->create();
 
 		// In input fields
